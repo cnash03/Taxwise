@@ -43,6 +43,23 @@ dotnet build src/TaxWise.App -t:Run -f net10.0-maccatalyst   # desktop app (need
 
 The App reads `ApiBaseUrl` from `src/TaxWise.App/appsettings.json` (default `http://localhost:5080`).
 
+## Ingest the IRS documents
+
+The sources are listed in [`data/sources/manifest.json`](data/sources/manifest.json). The PDFs download to `data/sources/pdf/` (gitignored).
+
+```bash
+dotnet run --project src/TaxWise.Ingestion -- --download --dry-run   # download, parse, chunk, write ingest-report.json (no keys needed)
+dotnet run --project src/TaxWise.Ingestion -- --spot-check           # embed with Voyage, upsert into Qdrant, run the acceptance searches
+```
+
+Options: `--only <docId>`, `--year <2025|2026|2027>`, `--recreate` (drop the collection first), `--spot-check-only`, `--qdrant-host <h> --qdrant-api-key <k>` (Qdrant Cloud).
+
+- **Edition check.** Each run prints the tax year read from each PDF's cover (or, for a Rev. Proc., from its section heading). A mismatch stops the run before anything is embedded. `irs.gov/pub/irs-pdf/` always serves the newest edition, so when the IRS posts a new year, point the manifest at the `irs-prior/` copy. The W-2/W-3 and 1098-E/T instructions already point there.
+- **Changed files.** The manifest stores each PDF's sha256. If a re-download doesn't match, the run stops so a human can check the new edition.
+- **Re-runs are idempotent.** Point ids derive from the chunk id, and each (document, year) is replaced as a whole, so re-running never duplicates or leaves stale chunks.
+- **Sanity check.** `data/sources/ingest-report.json` has chunk counts per document, average size, and the 10 shortest and longest chunks.
+- **Voyage rate limits.** A Voyage account without a payment method is capped at 3 requests and 10K tokens per minute, which can't fit even one embedding batch. Add a payment method in the Voyage dashboard; the free token allowance still applies.
+
 ## Build and test
 
 ```bash
