@@ -24,7 +24,7 @@ Dependencies point one way: `Shared ← Core ← Rag ← {Api, Ingestion, Eval}`
 2. **MAUI workload** (only needed for the App): `sudo dotnet workload install maui`.
 3. **Xcode** (only needed for the App on Mac Catalyst): install it from the App Store, then run `sudo xcode-select -s /Applications/Xcode.app` and open Xcode once to accept the license.
 4. **Docker Desktop**, for the local Qdrant vector store.
-5. **Secrets** (from Phase 1 on), via user-secrets. Never commit keys:
+5. **Secrets** (from Phase 1 on), via user-secrets. The API and Ingestion share one secrets store (`UserSecretsId` `taxwise-dev`), so set each key once. Never commit keys:
    ```
    dotnet user-secrets --project src/TaxWise.Api set ANTHROPIC_API_KEY <key>
    dotnet user-secrets --project src/TaxWise.Api set Voyage:ApiKey <key>

@@ -6,6 +6,8 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
+    <!-- Shared with the other TaxWise hosts so one `dotnet user-secrets set` covers them all. -->
+    <UserSecretsId>taxwise-dev</UserSecretsId>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
