@@ -50,4 +50,14 @@ public sealed class AnswerPromptTests
         Assert.Contains("\"enum\":[\"P1\",\"P2\",\"P3\",\"P4\"]", json);
         Assert.Contains("\"additionalProperties\":false", json);
     }
+
+    [Fact]
+    public void Schema_HasNoMaxItems()
+    {
+        // The API 400s on it (seen live: "For 'array' type, property 'maxItems' is not supported").
+        // CitationValidator caps follow-ups instead.
+        var json = System.Text.Json.JsonSerializer.Serialize(AnswerPrompt.Schema);
+
+        Assert.DoesNotContain("\"maxItems\"", json);
+    }
 }

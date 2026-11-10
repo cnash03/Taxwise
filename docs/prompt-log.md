@@ -205,12 +205,13 @@ Entries are append-only. The overall summary is in [AI_USAGE.md](AI_USAGE.md).
   - **Pro subscription vs API.** The AI explained that the $20 Claude Pro plan doesn't include API access.
   - **`claude -p` rejected.** We asked whether the app could shell out to `claude -p` on our subscription instead. The AI advised against it: it breaks on App Service (no CLI and no login there), a personal subscription can't power an app other people use, and starting a process for each question adds seconds. We agreed.
   - **Credentials: AI recommended a Console API key with prepaid credits → we used `ant auth login` with our Mines organization account instead.** The C# SDK's zero-argument `AnthropicClient` picks up that OAuth profile when `ANTHROPIC_API_KEY` is unset, and `ClaudeAnswerer`'s DI registration already falls back to it, so no code change was needed. Production still reads `ANTHROPIC_API_KEY` from an App Service setting.
+  - **Teammate access: AI offered a separate `ant auth login` per person or a shared key → we chose a shared API key.** It's easier for the teammate, and the deployed API needs a key anyway. We created it, and `docs/SETUP.md` step 3 now covers saving and checking it.
   - **Cheaper model for testing (our call).** We switched dev to Sonnet 5.5, which costs half as much as Opus 5.5 ($2/$10 vs $4/$20 per million tokens). The AI picked Sonnet over Haiku 4.5 because Haiku rejects the `effort` setting that `ClaudeAnswerer` sends.
 - **Verified by:**
   - `ant auth status`: logged in to the Mines organization with the `user:inference` scope.
   - `dotnet test`: 98/98 pass. The full `dotnet build` fails only in `TaxWise.App`, because the MacCatalyst workload needs Xcode 27.1 and 27.2 is installed. That's unrelated to this change.
-  - **Not yet verified:** no live `/api/ask` call has run with the `ant` credentials or with Sonnet 5.5, so the Phase 2 acceptance check is still pending.
-- **Worked?** Yes for the question and the config. The live check is still to do.
+  - **Live Phase 2 acceptance check, run after we added an API key:** the first `/api/ask` call failed with a 400, because the answer schema used `maxItems`, which structured outputs don't support. Unit tests couldn't catch this, since they use a fake answerer. We removed it (`CitationValidator` already caps follow-ups at 2) and added a test that keeps it out. On the rerun, "Is my scholarship taxable?" returned 200 with 4 paragraphs citing Pub 970 Ch. 1 (pp. 5–6) and Pub 519, citation numbers 1–3, `validator=ok`, 0 citations removed, `claude-sonnet-5-5`, 6.0 s. That's 99/99 tests.
+- **Worked?** Yes. The question was answered, the config changed, and the live check passed after a schema fix.
 - **Human change:** nothing yet. We ran `ant auth login` ourselves.
 - **AI limits seen:**
   - Its first answer ("you don't have one") was right about the Pro plan, but it only offered a paid Console key. It didn't mention that a university organization login through `ant auth login` might already give API access. We brought that option.

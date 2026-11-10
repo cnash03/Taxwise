@@ -48,7 +48,13 @@ dotnet user-secrets --project src/TaxWise.Api set ANTHROPIC_API_KEY <key>
 dotnet user-secrets --project src/TaxWise.Api set Voyage:ApiKey <key>
 ```
 
-The API and Ingestion share one secrets store, so you set each key only once.
+The API and Ingestion share one secrets store, so you set each key only once. Check both are there (this prints the values, so don't share the output):
+
+```
+dotnet user-secrets --project src/TaxWise.Api list
+```
+
+The Anthropic key is only used by `POST /api/ask`. Local runs use Claude Sonnet 5.5 to keep testing cheap (`appsettings.Development.json`); the deployed API uses Opus 5.5.
 
 ## 4. Run it
 
@@ -74,7 +80,13 @@ Add `--dry-run` to parse and chunk without calling Voyage or Qdrant. Add `--recr
 dotnet run --project src/TaxWise.Api --launch-profile http
 ```
 
-Check http://localhost:5080/health.
+Check http://localhost:5080/health, then ask a real question to confirm the Anthropic key works:
+
+```
+curl -X POST http://localhost:5080/api/ask -H "content-type: application/json" -d "{\"question\":\"Is my scholarship taxable?\",\"plainLanguage\":false,\"taxYear\":2025}"
+```
+
+You should get an answer citing Pub 970. In PowerShell, use `curl.exe` instead of `curl`.
 
 **Start the desktop App** in a second terminal, with the API still running:
 
@@ -105,6 +117,7 @@ If you use other AI tools (ChatGPT, Copilot, …), mention them when `/ai-report
 |---|---|
 | `Connection refused` on port 6334 | Docker isn't running, or you skipped `docker compose up -d`. |
 | `401` or `Unauthorized` from Voyage/Anthropic | Key missing or wrong. Run `dotnet user-secrets --project src/TaxWise.Api list`. |
+| `/api/ask` returns `502` | Usually the Anthropic key is missing or wrong. The API log line says which. |
 | Ports 5080, 6333, or 6334 already in use | Stop whatever is using them, or run `docker compose down` and try again. |
 | App build fails with a workload error | Run `dotnet workload install maui` (as Administrator on Windows). |
 | No AI logs appear | Check that `jq --version` works. On Windows, check that Git Bash is installed. |
