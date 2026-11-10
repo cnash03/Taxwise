@@ -20,6 +20,8 @@ Dependencies point one way: `Shared ← Core ← Rag ← {Api, Ingestion, Eval}`
 
 ## Setup (macOS)
 
+On Windows or Linux, or if you're new to the project, follow [docs/SETUP.md](docs/SETUP.md) instead.
+
 1. **.NET 10 SDK:** `brew install --cask dotnet-sdk` (asks for your password).
 2. **MAUI workload** (only needed for the App): `sudo dotnet workload install maui`.
 3. **Xcode** (only needed for the App on Mac Catalyst): install it from the App Store, then run `sudo xcode-select -s /Applications/Xcode.app` and open Xcode once to accept the license.
