@@ -1,0 +1,10 @@
+<Project>
+  <!-- Shared settings for every project. TargetFramework stays in each csproj because
+       TaxWise.App multi-targets (maccatalyst/windows); setting it here would break that. -->
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+</Project>

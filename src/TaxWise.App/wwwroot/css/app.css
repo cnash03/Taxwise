@@ -1,0 +1,186 @@
+/* TaxWise design tokens, taken from the Figma mockups (BUILD_PLAN §5, Phase 3). */
+:root {
+    --sidebar-bg: #123038;
+    --sidebar-text: #d7e4e6;
+    --sidebar-muted: #8aa5aa;
+    --sidebar-active-bg: rgba(255, 255, 255, 0.08);
+    --accent: #0F7A75;
+    --chip-bg: #FDF0D5;
+    --page-bg: #f6f7f7;
+    --surface: #ffffff;
+    --text: #1d2a2d;
+    --text-muted: #5d6b6e;
+    --border: #e1e6e7;
+    --ok: #2fbf71;
+    --down: #d9534f;
+    --pending: #b7c3c5;
+    --radius: 10px;
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+    margin: 0;
+    height: 100%;
+    font-family: var(--font);
+    color: var(--text);
+    background: var(--page-bg);
+}
+
+h1:focus { outline: none; }
+
+:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.app-loading {
+    display: grid;
+    place-items: center;
+    height: 100vh;
+    color: var(--text-muted);
+}
+
+/* ---------- Shell ---------- */
+
+.shell {
+    display: flex;
+    height: 100vh;
+}
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    width: 248px;
+    flex-shrink: 0;
+    padding: 20px 14px;
+    background: var(--sidebar-bg);
+    color: var(--sidebar-text);
+}
+
+.main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 28px 36px;
+}
+
+/* ---------- Brand + health dot ---------- */
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 8px 22px;
+}
+
+.brand-mark {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+}
+
+.brand-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.health-dot {
+    width: 9px;
+    height: 9px;
+    margin-left: auto;
+    border-radius: 50%;
+    background: var(--pending);
+}
+
+.health-dot.up { background: var(--ok); box-shadow: 0 0 0 3px rgba(47, 191, 113, 0.2); }
+.health-dot.down { background: var(--down); }
+
+/* ---------- Nav ---------- */
+
+.nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.nav-item {
+    display: block;
+    padding: 10px 12px;
+    border-radius: 8px;
+    color: var(--sidebar-text);
+    text-decoration: none;
+    font-size: 0.95rem;
+}
+
+.nav-item:hover { background: var(--sidebar-active-bg); }
+
+.nav-item.active {
+    background: var(--sidebar-active-bg);
+    color: #fff;
+    box-shadow: inset 3px 0 0 var(--accent);
+}
+
+/* ---------- Knowledge base footer ---------- */
+
+.kb-footer {
+    margin-top: auto;
+    padding: 14px 12px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.kb-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--sidebar-muted);
+}
+
+.kb-detail {
+    margin-top: 4px;
+    font-size: 0.85rem;
+}
+
+/* ---------- Pages ---------- */
+
+.page-header h1 {
+    margin: 0 0 20px;
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+.empty-state {
+    padding: 28px;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--text-muted);
+}
+
+/* ---------- Blazor error UI ---------- */
+
+#blazor-error-ui {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 0.6rem 1.25rem 0.7rem;
+    background: lightyellow;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+}
+
+#blazor-error-ui .dismiss {
+    position: absolute;
+    right: 0.75rem;
+    top: 0.5rem;
+    cursor: pointer;
+}

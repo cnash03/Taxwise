@@ -1,0 +1,57 @@
+@implements IDisposable
+@inject ApiHealthClient Health
+
+<span class="health-dot @(_healthy switch { true => "up", false => "down", null => "pending" })"
+      role="status"
+      title="@Label"
+      aria-label="@Label"></span>
+
+@code {
+    private static readonly TimeSpan PollInterval = TimeSpan.FromSeconds(10);
+    private readonly CancellationTokenSource _cts = new();
+    private bool? _healthy;
+
+    private string Label => _healthy switch
+    {
+        true => "API connected",
+        false => "API unreachable",
+        null => "Checking API…",
+    };
+
+    protected override void OnInitialized() => _ = PollAsync(_cts.Token);
+
+    private async Task PollAsync(CancellationToken cancellationToken)
+    {
+        using var timer = new PeriodicTimer(PollInterval);
+        do
+        {
+            var healthy = await Health.IsHealthyAsync(cancellationToken);
+            if (cancellationToken.IsCancellationRequested)
+                return;
+            if (healthy != _healthy)
+            {
+                _healthy = healthy;
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        while (await WaitAsync(timer, cancellationToken));
+    }
+
+    private static async Task<bool> WaitAsync(PeriodicTimer timer, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await timer.WaitForNextTickAsync(cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            return false;
+        }
+    }
+
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+    }
+}
