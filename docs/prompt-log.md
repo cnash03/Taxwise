@@ -64,3 +64,107 @@ Entries are append-only. The overall summary is in [AI_USAGE.md](AI_USAGE.md).
   - Deviated from BUILD_PLAN §2 on purpose: `TargetFramework` stays in each csproj rather than in `Directory.Build.props`, because the multi-targeting App would break otherwise.
   - The logging hook filed 9 events under the macOS user `callennash` with no branch while Xcode was being set up, most likely because `/usr/bin/git` fails until the Xcode license is accepted. Found during `/ai-report` and merged back into `cnash03`.
 - **Tag:** partial. We overrode the AI's suggested "success": every acceptance check passes, but it needed too much from us (two sudo installs, Xcode, and a broken copy-paste command).
+
+### 2026-11-10 · Phase 1 · Claude Code (claude-opus-5-5) · @cnash03 · session `cc8e27f2`
+- **Role:** execution agent, Phase 1 (ingestion), branch `phase-1-ingestion`. We asked for Phase 2. The agent found that Phase 1 hadn't been built yet and stopped to ask.
+- **Prompt:** "start phase 2 of the build_plan.md"
+  - Follow-ups: "approved, go ahead" (plan approval), "added a payment method, run the spot check", "yes, commit and open the PR".
+- **Generated:** the ingestion pipeline, commit `262d044` (46 files, +2,640 lines), PR #3:
+  - `data/sources/manifest.json` (9 IRS sources, sha256 tracking)
+  - a PdfPig layout reader
+  - section and Rev. Proc. chunkers in `TaxWise.Core/Chunking` (pure code)
+  - `VoyageClient` with jittered retry
+  - `QdrantChunkStore`
+  - the ingestion CLI (`--download`, `--dry-run`, `--recreate`, `--only`, `--year`, `--spot-check`)
+  - `ingest-report.json`
+  - 49 new xUnit tests
+- **Human decisions:** 1 checkpoint with 3 questions, all answered with the recommended or factual option. "Do Phase 1 first (Recommended)" over building Phase 2 against fakes; Docker "installed, not on PATH"; API keys "not yet". We approved the restated Phase 1 plan before any code was written. **We tagged the session partial, overriding the AI's suggested "success"**: it needed us for Voyage billing, and it changed an acceptance check we hadn't asked it to change.
+- **Verified by:**
+  - fetched the Voyage embeddings and rerank API reference before writing the client (BUILD_PLAN §4.2 says not to guess field names)
+  - downloaded all 9 IRS PDFs and probed their fonts, layout and covers with throwaway PdfPig scripts before writing the parser
+  - `dotnet build` and `dotnet test` on `TaxWise.CI.slnf`: 50 tests pass
+  - a live ingest of 1,487 chunks into Qdrant; a second run without `--recreate` still gave 1,487 points (no duplicates)
+  - `--spot-check-only`: §3.15 (TY2027) and §4.14 (TY2026) standard-deduction chunks ranked #1 at relevance 0.878, and the demo scholarship question returns Pub 970 Ch. 1, p. 5 at #1
+- **Worked?** yes, after one acceptance check was reworded (see AI limits).
+- **Human change:** added a payment method to the Voyage account. No code edits.
+- **AI caught in our materials:**
+  - **BUILD_PLAN is wrong about Rev. Proc. 2026-35.** The 2027 amounts are in **§3**, not §4, so the standard deduction is §3.15. The Phase 5 source comments must cite §3.xx.
+  - The plan's `irs-pdf/` URLs for the W-2/W-3 and 1098-E/T instructions already serve the **2026** editions. The manifest points at the `irs-prior/…--2025.pdf` copies, and the agent's cover-year check now catches this automatically.
+  - Real IRS chapter headings are a large "1." plus a title, not "Chapter 1" as the plan assumed.
+- **AI limits seen:**
+  - **The first chunker failed on real data.** Chunks averaged 290 tokens (target 350–700), with a quarter under 100, Pub 970 detected no chapters, and section labels were noisy. Pub 970 lost its chapters because its own running-header filter dropped the big "1." chapter number. It took 4 rounds of measuring the chunks against the real PDFs to fix.
+  - Guessed two library API names wrong: PdfPig's `DocstrumBoundingBox` is really `DocstrumBoundingBoxes`, and Qdrant's `Match(field, string)` is `MatchKeyword`. Both were fixed from compiler errors, as BUILD_PLAN §4 says to.
+  - `dotnet add package` again picked .NET 11 (`Microsoft.Extensions.*` 11.0.0), the same problem as Phase 0. It pinned 10.0.15.
+  - **The bare "room and board" spot check failed.** The top hits were Pub 970 Ch. 7 (529 plans) and the dependency support rules. The agent made it an informational row and added two scholarship questions as the pass/fail checks. It flagged the change to us and in the PR, but it is still the agent changing its own acceptance criteria.
+  - Voyage returned 429 without a payment method on the account (3 requests and 10K tokens per minute), so live ingestion was blocked until we added one. Session `0640c1d8` had predicted this.
+  - **Two Claude sessions worked on the same branch at once.** Mid-build, this agent noticed files changing that it hadn't edited (`UserSecretsId`, README). It inspected them, showing the stored secret only as `****`, and built on them rather than overwriting them.
+- **Tag:** partial
+
+### 2026-11-10 · Phase 1 setup · Claude Code (claude-opus-5-5) · @cnash03 · session `0640c1d8`
+- **Role:** ad-hoc (secrets and environment setup for Phase 1). It ran alongside `cc8e27f2` on the same branch.
+- **Prompt:** "help me set up the voyager api keys and what not that i need for phase 1 of the project"
+  - Follow-up: "yes commit it"
+- **Generated:** a shared `UserSecretsId` (`taxwise-dev`) for `TaxWise.Api` and `TaxWise.Ingestion`, `src/TaxWise.Ingestion/Properties/launchSettings.json` (runs ingestion as Development so user secrets load), and a README line. Commit `90a7b15`.
+- **Human decisions:** no checkpoints. We followed its steps: created the Voyage key and saved it in our own terminal.
+- **Verified by:** listed the existing secrets with values redacted. Its reply says the CI build still passes.
+- **Worked?** yes. The key loaded in `cc8e27f2` with no further setup.
+- **Human change:** none.
+- **AI limits seen:**
+  - **It told us to save the key in our own terminal, not in chat, "so it doesn't end up in the AI logs".** The logs confirm the key never appears.
+  - **It predicted the Voyage rate limit** (3 requests and 10K tokens per minute without a payment method), and said one 128-chunk batch would get stuck. That is exactly what happened in `cc8e27f2`.
+  - Said Docker "isn't installed on this machine" and gave an install command. Docker Desktop was installed and running, just not on that shell's PATH.
+  - **Its commit swept in another session's work.** It said `90a7b15` contained "only the four files I changed", but the Ingestion `.csproj` hunk also carried `cc8e27f2`'s in-progress PdfPig and Hosting package references. The commit was harmless (both were needed), but its claim was wrong. Found during `/ai-report`.
+  - A follow-up "push it" wasn't acted on before the session ended. `e3c316a6` pushed the branch later.
+- **Tag:** success
+
+### 2026-11-10 · Docs · Claude Code (claude-opus-5-5) · @cnash03 · session `e3c316a6`
+- **Role:** ad-hoc (teammate onboarding docs).
+- **Prompt:** "give me a setupguide for my partener - clear concise and not dependent on mac"
+  - Follow-ups: "commit and push the setup guide", then "fill in the url and put it on main".
+- **Generated:** [`docs/SETUP.md`](SETUP.md) (110 lines: tools per OS, clone and build, API keys, run order, AI logging with Git Bash on Windows, troubleshooting) and a README link. Commit `904db03`, which was the first push of `phase-1-ingestion`.
+- **Human decisions:** no checkpoints. We later dropped the "put it on main" request.
+- **Verified by:** nothing was run. It said plainly that it hadn't tested the steps on Windows or Linux.
+- **Worked?** yes for the guide. The final request (fill in the URL, move the guide to `main`) wasn't done before the session ended, and we dropped it.
+- **Human change:** none.
+- **AI limits seen:**
+  - Pushed to the current branch (`phase-1-ingestion`), not `main` where the partner would look. It flagged this right after pushing, offered to move the guide, and pointed out that merging the branch would drag in unfinished ingestion work.
+  - Left `<repo-url>` as a placeholder and flagged it. It is still in the file.
+  - Warned that the guide's ingestion step only works once the Phase 1 code is pushed.
+- **Tag:** success
+
+### 2026-11-10 · Evaluation · Claude Code (claude-opus-5-5) · @cnash03 · session `b1c9df54`
+- **Role:** evaluation agent for Phases 0 and 1, which then became the fixer for two of its own findings. Branch `phase-1-ingestion`. This entry was written by `/ai-report` inside the session it describes, once the work was done.
+- **Prompt:** "evaluate the first 2phases of the build"
+  - Follow-ups: "fix issues 1 and 2 and re-ingest", "yes commit and update the PR".
+- **Generated:**
+  - An evaluation against BUILD_PLAN §4 that read the code, re-ran the checks and **profiled the 1,487 stored chunks straight from Qdrant**. It reported 6 issues, ranked by importance. The top two were:
+    1. 99 chunks (6.7%) were rows from the IRS Tax Table and EIC Table. They embed poorly, and retrieving them would let the model read tax amounts off a row, against BUILD_PLAN §10.
+    2. 584 chunks (39%) had a merged section label such as `Gambling Winnings · Social Security Benefits · …`, which Phase 2 would show in citations.
+  - The fixes:
+    - `SectionChunker` now skips lookup tables up to the next major heading or chapter.
+    - `Chunk.Section` is now the section with the most text in the chunk, and a new `Chunk.Sections` field (payload `sections`) holds the full list. All section names still go into the text that gets embedded.
+    - 7 new tests (57 in total).
+    - A regenerated `ingest-report.json`.
+    - Commit `02441ed` (11 files, +212/−55).
+- **Human decisions:**
+  - The evaluation recommended fixing issues 1 and 2 before merging PR #3 and called issues 3–6 optional. We agreed.
+  - The AI suggested tagging the session "success". **We tagged it partial**, because the commit and push didn't land within the session.
+- **Verified by:**
+  - `dotnet build` (0 warnings) and `dotnet test`: 50 tests before the fixes, 57 after.
+  - CI on PR #3.
+  - A `--dry-run`, then the real `--recreate --spot-check` re-ingest: **1,377 points, matching the report** (only i1040 lost 73 chunks and p17 lost 37).
+  - The spot checks pass: §3.15 for TY2027, §4.14 for TY2026, and both scholarship questions find Pub 970 p. 5.
+  - After the re-ingest, it scrolled the whole collection again: 0 mostly-numeric chunks, 0 `·`-joined section labels, 0 lookup-table sections left.
+- **Worked?** The evaluation and the fixes, yes. Landing the change, partly:
+  - Claude Code's auto-mode safety check blocked the agent's `git commit && git push`, so we ran the commands by hand.
+  - We updated the PR description first, but at that point the code it described wasn't on GitHub yet.
+  - Our first `git commit` didn't land; the agent noticed by checking `git log` rather than trusting "done". We don't know why it failed.
+  - The second commit landed as `02441ed`, but the push didn't run, so the branch is still one commit ahead of `origin`.
+- **Human change:** ran the commit, push and `gh pr edit` commands. No code edits.
+- **AI limits seen:**
+  - **It evaluated the code the previous session wrote and found real problems that session missed or didn't flag.** Phase 1's own report listed the 2-token `"96,000"` chunk and the 798-token table chunk among the shortest and longest chunks, but neither the agent nor we treated them as a problem. The evaluation only found the scale (99 table chunks, 584 merged labels) by querying Qdrant, not by reading the code.
+  - It read "the first 2 phases" as Phases 0 and 1, the two that exist, rather than BUILD_PLAN's Phase 2 (the query pipeline). It said so at the top of its report.
+  - It didn't launch the MAUI app, so the green health dot from Phase 0 wasn't re-verified. It said so in the report.
+  - It found a problem it didn't fix: p17's back matter (Taxpayer Bill of Rights, How To Get Tax Help) is labelled "Chapter 14" in citations. It's left for Phase 2.
+  - It said the uncommitted AI logs should go in with the phase (BUILD_PLAN §0 step 5); they are in `02441ed`.
+- **Tag:** partial

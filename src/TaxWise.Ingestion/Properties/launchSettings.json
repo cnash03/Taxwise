@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "TaxWise.Ingestion": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

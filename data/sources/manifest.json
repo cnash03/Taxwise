@@ -1,0 +1,101 @@
+{
+  "documents": [
+    {
+      "docId": "p17",
+      "title": "Pub 17, Your Federal Income Tax",
+      "url": "https://www.irs.gov/pub/irs-pdf/p17.pdf",
+      "priorYearUrl": "https://www.irs.gov/pub/irs-prior/p17--2025.pdf",
+      "taxYear": 2025,
+      "kind": "publication",
+      "sha256": "2d2381d62c7c77ed4b64b83ac23c28ed85b7c8304eb580c09bd9fd660be0840b"
+    },
+    {
+      "docId": "p970",
+      "title": "Pub 970, Tax Benefits for Education",
+      "url": "https://www.irs.gov/pub/irs-pdf/p970.pdf",
+      "priorYearUrl": "https://www.irs.gov/pub/irs-prior/p970--2025.pdf",
+      "taxYear": 2025,
+      "kind": "publication",
+      "sha256": "167f3d6df0d9370a3980b25b7a2e7b479ab7f336cce763d1f0c1c4962b18285e"
+    },
+    {
+      "docId": "p501",
+      "title": "Pub 501, Dependents, Standard Deduction, and Filing Information",
+      "url": "https://www.irs.gov/pub/irs-pdf/p501.pdf",
+      "priorYearUrl": "https://www.irs.gov/pub/irs-prior/p501--2025.pdf",
+      "taxYear": 2025,
+      "kind": "publication",
+      "sha256": "288b62a4917f3bc3df0bade7a22c23a8ae648ba9eb5086df5b8b50e881148ff6"
+    },
+    {
+      "docId": "p519",
+      "title": "Pub 519, U.S. Tax Guide for Aliens",
+      "url": "https://www.irs.gov/pub/irs-pdf/p519.pdf",
+      "priorYearUrl": "https://www.irs.gov/pub/irs-prior/p519--2025.pdf",
+      "taxYear": 2025,
+      "kind": "publication",
+      "sha256": "c220ed64473d9f26b09784e45d5c4e05b052caace1263278bb6dc2060796ed85"
+    },
+    {
+      "docId": "i1040",
+      "title": "Form 1040 Instructions (incl. Tax Table)",
+      "url": "https://www.irs.gov/pub/irs-pdf/i1040gi.pdf",
+      "priorYearUrl": "https://www.irs.gov/pub/irs-prior/i1040gi--2025.pdf",
+      "taxYear": 2025,
+      "kind": "instructions",
+      "sha256": "482e9c487c608f1bbeaceef35bc3c0933e8b35443cfff447e4279d590468364a"
+    },
+    {
+      "docId": "iw2",
+      "title": "General Instructions for Forms W-2 and W-3",
+      "url": "https://www.irs.gov/pub/irs-prior/iw2w3--2025.pdf",
+      "taxYear": 2025,
+      "kind": "instructions",
+      "sha256": "bfecbc99720cc8fbedb50f6e698ac1f6fa758dbfa5df775715446b7cc30bae2b",
+      "note": "irs-pdf/iw2w3.pdf already serves the 2026 edition (checked 2026-11-10), so this points at the 2025 prior-year copy."
+    },
+    {
+      "docId": "i1098t",
+      "title": "Instructions for Forms 1098-E and 1098-T",
+      "url": "https://www.irs.gov/pub/irs-prior/i1098et--2025.pdf",
+      "taxYear": 2025,
+      "kind": "instructions",
+      "sha256": "68c0f34312f15295ac882e3b4148c0cc93df1f5cf31de8c8f9793258672bafb1",
+      "note": "irs-pdf/i1098et.pdf already serves the 2026 edition (checked 2026-11-10), so this points at the 2025 prior-year copy."
+    },
+    {
+      "docId": "rp-25-32",
+      "title": "Rev. Proc. 2025-32, TY2026 inflation adjustments",
+      "url": "https://www.irs.gov/pub/irs-drop/rp-25-32.pdf",
+      "taxYear": 2026,
+      "kind": "rev-proc",
+      "sha256": "e9ada115fb43a4af5ea326ca91edd40ab0bf29b9be01d2c13d7b8fa96214635b",
+      "revProcSections": [
+        {
+          "number": 4,
+          "taxYear": 2026
+        },
+        {
+          "number": 3,
+          "taxYear": 2025
+        }
+      ],
+      "note": "§4 = 2026 adjusted items; §3 = 2025 items as modified by the OBBBA."
+    },
+    {
+      "docId": "rp-26-35",
+      "title": "Rev. Proc. 2026-35, TY2027 inflation adjustments",
+      "url": "https://www.irs.gov/pub/irs-drop/rp-26-35.pdf",
+      "taxYear": 2027,
+      "kind": "rev-proc",
+      "sha256": "87b383c6ce6e616fd006a61f5eed46fe67099b9c23fb1e1c42ff5359474513b8",
+      "revProcSections": [
+        {
+          "number": 3,
+          "taxYear": 2027
+        }
+      ],
+      "note": "Unlike Rev. Proc. 2025-32, this one puts the adjusted items in §3 (standard deduction is §3.15)."
+    }
+  ]
+}
