@@ -1,0 +1,72 @@
+<aside class="source-panel" aria-label="Source passage">
+    <div class="panel-label">Source passage</div>
+
+    @if (Source is null)
+    {
+        <p class="panel-empty">Click a numbered citation in an answer to see the exact IRS passage it came from.</p>
+    }
+    else
+    {
+        var (before, mark, after) = SourceLabels.SplitHighlight(Source.Text, Highlight);
+        <div class="source-head">
+            <span class="source-number">@Source.Number</span>
+            <div>
+                <div class="source-title">@SourceLabels.ShortTitle(Source.DocTitle)</div>
+                <div class="source-subtitle">@Subtitle</div>
+            </div>
+        </div>
+
+        <div class="tags">
+            <span class="tag">Tax year @Source.TaxYear</span>
+            @if (SourceLabels.ShortChapter(Source.Chapter) is { } chapter)
+            {
+                <span class="tag">@chapter</span>
+            }
+            <span class="tag">Page @Source.Page</span>
+        </div>
+
+        <h3 class="source-section">@Source.Section</h3>
+
+        <div class="passage">@before@if (mark is not null){<mark @ref="_mark">@mark</mark>}@after</div>
+
+        @if (mark is null && Highlight is not null)
+        {
+            <p class="panel-note">The quoted sentence couldn't be matched exactly, so nothing is highlighted.</p>
+        }
+
+        <button class="btn btn-primary open-pdf" @onclick="() => OnOpenPdf.InvokeAsync(Source)">Open page @Source.Page in the PDF</button>
+    }
+</aside>
+
+@code {
+    private ElementReference _mark;
+    private string? _scrolledFor;
+
+    [Inject] private IJSRuntime JS { get; set; } = default!;
+
+    [Parameter] public SourcePassage? Source { get; set; }
+    [Parameter] public string? Highlight { get; set; }
+    [Parameter] public EventCallback<SourcePassage> OnOpenPdf { get; set; }
+
+    /// <summary>The rest of the doc title, e.g. "Tax Benefits for Education", plus the chapter name.</summary>
+    private string Subtitle
+    {
+        get
+        {
+            var title = Source!.DocTitle;
+            var comma = title.IndexOf(',');
+            var rest = comma > 0 ? title[(comma + 1)..].Trim() : "";
+            return string.Join(" · ", new[] { rest, Source.Chapter }.Where(s => !string.IsNullOrWhiteSpace(s)));
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Bring the highlighted sentence into view once per selection.
+        var key = Source is null ? null : $"{Source.ChunkId}|{Highlight}";
+        if (key == _scrolledFor) return;
+        _scrolledFor = key;
+        if (Source is not null && Highlight is not null && _mark.Context is not null)
+            await JS.InvokeVoidAsync("taxwise.scrollIntoView", _mark);
+    }
+}

@@ -5,5 +5,20 @@
 </header>
 
 <section class="empty-state">
-    <p>Ask a few questions first. Quizzes are built from what you've asked about.</p>
+    @if (!string.IsNullOrWhiteSpace(Topic))
+    {
+        <p>Quizzes on <strong>@Topic</strong> are coming in Phase 6. They'll be built from the @ChunkCount IRS passages cited in your chat.</p>
+    }
+    else
+    {
+        <p>Ask a few questions first. Quizzes are built from what you've asked about.</p>
+    }
 </section>
+
+@code {
+    /// <summary>Set by "Quiz me on &lt;topic&gt;" in chat; <see cref="Chunks"/> is the chat's cited chunk IDs, comma-separated.</summary>
+    [SupplyParameterFromQuery] public string? Topic { get; set; }
+    [SupplyParameterFromQuery] public string? Chunks { get; set; }
+
+    private int ChunkCount => Chunks?.Split(',', StringSplitOptions.RemoveEmptyEntries).Length ?? 0;
+}

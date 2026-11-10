@@ -1,0 +1,27 @@
+@inject UserSettings Settings
+
+<label class="year-picker" title="@Tooltip">
+    <span>Tax year</span>
+    <select value="@Value" @onchange="OnChange" disabled="@Disabled">
+        @foreach (var year in UserSettings.SupportedTaxYears)
+        {
+            <option value="@year">@year</option>
+        }
+    </select>
+</label>
+
+@code {
+    /// <summary>Each feature remembers its own year, with its own default (BUILD_PLAN §1a).</summary>
+    [Parameter, EditorRequired] public TaxYearFeature Feature { get; set; }
+    [Parameter] public int Value { get; set; }
+    [Parameter] public EventCallback<int> ValueChanged { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public string? Tooltip { get; set; }
+
+    private async Task OnChange(ChangeEventArgs e)
+    {
+        if (!int.TryParse(e.Value?.ToString(), out var year)) return;
+        Settings.SetTaxYear(Feature, year);
+        await ValueChanged.InvokeAsync(year);
+    }
+}

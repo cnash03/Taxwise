@@ -1,10 +1,262 @@
 @page "/"
 @page "/ask"
+@implements IDisposable
+@inject TaxWiseApiClient Api
+@inject ChatSession Chat
+@inject UserSettings Settings
+@inject ILauncher Launcher
+@inject NavigationManager Nav
+@inject IJSRuntime JS
 
-<header class="page-header">
-    <h1>Ask a question</h1>
-</header>
+<div class="ask">
+    <section class="chat">
+        <header class="chat-header">
+            <div class="chat-heading">
+                <h1 class="chat-title" title="@Chat.Title">@Chat.Title</h1>
+                <div class="chat-subtitle">Answers come only from official IRS publications, with citations.</div>
+            </div>
+            <div class="chat-controls">
+                <TaxYearPicker Feature="TaxYearFeature.Chat" @bind-Value="_taxYear" Disabled="Busy" />
+                <label class="toggle">
+                    <input type="checkbox" role="switch" checked="@_plainLanguage" @onchange="TogglePlainLanguage" />
+                    <span class="toggle-track" aria-hidden="true"></span>
+                    <span>Plain-language mode</span>
+                </label>
+                @if (Chat.Turns.Count > 0)
+                {
+                    <button class="btn" disabled="@Busy" @onclick="NewChat">New chat</button>
+                }
+            </div>
+        </header>
 
-<section class="empty-state">
-    <p>Cited answers from official IRS publications are coming in Phase 2.</p>
-</section>
+        @if (LimitedYearBanner is { } banner)
+        {
+            <div class="banner" role="note">@banner</div>
+        }
+
+        <div class="messages" @ref="_messages">
+            @if (Chat.Turns.Count == 0)
+            {
+                <div class="welcome">
+                    <h2>Ask about your federal taxes</h2>
+                    <p>TaxWise searches IRS publications for tax year @_taxYear and answers with numbered citations you can check.</p>
+                    <div class="follow-ups">
+                        @foreach (var example in Examples)
+                        {
+                            <button class="follow-up" @onclick="() => AskAsync(example)">@example</button>
+                        }
+                    </div>
+                </div>
+            }
+
+            @foreach (var turn in Chat.Turns)
+            {
+                <div class="user-row">
+                    <div class="user-bubble">@turn.Question</div>
+                </div>
+                <div class="answer-row">
+                    <AnswerCard Turn="turn"
+                                Selected="_selected"
+                                Busy="Busy"
+                                OnCite="Select"
+                                OnFollowUp="AskAsync"
+                                OnQuiz="QuizMe"
+                                OnOpenLink="OpenLinkAsync"
+                                OnRetry="RetryAsync" />
+                </div>
+            }
+        </div>
+
+        <form class="composer" @onsubmit="SubmitAsync">
+            <input class="composer-input"
+                   @bind="_draft" @bind:event="oninput"
+                   maxlength="1000"
+                   placeholder="Ask a question about your taxes…"
+                   aria-label="Your question"
+                   disabled="@Busy" />
+            <button class="btn btn-primary" type="submit" disabled="@(Busy || string.IsNullOrWhiteSpace(_draft))">Ask</button>
+        </form>
+        @if (_openError is not null)
+        {
+            <div class="inline-error" role="alert">@_openError</div>
+        }
+    </section>
+
+    <SourcePanel Source="_selected?.Source" Highlight="_selected?.Citation.Highlight" OnOpenPdf="OpenPdfAsync" />
+</div>
+
+@code {
+    private static readonly string[] Examples =
+    [
+        "My scholarship paid my tuition and also gave me $1,200 for housing. Do I have to pay tax on it?",
+        "Do I need to file a tax return if I only worked a summer job?",
+        "Is my scholarship taxable?",
+    ];
+
+    private readonly CancellationTokenSource _cts = new();
+    private ElementReference _messages;
+    private string _draft = "";
+    private bool _plainLanguage;
+    private int _taxYear;
+    private CitationSelection? _selected;
+    private KnowledgeBaseResponse? _knowledgeBase;
+    private string? _openError;
+    private bool _scrollPending;
+
+    private bool Busy => Chat.Turns.Any(t => t.Status == TurnStatus.Loading);
+
+    /// <summary>BUILD_PLAN §1a: years without their full publications get a banner naming the Rev. Proc. in use.</summary>
+    private string? LimitedYearBanner
+    {
+        get
+        {
+            if (_knowledgeBase is null || _knowledgeBase.FullKnowledgeBaseYears.Contains(_taxYear)) return null;
+            var revProc = _knowledgeBase.Documents.FirstOrDefault(d => d.Kind == "rev-proc" && d.TaxYears.Contains(_taxYear));
+            var notice = revProc is null ? "" : $" ({SourceLabels.ShortTitle(revProc.Title)})";
+            return $"Full IRS guides for {_taxYear} aren't out yet. Answers use the IRS inflation-adjustment notice{notice} and may be limited.";
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _plainLanguage = Settings.PlainLanguage;
+        _taxYear = Settings.GetTaxYear(TaxYearFeature.Chat);
+
+        // A request still marked loading was cancelled when we left the page; let the student retry it.
+        foreach (var turn in Chat.Turns.Where(t => t.Status == TurnStatus.Loading))
+            Fail(turn, "Stopped because you left the page.", unreachable: false);
+
+        try
+        {
+            _knowledgeBase = await Api.GetKnowledgeBaseAsync(_cts.Token);
+        }
+        catch (ApiException)
+        {
+            // The banner is optional; the health dot already shows the API is down.
+        }
+        catch (OperationCanceledException)
+        {
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender || _scrollPending)
+        {
+            _scrollPending = false;
+            await JS.InvokeVoidAsync("taxwise.scrollToBottom", _messages);
+        }
+    }
+
+    private void TogglePlainLanguage(ChangeEventArgs e)
+    {
+        _plainLanguage = e.Value is true;
+        Settings.PlainLanguage = _plainLanguage;
+    }
+
+    private void NewChat()
+    {
+        Chat.Clear();
+        _selected = null;
+    }
+
+    private Task SubmitAsync() => AskAsync(_draft);
+
+    private async Task AskAsync(string question)
+    {
+        question = question.Trim();
+        if (question.Length == 0 || Busy) return;
+        _draft = "";
+        var turn = new ChatTurn(question, _plainLanguage, _taxYear);
+        Chat.Turns.Add(turn);
+        await RunAsync(turn);
+    }
+
+    private async Task RetryAsync(ChatTurn failed)
+    {
+        if (Busy) return;
+        var turn = new ChatTurn(failed.Question, failed.PlainLanguage, failed.TaxYear);
+        Chat.Turns[Chat.Turns.IndexOf(failed)] = turn;
+        await RunAsync(turn);
+    }
+
+    private async Task RunAsync(ChatTurn turn)
+    {
+        _scrollPending = true;
+        StateHasChanged();
+        try
+        {
+            turn.Response = await Api.AskAsync(new AskRequest(turn.Question, turn.PlainLanguage, turn.TaxYear), _cts.Token);
+            turn.Status = TurnStatus.Done;
+            SelectFirstCitation(turn);
+        }
+        catch (ApiException e)
+        {
+            Fail(turn, e.Message, e.ApiUnreachable);
+        }
+        catch (OperationCanceledException)
+        {
+            // The page is going away; OnInitializedAsync marks it on the way back.
+            return;
+        }
+        _scrollPending = true;
+    }
+
+    private static void Fail(ChatTurn turn, string message, bool unreachable)
+    {
+        turn.Status = TurnStatus.Failed;
+        turn.Error = message;
+        turn.ApiUnreachable = unreachable;
+    }
+
+    /// <summary>Show the first cited passage right away so the panel isn't empty after an answer.</summary>
+    private void SelectFirstCitation(ChatTurn turn)
+    {
+        if (turn.IsRefusal || turn.Response is not { } r) return;
+        var c = r.Paragraphs.SelectMany(p => p.Citations).FirstOrDefault();
+        var source = c is null ? null : r.Sources.FirstOrDefault(s => s.Number == c.Number);
+        if (c is not null && source is not null) _selected = new CitationSelection(turn, c, source);
+    }
+
+    private void Select(CitationSelection selection) => _selected = selection;
+
+    /// <summary>"Quiz me on &lt;topic&gt;" hands quizzes this chat's cited chunk IDs (BUILD_PLAN §5, Phase 3).</summary>
+    private void QuizMe(string topic)
+    {
+        var chunks = string.Join(",", Chat.CitedChunkIds);
+        Nav.NavigateTo($"quizzes?topic={Uri.EscapeDataString(topic)}&chunks={Uri.EscapeDataString(chunks)}");
+    }
+
+    private async Task OpenPdfAsync(SourcePassage source)
+    {
+        if (!Uri.TryCreate($"{source.PdfUrl}#page={source.Page}", UriKind.Absolute, out var uri))
+        {
+            _openError = "This source has no PDF link.";
+            return;
+        }
+        await OpenAsync(uri);
+    }
+
+    private Task OpenLinkAsync(string url) =>
+        Uri.TryCreate(url, UriKind.Absolute, out var uri) ? OpenAsync(uri) : Task.CompletedTask;
+
+    private async Task OpenAsync(Uri uri)
+    {
+        _openError = null;
+        try
+        {
+            if (!await Launcher.OpenAsync(uri))
+                _openError = "Couldn't open that link on this computer.";
+        }
+        catch (Exception e) when (e is InvalidOperationException or PlatformNotSupportedException)
+        {
+            _openError = "Couldn't open that link on this computer.";
+        }
+    }
+
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+    }
+}
