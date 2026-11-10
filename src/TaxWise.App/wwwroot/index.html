@@ -20,6 +20,12 @@
     </div>
 
     <script src="_framework/blazor.webview.js" autostart="false"></script>
+    <script>
+        window.taxwise = {
+            scrollToBottom: el => { if (el) el.scrollTop = el.scrollHeight; },
+            scrollIntoView: el => { if (el) el.scrollIntoView({ block: "center", behavior: "smooth" }); }
+        };
+    </script>
 
 </body>
 

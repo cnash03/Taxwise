@@ -29,6 +29,18 @@ public static class MauiProgram
 			client.BaseAddress = new Uri(apiBaseUrl);
 			client.Timeout = TimeSpan.FromSeconds(5);
 		});
+		builder.Services.AddHttpClient<TaxWiseApiClient>(client =>
+		{
+			client.BaseAddress = new Uri(apiBaseUrl);
+			// Retrieval + a Claude call with thinking can take a while.
+			client.Timeout = TimeSpan.FromSeconds(120);
+		});
+
+		builder.Services.AddSingleton(Preferences.Default);
+		builder.Services.AddSingleton(Launcher.Default);
+		builder.Services.AddSingleton<UserSettings>();
+		builder.Services.AddSingleton<GlossaryService>();
+		builder.Services.AddSingleton<ChatSession>();
 
 		builder.Services.AddMauiBlazorWebView();
 
