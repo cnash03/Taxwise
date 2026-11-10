@@ -1,3 +1,4 @@
+using TaxWise.Rag.Sources;
 using Microsoft.Extensions.Logging;
 using TaxWise.Core;
 using TaxWise.Core.Chunking;

@@ -2,7 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using TaxWise.Core.Chunking;
 
-namespace TaxWise.Ingestion;
+namespace TaxWise.Rag.Sources;
 
 /// <summary>data/sources/manifest.json (BUILD_PLAN §4.1).</summary>
 public sealed class Manifest

@@ -1,3 +1,4 @@
+using TaxWise.Rag.Sources;
 using System.Security.Cryptography;
 
 namespace TaxWise.Ingestion;

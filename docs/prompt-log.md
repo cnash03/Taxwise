@@ -168,3 +168,53 @@ Entries are append-only. The overall summary is in [AI_USAGE.md](AI_USAGE.md).
   - It found a problem it didn't fix: p17's back matter (Taxpayer Bill of Rights, How To Get Tax Help) is labelled "Chapter 14" in citations. It's left for Phase 2.
   - It said the uncommitted AI logs should go in with the phase (BUILD_PLAN §0 step 5); they are in `02441ed`.
 - **Tag:** partial
+
+### 2026-11-10 · Phase 2 · Claude Code (claude-opus-5-5) · @cnash03 · session `133e0d28`
+- **Role:** execution agent, Phase 2 (query API). It started on `phase-1-ingestion` and moved to the new `phase-2-query-api` branch once PR #3 merged.
+- **Prompt:** "start on phase 2"
+  - Follow-ups: "commit the logs to PR #3", "PR #3 is merged, start phase 2".
+- **Generated:**
+  - **Shared:** `Ask.cs` (request and response types), `KnowledgeBase.cs`, `ApiRoutes.cs`.
+  - **Core:** `Guardrails/CitationValidator.cs` and `DraftAnswer.cs`. When Claude's quote matches the passage, the highlight is copied from the passage itself.
+  - **Rag:** `Answering/` (retriever, `ClaudeAnswerer` with structured JSON output, prompt caching and the server-side refusal fallback, `AskService`), prompts as embedded resources, and `SourceLibrary`. `Manifest` and `RepoPaths` moved from Ingestion to `Rag/Sources`.
+  - **Api:** `POST /api/ask`, `GET /api/sources/{docId}/pdf`, `GET /api/knowledge-base`, and `ApiOptions`.
+  - **Tests:** `CitationValidatorTests`, `AskPipelineTests`, `AnswerPromptTests`, `AskEndpointTests` (98 in total).
+  - Commit `348f379` (AI logs onto PR #3). The Phase 2 code is not committed yet.
+- **Human decisions:**
+  - Plan approval: the AI recommended "Approve, branch off phase-1". **We chose "Approve, wait for main"**, so Phase 2 starts from merged code rather than stacking on an open PR.
+- **Verified by:**
+  - `dotnet test TaxWise.CI.slnf`: 98/98 pass, 0 warnings.
+  - A live run against local Qdrant and Voyage. "How do I stake crypto for yield?" was refused without calling Claude (`claudeCalled=false` in the log). The Pub 970 PDF and `/api/knowledge-base` endpoints worked. With no credentials, `/api/ask` returned a clean 502 and logged the auth error.
+- **Worked?** Partly. The pipeline is built and tested, but the main acceptance check ("Is my scholarship taxable?" cites Pub 970 Ch. 1) never ran, because there was no Anthropic credential on the machine. It's carried into `14adbac0`.
+- **Human change:** nothing yet.
+- **AI limits seen:**
+  - It guessed C# SDK type names (`BetaMessageParam`, `.ToString()` on API enums) and fixed them from compiler errors and the SDK's XML docs, as BUILD_PLAN allows.
+  - **It flagged a weak guardrail itself:** the off-topic crypto question scored 0.350 against a 0.35 threshold, so it only just passed. It now logs the top score to 4 decimals for the Phase 7 calibration.
+  - It departed from the plan in two places and said so: an extra `Links` field on `AskResponse` (the plan says refusals include links but had no field for them), and `MaxTokens` raised from 4000 to 16000, because thinking counts toward the limit.
+  - Merging the PR left a stash and a conflicted log file. The agent resolved it by hand and left `stash@{0}` for us to drop.
+- **Tag:** partial
+
+### 2026-11-10 · Phase 2 setup · Claude Code (claude-opus-5-5) · @cnash03 · session `14adbac0`
+- **Role:** ad-hoc. Questions about getting Claude API access, then a config change. Branch `phase-2-query-api`. This entry was written by `/ai-report` inside the session it describes.
+- **Prompt:** "how do i find my antorhipci key - or do i even have one on my $20 a moath plan"
+  - Follow-ups: "can I just claude -p in my project insead of a api key", "okay how to i set up a key?", "switch it to a cheaper model for testing and used ant auth login instead of a key - note that in the ai report".
+- **Generated:**
+  - `appsettings.Development.json` now sets `Anthropic:Model` to `claude-sonnet-5-5` with effort `medium` for local runs. Production (`appsettings.json`) stays on `claude-opus-5-5`.
+  - Doc comments in `RagServiceCollectionExtensions.cs` and `ClaudeAnswerer.cs` now explain the credential fallback and that both models run adaptive thinking when no thinking config is sent.
+- **Human decisions:**
+  - **Pro subscription vs API.** The AI explained that the $20 Claude Pro plan doesn't include API access.
+  - **`claude -p` rejected.** We asked whether the app could shell out to `claude -p` on our subscription instead. The AI advised against it: it breaks on App Service (no CLI and no login there), a personal subscription can't power an app other people use, and starting a process for each question adds seconds. We agreed.
+  - **Credentials: AI recommended a Console API key with prepaid credits → we used `ant auth login` with our Mines organization account instead.** The C# SDK's zero-argument `AnthropicClient` picks up that OAuth profile when `ANTHROPIC_API_KEY` is unset, and `ClaudeAnswerer`'s DI registration already falls back to it, so no code change was needed. Production still reads `ANTHROPIC_API_KEY` from an App Service setting.
+  - **Teammate access: AI offered a separate `ant auth login` per person or a shared key → we chose a shared API key.** It's easier for the teammate, and the deployed API needs a key anyway. We created it, and `docs/SETUP.md` step 3 now covers saving and checking it.
+  - **Cheaper model for testing (our call).** We switched dev to Sonnet 5.5, which costs half as much as Opus 5.5 ($2/$10 vs $4/$20 per million tokens). The AI picked Sonnet over Haiku 4.5 because Haiku rejects the `effort` setting that `ClaudeAnswerer` sends.
+- **Verified by:**
+  - `ant auth status`: logged in to the Mines organization with the `user:inference` scope.
+  - `dotnet test`: 98/98 pass. The full `dotnet build` fails only in `TaxWise.App`, because the MacCatalyst workload needs Xcode 27.1 and 27.2 is installed. That's unrelated to this change.
+  - **Live Phase 2 acceptance check, run after we added an API key:** the first `/api/ask` call failed with a 400, because the answer schema used `maxItems`, which structured outputs don't support. Unit tests couldn't catch this, since they use a fake answerer. We removed it (`CitationValidator` already caps follow-ups at 2) and added a test that keeps it out. On the rerun, "Is my scholarship taxable?" returned 200 with 4 paragraphs citing Pub 970 Ch. 1 (pp. 5–6) and Pub 519, citation numbers 1–3, `validator=ok`, 0 citations removed, `claude-sonnet-5-5`, 6.0 s. That's 99/99 tests.
+- **Worked?** Yes. The question was answered, the config changed, and the live check passed after a schema fix.
+- **Human change:** nothing yet. We ran `ant auth login` ourselves.
+- **AI limits seen:**
+  - Its first answer ("you don't have one") was right about the Pro plan, but it only offered a paid Console key. It didn't mention that a university organization login through `ant auth login` might already give API access. We brought that option.
+  - The `133e0d28` session had reported that the `ant` CLI wasn't installed, so the agents couldn't have used this path until we installed it and logged in.
+  - The `ant` login is tied to a personal account and its OAuth token expires (about 8 hours here). A partner needs their own `ant auth login` or a key, and SETUP.md doesn't say so yet.
+- **Tag:** success

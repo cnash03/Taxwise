@@ -1,0 +1,32 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["status", "paragraphs"],
+  "properties": {
+    "status": { "enum": ["answered", "insufficient_sources"] },
+    "paragraphs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["text", "citations"],
+        "properties": {
+          "text": { "type": "string" },
+          "citations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["passage", "quote"],
+              "properties": {
+                "passage": { "enum": ["P1", "P2", "P3", "P4"] },
+                "quote":   { "type": "string", "description": "Exact sentence copied from that passage that supports the paragraph" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "suggestedFollowUps": { "type": "array", "items": { "type": "string" }, "description": "At most 2 short follow-up questions" }
+  }
+}
