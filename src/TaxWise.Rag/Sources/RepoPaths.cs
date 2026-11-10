@@ -1,4 +1,4 @@
-namespace TaxWise.Ingestion;
+namespace TaxWise.Rag.Sources;
 
 /// <summary>Locates the repo root (the folder holding TaxWise.sln) so paths work from any working directory.</summary>
 public static class RepoPaths

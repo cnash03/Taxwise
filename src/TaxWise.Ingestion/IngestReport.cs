@@ -1,3 +1,4 @@
+using TaxWise.Rag.Sources;
 using System.Text.Json;
 using TaxWise.Core;
 using TaxWise.Core.Chunking;

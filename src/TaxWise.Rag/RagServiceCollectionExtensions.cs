@@ -1,9 +1,11 @@
+using Anthropic;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Http.Resilience;
 using Microsoft.Extensions.Options;
 using Polly;
 using Qdrant.Client;
+using TaxWise.Rag.Answering;
 using TaxWise.Rag.VectorStore;
 using TaxWise.Rag.Voyage;
 
@@ -25,6 +27,29 @@ public static class RagServiceCollectionExtensions
             return new QdrantClient(o.Host, o.Port, o.UseHttps, string.IsNullOrWhiteSpace(o.ApiKey) ? null : o.ApiKey);
         });
         services.AddSingleton<IChunkStore, QdrantChunkStore>();
+        return services;
+    }
+
+    /// <summary>
+    /// Adds the cited Q&amp;A pipeline on top of <see cref="AddTaxWiseRag"/>: retriever, Claude answerer and
+    /// <see cref="AskService"/>. The Anthropic key is read from <c>ANTHROPIC_API_KEY</c> (env, user-secrets or
+    /// App Service settings) when the client is first needed, so hosts without a key still start. Without a key the
+    /// SDK falls back to the <c>ant auth login</c> profile in <c>~/.config/anthropic</c>, which is how local dev runs.
+    /// </summary>
+    public static IServiceCollection AddTaxWiseAnswering(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<AnthropicOptions>(configuration.GetSection(AnthropicOptions.SectionName));
+        services.Configure<RetrievalOptions>(configuration.GetSection(RetrievalOptions.SectionName));
+
+        services.AddSingleton(_ =>
+        {
+            var key = configuration["ANTHROPIC_API_KEY"];
+            // Retries are done by ClaudeAnswerer (once, on 5xx/connection only), so the SDK's own are off.
+            return string.IsNullOrWhiteSpace(key) ? new AnthropicClient { MaxRetries = 0 } : new AnthropicClient { ApiKey = key, MaxRetries = 0 };
+        });
+        services.AddSingleton<IRetriever, Retriever>();
+        services.AddSingleton<IAnswerer, ClaudeAnswerer>();
+        services.AddSingleton<AskService>();
         return services;
     }
 
