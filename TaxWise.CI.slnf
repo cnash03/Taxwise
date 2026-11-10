@@ -1,0 +1,16 @@
+{
+  "solution": {
+    "path": "TaxWise.sln",
+    "projects": [
+      "src/TaxWise.Shared/TaxWise.Shared.csproj",
+      "src/TaxWise.Core/TaxWise.Core.csproj",
+      "src/TaxWise.Rag/TaxWise.Rag.csproj",
+      "src/TaxWise.Ingestion/TaxWise.Ingestion.csproj",
+      "src/TaxWise.Api/TaxWise.Api.csproj",
+      "eval/TaxWise.Eval/TaxWise.Eval.csproj",
+      "tests/TaxWise.Core.Tests/TaxWise.Core.Tests.csproj",
+      "tests/TaxWise.Rag.Tests/TaxWise.Rag.Tests.csproj",
+      "tests/TaxWise.Api.Tests/TaxWise.Api.Tests.csproj"
+    ]
+  }
+}

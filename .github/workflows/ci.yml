@@ -1,0 +1,22 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-test:
+    # TaxWise.App (MAUI) is excluded via TaxWise.CI.slnf; the MAUI workload is too heavy for CI.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Restore
+        run: dotnet restore TaxWise.CI.slnf
+      - name: Build
+        run: dotnet build TaxWise.CI.slnf --no-restore -c Release
+      - name: Test
+        run: dotnet test TaxWise.CI.slnf --no-build -c Release

@@ -1,0 +1,25 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+*.userprefs
+*.swp
+.vs/
+TestResults/
+*.trx
+*.nupkg
+artifacts/
+publish/
+
+## IDEs / OS
+.idea/
+.vscode/
+.DS_Store
+
+## TaxWise
+data/qdrant/
+data/sources/pdf/
+**/appsettings.Development.local.json
+*.env
+.env*
