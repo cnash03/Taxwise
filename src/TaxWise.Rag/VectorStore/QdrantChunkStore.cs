@@ -77,6 +77,7 @@ public static class PayloadKeys
     public const string TaxYear = "taxYear";
     public const string Chapter = "chapter";
     public const string Section = "section";
+    public const string Sections = "sections";
     public const string PageStart = "pageStart";
     public const string PageEnd = "pageEnd";
     public const string Text = "text";
@@ -99,6 +100,7 @@ public static class ChunkPayload
             [PayloadKeys.Text] = c.Text,
         };
         if (c.Chapter is not null) payload[PayloadKeys.Chapter] = c.Chapter;
+        if (c.Sections is not null) payload[PayloadKeys.Sections] = c.Sections.ToArray();
         return payload;
     }
 
@@ -113,5 +115,8 @@ public static class ChunkPayload
         p[PayloadKeys.Section].StringValue,
         (int)p[PayloadKeys.PageStart].IntegerValue,
         (int)p[PayloadKeys.PageEnd].IntegerValue,
-        p[PayloadKeys.Text].StringValue);
+        p[PayloadKeys.Text].StringValue,
+        p.TryGetValue(PayloadKeys.Sections, out var sections) && sections.KindCase == Value.KindOneofCase.ListValue
+            ? sections.ListValue.Values.Select(v => v.StringValue).ToList()
+            : null);
 }

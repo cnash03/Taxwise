@@ -24,4 +24,16 @@ public sealed class ChunkPayloadTests
         Assert.False(payload.ContainsKey(PayloadKeys.Chapter));
         Assert.Equal(chunk, ChunkPayload.FromPayload(payload));
     }
+
+    [Fact]
+    public void MergedSections_RoundTrip()
+    {
+        var chunk = new Chunk("p970-ty2025-p5-010", "p970", "Pub 970, Tax Benefits for Education", 2025,
+            "Chapter 1. Scholarships", "Tax-Free Scholarships", 5, 5, "text", ["Scholarships", "Tax-Free Scholarships"]);
+
+        var roundTripped = ChunkPayload.FromPayload(ChunkPayload.ToPayload(chunk));
+
+        Assert.Equal(chunk.Sections, roundTripped.Sections);
+        Assert.Equal(chunk with { Sections = null }, roundTripped with { Sections = null });
+    }
 }

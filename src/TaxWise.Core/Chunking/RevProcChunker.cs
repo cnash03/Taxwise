@@ -90,7 +90,8 @@ public static partial class RevProcChunker
             var to = t + 1 < tableStarts.Count ? tableStarts[t + 1] : lines.Count;
             var slice = lines.GetRange(from, to - from);
             var text = string.Join('\n', slice.Select(l => l.Text));
-            yield return new PackedText($"{label} > {lines[tableStarts[t]].Text}", text, slice.Min(l => l.Page), slice.Max(l => l.Page));
+            var section = $"{label} > {lines[tableStarts[t]].Text}";
+            yield return new PackedText(section, [section], text, slice.Min(l => l.Page), slice.Max(l => l.Page));
         }
     }
 

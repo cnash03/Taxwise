@@ -105,11 +105,56 @@ public sealed class SectionChunkerTests
     }
 
     [Fact]
-    public void ShortSections_MergeIntoOneChunk_AndNameBothSections()
+    public void ShortSections_MergeIntoOneChunk_AndListBothSections()
     {
         var chunk = Assert.Single(SectionChunker.Chunk(Pub970,
             [Heading(4, "Reminders", 17), Body(4, 40), Heading(4, "Introduction", 17), Body(4, 40)]));
-        Assert.Equal("Reminders · Introduction", chunk.Section);
+        Assert.Equal(["Reminders", "Introduction"], chunk.AllSections);
+        Assert.Contains("> Reminders · Introduction\n\n", chunk.EmbeddingText);
+    }
+
+    [Fact]
+    public void MergedChunk_IsNamedAfterTheSectionWithTheMostText()
+    {
+        var chunk = Assert.Single(SectionChunker.Chunk(Pub970,
+            [Heading(5, "Scholarships", 17), Body(5, 20), Heading(5, "Tax-Free Scholarships", 17), Body(5, 200)]));
+        Assert.Equal("Tax-Free Scholarships", chunk.Section);
+        Assert.Equal("Pub 970 > Tax-Free Scholarships", chunk.Breadcrumb);
+    }
+
+    [Fact]
+    public void SingleSectionChunk_HasNoSectionsList()
+    {
+        var chunk = Assert.Single(SectionChunker.Chunk(Pub970, [Heading(5, "Scholarships", 17), Body(5, 200)]));
+        Assert.Null(chunk.Sections);
+        Assert.Equal(["Scholarships"], chunk.AllSections);
+    }
+
+    [Theory]
+    [InlineData("2025 Tax Table CAUTION !")]
+    [InlineData("2025 Earned Income Credit (EIC) Table Caution. This is not a tax table.")]
+    [InlineData("Sample Table")]
+    public void LookupTables_AreSkippedUntilTheNextMajorHeading(string tableHeading)
+    {
+        var chunks = SectionChunker.Chunk(Pub970,
+        [
+            Heading(60, "Line 27", 17), Body(60, 400, "a"),
+            Heading(68, tableHeading, 17), Body(68, "See the instructions for line 16."), Table(68, 40), Table(69, 40),
+            Heading(80, "2025 Tax Computation Worksheet", 17), Body(80, 400, "b"),
+        ]);
+
+        Assert.DoesNotContain(chunks, c => c.AllSections.Contains(tableHeading) || c.Text.Contains("line 16") || c.Text.Contains("1,000 1,050"));
+        Assert.Contains(chunks, c => c.Section == "Line 27");
+        Assert.Contains(chunks, c => c.Section == "2025 Tax Computation Worksheet" && c.Text.Contains("b399"));
+    }
+
+    [Fact]
+    public void LookupTableSkip_EndsAtTheNextChapter()
+    {
+        var chunks = SectionChunker.Chunk(Pub970,
+            [Heading(68, "2025 Tax Table", 17), Table(68, 40), Heading(80, "2.", 18), Heading(80, "Credits", 18), Body(80, 100, "c")]);
+        var chunk = Assert.Single(chunks);
+        Assert.Equal("Chapter 2. Credits", chunk.Chapter);
     }
 
     [Fact]

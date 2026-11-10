@@ -5,7 +5,9 @@ namespace TaxWise.Core.Chunking;
 /// start a new chunk here once the current one has reached the minimum size.</param>
 internal sealed record PackUnit(string Text, int Page, bool IsTable, string Section, bool SoftBreak = false);
 
-internal sealed record PackedText(string Section, string Text, int PageStart, int PageEnd);
+/// <param name="Section">The section that contributes the most text: what a citation names.</param>
+/// <param name="Sections">Every section in the chunk, in reading order (one entry unless short sections were merged).</param>
+internal sealed record PackedText(string Section, IReadOnlyList<string> Sections, string Text, int PageStart, int PageEnd);
 
 /// <summary>
 /// Greedy packer for one section: fills chunks up to <see cref="ChunkingOptions.MaxTokens"/>, never
@@ -57,18 +59,22 @@ internal static class ChunkPacker
             var body = join(texts);
             var text = overlap is null ? body : overlap + " " + body;
             var pageStart = overlap is null ? current[0].Page : Math.Min(overlapPage, current[0].Page);
-            var packed = new PackedText(SectionLabel(current), text, pageStart, current.Max(u => u.Page));
+            var packed = new PackedText(MainSection(current), current.Select(u => u.Section).Distinct().ToList(),
+                text, pageStart, current.Max(u => u.Page));
             result.Add(packed);
             return packed;
         }
     }
 
-    /// <summary>"Reminders · Introduction" when short sections were merged into one chunk (at most three names).</summary>
-    private static string SectionLabel(List<PackUnit> units)
-    {
-        var names = units.Select(u => u.Section).Distinct().ToList();
-        return names.Count <= 3 ? string.Join(" · ", names) : string.Join(" · ", names.Take(3)) + " …";
-    }
+    /// <summary>
+    /// The section with the most tokens in the chunk (the first one on a tie). A merged chunk usually holds a
+    /// heading or two of one section and the body of the next; the citation should name the body's section.
+    /// </summary>
+    private static string MainSection(List<PackUnit> units) =>
+        units.GroupBy(u => u.Section)
+            .Select((g, order) => (g.Key, Tokens: g.Sum(u => TextUtil.EstimateTokens(u.Text)), order))
+            .OrderByDescending(x => x.Tokens).ThenBy(x => x.order)
+            .First().Key;
 
     /// <summary>Splits oversized prose units so each fits in a chunk with room for overlap. Tables stay whole.</summary>
     private static IEnumerable<PackUnit> Expand(IEnumerable<PackUnit> units, ChunkingOptions options)

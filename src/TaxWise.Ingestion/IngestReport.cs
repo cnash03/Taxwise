@@ -38,6 +38,7 @@ public static class IngestReport
         tokens = x.Tokens,
         chapter = x.Chunk.Chapter,
         section = x.Chunk.Section,
+        sections = x.Chunk.Sections,
         pages = x.Chunk.PageStart == x.Chunk.PageEnd ? $"{x.Chunk.PageStart}" : $"{x.Chunk.PageStart}–{x.Chunk.PageEnd}",
         preview = x.Chunk.Text.Length <= 160 ? x.Chunk.Text : x.Chunk.Text[..160] + "…",
     };

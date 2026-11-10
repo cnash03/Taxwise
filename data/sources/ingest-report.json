@@ -1,7 +1,7 @@
 {
   "generatedOn": "2026-11-10",
-  "totalChunks": 1487,
-  "averageTokens": 415.2,
+  "totalChunks": 1377,
+  "averageTokens": 404.8,
   "coverChecks": [
     {
       "docId": "p17",
@@ -62,8 +62,8 @@
     {
       "docId": "p17",
       "taxYear": 2025,
-      "chunks": 468,
-      "averageTokens": 423.4,
+      "chunks": 431,
+      "averageTokens": 416.7,
       "pages": "1–131"
     },
     {
@@ -90,8 +90,8 @@
     {
       "docId": "i1040",
       "taxYear": 2025,
-      "chunks": 298,
-      "averageTokens": 477.1,
+      "chunks": 225,
+      "averageTokens": 447.3,
       "pages": "1–126"
     },
     {
@@ -131,13 +131,6 @@
     }
   ],
   "shortest": [
-    {
-      "id": "i1040-ty2025-p79-191",
-      "tokens": 2,
-      "section": "2025 Tax Table CAUTION !",
-      "pages": "79",
-      "preview": "96,000"
-    },
     {
       "id": "rp-25-32-ty2026-p12-005",
       "tokens": 12,
@@ -209,16 +202,17 @@
       "section": ".37 Special Rules for Credits and Deductions",
       "pages": "20",
       "preview": ".37 Special Rules for Credits and Deductions. For taxable years beginning in 2027, the amount of the deduction under § 642(b)(2)(C)(i) is $5,450."
+    },
+    {
+      "id": "rp-26-35-ty2027-p30-070",
+      "tokens": 31,
+      "chapter": "Section 3. 2027 Adjusted Items",
+      "section": ".66 Attorney Fee Awards",
+      "pages": "30",
+      "preview": ".66 Attorney Fee Awards. For fees incurred in calendar year 2027, the attorney fee award limitation under § 7430(c)(1)(B)(iii) is $270 per hour."
     }
   ],
   "longest": [
-    {
-      "id": "i1040-ty2025-p79-192",
-      "tokens": 798,
-      "section": "2025 Tax Table CAUTION !",
-      "pages": "79",
-      "preview": "93,000 93,050 93,050 93,100 15,380 15,391 10,686 10,692 15,380 15,391 13,641 13,652 96,000 96,050 96,050 96,100 16,040 16,051 11,046 11,052 16,040 16,051 14,301…"
-    },
     {
       "id": "i1040-ty2025-p29-061",
       "tokens": 695,
@@ -238,7 +232,12 @@
       "id": "p519-ty2025-p31-076",
       "tokens": 693,
       "chapter": "Chapter 4. How Income of Aliens Is Taxed",
-      "section": "Gambling Winnings · Social Security Benefits · Sales or Exchanges of Capital Assets",
+      "section": "Sales or Exchanges of Capital Assets",
+      "sections": [
+        "Gambling Winnings",
+        "Social Security Benefits",
+        "Sales or Exchanges of Capital Assets"
+      ],
       "pages": "31–32",
       "preview": "Gambling Winnings\nIn general, nonresident aliens are subject to the 30% tax on the gross proceeds from gambling won in the United States if that income is not e…"
     },
@@ -265,27 +264,49 @@
       "preview": "(such as room and board) other than qualified education expenses, as defined in Qualified education expenses in chapter 1. • The use of the money isn’t restrict…"
     },
     {
-      "id": "p17-ty2025-p112-414",
-      "tokens": 689,
-      "chapter": "Chapter 14. Child Tax Credit and Credit for Other Dependents",
-      "section": "Additional Child Tax Credit (ACTC) · 2025 Tax Table CAUTION ! · Sample Table",
-      "pages": "112–113",
-      "preview": "Additional Child Tax Credit (ACTC)\nThis credit is for certain individuals who get less than the full amount of the CTC.\nThe ODC can’t be used to figure the ACTC…"
-    },
-    {
       "id": "p970-ty2025-p38-086",
       "tokens": 688,
       "chapter": "Chapter 6. Coverdell Education Savings Account (ESA)",
-      "section": "Qualified Education Expenses · Eligible Educational Institution · Qualified Higher Education Expenses",
+      "section": "Qualified Higher Education Expenses",
+      "sections": [
+        "Qualified Education Expenses",
+        "Eligible Educational Institution",
+        "Qualified Higher Education Expenses"
+      ],
       "pages": "38–39",
       "preview": "Designated beneficiary. This is the individual named in the document creating the trust or custodial account to receive the benefit of the funds in the account.…"
     },
     {
       "id": "i1040-ty2025-p25-051",
       "tokens": 688,
-      "section": "Line 2b · Taxable Interest · Line 3a …",
+      "section": "Qualified Dividends",
+      "sections": [
+        "Line 2b",
+        "Taxable Interest",
+        "Line 3a",
+        "Qualified Dividends"
+      ],
       "pages": "25–26",
       "preview": "Line 2b\nTaxable Interest\nEach payer should send you a Form 1099-INT or Form 1099-OID. Enter your total taxable interest income on line 2b. But you must fill in …"
+    },
+    {
+      "id": "i1040-ty2025-p98-162",
+      "tokens": 688,
+      "section": "Student Loan Interest Deduction",
+      "pages": "98",
+      "preview": "Exception. Use Pub. 970 instead of the worksheet in these instructions to figure your student loan interest deduction if you file Form 2555 or 4563, or you excl…"
+    },
+    {
+      "id": "p519-ty2025-p90-218",
+      "tokens": 687,
+      "chapter": "Chapter 12. How To Get Tax Help",
+      "section": "Trinidad and Tobago",
+      "sections": [
+        "Thailand",
+        "Trinidad and Tobago"
+      ],
+      "pages": "90–91",
+      "preview": "Thailand\n1. I was a resident of Thailand on the date of my arrival in the United States. I am not a U.S. citizen. I have not been lawfully accorded the privileg…"
     }
   ]
 }

@@ -13,7 +13,9 @@ namespace TaxWise.Core.Chunking;
 /// Chapters are hard boundaries. Headings are soft ones: a new chunk starts at a heading once the current
 /// chunk has reached the minimum size; otherwise the short section is merged with the next one and the
 /// chunk's <see cref="Chunk.Section"/> names both. Without this, a quarter of all chunks were under 100 tokens.
-/// Everything after an "Index" heading is skipped.
+/// Everything after an "Index" heading is skipped, and so are the IRS lookup tables (Tax Table, EIC Table):
+/// pages of numbers that embed poorly and would tempt the model to read tax amounts off a retrieved row,
+/// which the calculator owns (BUILD_PLAN §10). Skipping lasts until the next major heading or chapter.
 /// </summary>
 public static partial class SectionChunker
 {
@@ -32,6 +34,7 @@ public static partial class SectionChunker
         string? chapter = null;
         var section = FrontMatterSection;
         var inIndex = false;
+        var inLookupTable = false;
 
         for (var i = 0; i < blocks.Count; i++)
         {
@@ -46,7 +49,7 @@ public static partial class SectionChunker
                 var rest = TakeSameStyleRun(blocks, ref i, block.FontSize, skipFirst: true);
                 var title = string.Join(' ', new[] { number.Groups[2].Value, rest }.Where(x => x.Length > 0)).Trim();
                 FlushSegment();
-                inIndex = false;
+                inIndex = inLookupTable = false;
                 chapter = $"Chapter {number.Groups[1].Value}. {title}".TrimEnd(' ', '.');
                 section = title.Length > 0 ? title : chapter;
                 continue;
@@ -55,7 +58,7 @@ public static partial class SectionChunker
             {
                 var title = TakeSameStyleRun(blocks, ref i, block.FontSize, skipFirst: false);
                 FlushSegment();
-                inIndex = false;
+                inIndex = inLookupTable = false;
                 chapter = title;
                 section = title;
                 continue;
@@ -66,11 +69,12 @@ public static partial class SectionChunker
             {
                 var heading = TakeSameStyleRun(blocks, ref i, block.FontSize, skipFirst: false);
                 if (heading.Equals("Index", StringComparison.OrdinalIgnoreCase)) inIndex = true;
+                inLookupTable = LookupTable().IsMatch(heading);
                 section = heading;
-                if (!inIndex) segment.Add(new PackUnit(heading, block.Page, false, section, SoftBreak: true));
+                if (!inIndex && !inLookupTable) segment.Add(new PackUnit(heading, block.Page, false, section, SoftBreak: true));
                 continue;
             }
-            if (inIndex) continue;
+            if (inIndex || inLookupTable) continue;
 
             // Minor and run-in headings are soft break points but don't rename the section: labels stay
             // at the level a reader would look for ("Tax-Free Scholarships and Fellowship Grants").
@@ -149,6 +153,10 @@ public static partial class SectionChunker
 
     [GeneratedRegex(@"^(\d{1,2})\.?(?:\s+(.+))?$")] private static partial Regex ChapterNumber();
     [GeneratedRegex(@"^Chapter\s+\d+\b")] private static partial Regex ChapterWord();
+
+    /// <summary>"2025 Tax Table", "2025 Earned Income Credit (EIC) Table", and Pub 17's "Sample Table" inside its Tax Table.</summary>
+    [GeneratedRegex(@"^(?:\d{4} (?:Tax Table|Earned Income Credit \(EIC\) Table)\b|Sample Table$)")]
+    private static partial Regex LookupTable();
 }
 
 internal static class ChunkFactory
@@ -163,7 +171,8 @@ internal static class ChunkFactory
                 Chunk.MakeId(doc.DocId, taxYear, p.Text.PageStart, ordinal++),
                 doc.DocId, doc.DocTitle, taxYear, p.Chapter,
                 string.IsNullOrWhiteSpace(p.Text.Section) ? "Introduction" : p.Text.Section,
-                p.Text.PageStart, p.Text.PageEnd, p.Text.Text))
+                p.Text.PageStart, p.Text.PageEnd, p.Text.Text,
+                p.Text.Sections.Count > 1 ? p.Text.Sections : null))
             .ToList();
     }
 }
