@@ -134,7 +134,8 @@ public sealed class AskEndpointTests : IClassFixture<WebApplicationFactory<Progr
 
     private sealed class LambdaRetriever(Func<RetrievalResult> result) : IRetriever
     {
-        public Task<RetrievalResult> RetrieveAsync(string question, int taxYear, CancellationToken ct = default) => Task.FromResult(result());
+        public Task<RetrievalResult> RetrieveAsync(string question, int taxYear, IReadOnlyCollection<string>? docIds = null,
+        CancellationToken ct = default) => Task.FromResult(result());
     }
 
     private sealed class StubAnswerer : IAnswerer

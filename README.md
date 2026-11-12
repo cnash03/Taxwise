@@ -43,6 +43,26 @@ dotnet build src/TaxWise.App -t:Run -f net10.0-maccatalyst   # desktop app (need
 
 The App reads `ApiBaseUrl` from `src/TaxWise.App/appsettings.json` (default `http://localhost:5080`).
 
+If the App build fails with *"This version of .NET for MacCatalyst requires Xcode 27.1"* and you have a newer Xcode, add `-p:ValidateXcodeVersion=false` to the App command.
+
+## Ask a question (chat)
+
+The **Ask a question** page sends `POST /api/ask` and shows cited answers:
+
+- Each paragraph has numbered citation chips (`1 · Pub 970 · Ch. 1 · p. 5 · TY 2025`). Click one to see the IRS passage in the right-hand panel with the quoted sentence highlighted, then **Open page N in the PDF**.
+- **Plain-language mode** (header toggle, remembered between launches) asks Claude for simpler wording from the same passages. In that mode, tax terms get hover definitions from [`data/glossary.json`](data/glossary.json). Those definitions are written and reviewed by people, not generated. Set `reviewed: true` on each entry after checking it against its `chunkId`.
+- The **Tax year** picker defaults to 2025 for chat. Years without their full IRS guides show a banner naming the Rev. Proc. the answers rely on.
+- **Quiz me on …** passes the chat's cited chunk IDs to the quizzes page (Phase 6).
+
+## Explain my form
+
+The **Explain my form** page walks through a sample W-2 and 1098-T, one box at a time:
+
+- The sample boxes, their values and where each one goes (`goesTo`) are in [`data/forms/`](data/forms). A person checks each `goesTo` against the TY2025 instructions. The model explains the mapping but never decides it, and the API always returns `goesTo` from the data.
+- Clicking a box sends `POST /api/forms/explain` (`{ form, boxId, plainLanguage }`). The API searches only that box's `sourceDocs` with its `retrievalQuery`, refuses below the rerank threshold without calling Claude, and runs the same citation validator as chat. Explanations are cached in memory per form, box and mode.
+- `GET /api/forms/{w2|1098t}` returns a sample. Set `Forms:Directory` when the API runs outside the repo.
+- The page stays on tax year 2025 until the IRS releases the 2026 form instructions. **Upload mine** is shown but disabled (stretch goal).
+
 ## Ingest the IRS documents
 
 The sources are listed in [`data/sources/manifest.json`](data/sources/manifest.json). The PDFs download to `data/sources/pdf/` (gitignored).

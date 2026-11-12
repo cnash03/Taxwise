@@ -1,0 +1,6 @@
+@* Answer text with glossary terms wrapped in hover/focus tooltips. Definitions are from data/glossary.json, never the LLM. *@
+@foreach (var s in Segments){@if (s.Term is null){@s.Text}else{<span class="term" tabindex="0">@s.Text<span class="term-tip" role="tooltip">@s.Term.Definition</span></span>}}
+
+@code {
+    [Parameter, EditorRequired] public IReadOnlyList<TextSegment> Segments { get; set; } = [];
+}

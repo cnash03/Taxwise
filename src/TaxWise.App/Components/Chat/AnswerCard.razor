@@ -1,0 +1,135 @@
+@inject GlossaryService Glossary
+
+@if (Turn.Status == TurnStatus.Loading)
+{
+    <div class="status-line pending"><span class="dot"></span>Searching IRS publications for tax year @Turn.TaxYear…</div>
+    <article class="answer-card loading" aria-busy="true">
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+        <div class="skeleton short"></div>
+    </article>
+}
+else if (Turn.Status == TurnStatus.Failed)
+{
+    <article class="answer-card error" role="alert">
+        <div class="error-title">@(Turn.ApiUnreachable ? "TaxWise API unavailable" : "Something went wrong")</div>
+        <p>@Turn.Error</p>
+        <button class="btn" @onclick="() => OnRetry.InvokeAsync(Turn)">Try again</button>
+    </article>
+}
+else if (Turn.Response is { } r)
+{
+    <div class="status-line"><span class="dot"></span>Searched @r.PassagesSearched passages, kept the @r.PassagesKept most relevant</div>
+
+    @if (Turn.IsRefusal)
+    {
+        <article class="answer-card refusal">
+            @foreach (var p in r.Paragraphs)
+            {
+                <p>@p.Text</p>
+            }
+            @if (r.Links.Count > 0)
+            {
+                <div class="help-links">
+                    @foreach (var link in r.Links)
+                    {
+                        <button class="link-btn" @onclick="() => OnOpenLink.InvokeAsync(link.Url)">@link.Label ↗</button>
+                    }
+                </div>
+            }
+            <footer class="disclaimer">@r.Disclaimer</footer>
+        </article>
+    }
+    else
+    {
+        <article class="answer-card">
+            @if (Turn.PlainLanguage)
+            {
+                <div class="mode-tag">Plain language</div>
+            }
+            @for (var i = 0; i < r.Paragraphs.Count; i++)
+            {
+                var paragraph = r.Paragraphs[i];
+                <div class="answer-paragraph">
+                    <p>
+                        @if (_segments is not null)
+                        {
+                            <GlossaryText Segments="_segments[i]" />
+                        }
+                        else
+                        {
+                            @paragraph.Text
+                        }
+                    </p>
+                    <div class="chips">
+                        @foreach (var c in paragraph.Citations)
+                        {
+                            var source = r.Sources.FirstOrDefault(s => s.Number == c.Number);
+                            if (source is null) continue;
+                            <button class="chip @(IsSelected(c) ? "selected" : null)"
+                                    title="@source.Section"
+                                    aria-pressed="@IsSelected(c)"
+                                    @onclick="() => OnCite.InvokeAsync(new CitationSelection(Turn, c, source))">
+                                @SourceLabels.Chip(source)
+                            </button>
+                        }
+                    </div>
+                </div>
+            }
+            <footer class="disclaimer">@r.Disclaimer</footer>
+        </article>
+
+        <div class="follow-ups">
+            @if (QuizTopic is { } topic)
+            {
+                <button class="follow-up quiz" @onclick="() => OnQuiz.InvokeAsync(topic)">Quiz me on @topic</button>
+            }
+            @foreach (var f in r.SuggestedFollowUps)
+            {
+                <button class="follow-up" disabled="@Busy" @onclick="() => OnFollowUp.InvokeAsync(f)">@f</button>
+            }
+        </div>
+    }
+}
+
+@code {
+    private IReadOnlyList<IReadOnlyList<TextSegment>>? _segments;
+    private AskResponse? _segmentsFor;
+
+    [Parameter, EditorRequired] public ChatTurn Turn { get; set; } = default!;
+    [Parameter] public CitationSelection? Selected { get; set; }
+    [Parameter] public bool Busy { get; set; }
+    [Parameter] public EventCallback<CitationSelection> OnCite { get; set; }
+    [Parameter] public EventCallback<string> OnFollowUp { get; set; }
+    [Parameter] public EventCallback<string> OnQuiz { get; set; }
+    [Parameter] public EventCallback<string> OnOpenLink { get; set; }
+    [Parameter] public EventCallback<ChatTurn> OnRetry { get; set; }
+
+    /// <summary>The section of the first cited passage, e.g. "Scholarships and Fellowship Grants".</summary>
+    private string? QuizTopic
+    {
+        get
+        {
+            var r = Turn.Response!;
+            var first = r.Paragraphs.SelectMany(p => p.Citations).FirstOrDefault();
+            return first is null ? null : r.Sources.FirstOrDefault(s => s.Number == first.Number)?.Section;
+        }
+    }
+
+    private bool IsSelected(CitationRef c) =>
+        Selected is { } s && ReferenceEquals(s.Turn, Turn) && s.Citation == c;
+
+    protected override void OnParametersSet()
+    {
+        // Glossary tooltips are part of plain-language mode (BUILD_PLAN §5.2): first match of each term per answer.
+        if (!Turn.PlainLanguage || Turn.IsRefusal || Turn.Response is null)
+        {
+            _segments = null;
+            return;
+        }
+        if (ReferenceEquals(_segmentsFor, Turn.Response)) return;
+        var used = new HashSet<GlossaryTerm>();
+        _segments = Turn.Response.Paragraphs.Select(p => Glossary.Marker.Mark(p.Text, used)).ToList();
+        _segmentsFor = Turn.Response;
+    }
+}

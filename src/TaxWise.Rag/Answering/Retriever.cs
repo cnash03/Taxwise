@@ -16,7 +16,9 @@ public sealed record RetrievalResult(int Searched, IReadOnlyList<RetrievedPassag
 
 public interface IRetriever
 {
-    Task<RetrievalResult> RetrieveAsync(string question, int taxYear, CancellationToken ct = default);
+    /// <param name="docIds">When set, only these manifest documents are searched (Explain my form, BUILD_PLAN §6).</param>
+    Task<RetrievalResult> RetrieveAsync(string question, int taxYear, IReadOnlyCollection<string>? docIds = null,
+        CancellationToken ct = default);
 }
 
 /// <summary>Embed the question → Qdrant top K for the tax year → Voyage rerank → keep the top N (BUILD_PLAN §5.1).</summary>
@@ -24,10 +26,11 @@ public sealed class Retriever(IVoyageClient voyage, IChunkStore store, IOptions<
 {
     private readonly RetrievalOptions _options = options.Value;
 
-    public async Task<RetrievalResult> RetrieveAsync(string question, int taxYear, CancellationToken ct = default)
+    public async Task<RetrievalResult> RetrieveAsync(string question, int taxYear, IReadOnlyCollection<string>? docIds = null,
+        CancellationToken ct = default)
     {
         var vectors = await voyage.EmbedAsync([question], VoyageInputType.Query, ct);
-        var hits = await store.SearchAsync(vectors[0], taxYear, _options.VectorTopK, ct: ct);
+        var hits = await store.SearchAsync(vectors[0], taxYear, _options.VectorTopK, docIds, ct);
         if (hits.Count == 0) return new RetrievalResult(0, [], 0, false);
 
         // Rerank on the same breadcrumb + text that was embedded, so section names still count.

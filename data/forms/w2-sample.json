@@ -1,0 +1,100 @@
+{
+  "formId": "w2",
+  "form": "W-2",
+  "title": "Wage and Tax Statement",
+  "taxYear": 2025,
+  "issuerLabel": "c · Employer name",
+  "issuer": "Sample Employer Inc.",
+  "boxes": [
+    {
+      "id": "1",
+      "label": "Wages, tips, other compensation",
+      "value": "$28,000.00",
+      "summary": "The pay your employer reports as taxable income.",
+      "goesTo": "Form 1040, line 1a",
+      "retrievalQuery": "Form W-2 box 1 wages tips other compensation total amount line 1a",
+      "sourceDocs": ["iw2", "i1040"]
+    },
+    {
+      "id": "2",
+      "label": "Federal income tax withheld",
+      "value": "$1,500.00",
+      "summary": "The tax already paid for you. It can come back as a refund.",
+      "goesTo": "Form 1040, line 25a",
+      "retrievalQuery": "Form W-2 box 2 federal income tax withheld line 25a",
+      "sourceDocs": ["iw2", "i1040"]
+    },
+    {
+      "id": "3",
+      "label": "Social security wages",
+      "value": "$28,000.00",
+      "summary": "The pay that social security tax was figured on.",
+      "goesTo": "Not entered on Form 1040",
+      "retrievalQuery": "Form W-2 box 3 social security wages",
+      "sourceDocs": ["iw2"]
+    },
+    {
+      "id": "4",
+      "label": "Social security tax withheld",
+      "value": "$1,736.00",
+      "summary": "Social security tax taken out of your pay.",
+      "goesTo": "Not entered on Form 1040",
+      "retrievalQuery": "Form W-2 box 4 social security tax withheld",
+      "sourceDocs": ["iw2"]
+    },
+    {
+      "id": "5",
+      "label": "Medicare wages and tips",
+      "value": "$28,000.00",
+      "summary": "The pay that Medicare tax was figured on.",
+      "goesTo": "Not entered on Form 1040",
+      "retrievalQuery": "Form W-2 box 5 Medicare wages and tips",
+      "sourceDocs": ["iw2"]
+    },
+    {
+      "id": "6",
+      "label": "Medicare tax withheld",
+      "value": "$406.00",
+      "summary": "Medicare tax taken out of your pay.",
+      "goesTo": "Not entered on Form 1040",
+      "retrievalQuery": "Form W-2 box 6 Medicare tax withheld",
+      "sourceDocs": ["iw2"]
+    },
+    {
+      "id": "12",
+      "label": "Code DD · Cost of employer-sponsored health coverage",
+      "value": "DD $4,800.00",
+      "summary": "What your health coverage cost. It's for your information only.",
+      "goesTo": "Not entered on Form 1040 (not taxable)",
+      "retrievalQuery": "Form W-2 box 12 code DD cost of employer-sponsored health coverage not taxable",
+      "sourceDocs": ["iw2"]
+    },
+    {
+      "id": "15",
+      "label": "State",
+      "value": "CO",
+      "summary": "The state your wages were reported to.",
+      "goesTo": "Your state tax return (not Form 1040)",
+      "retrievalQuery": "Form W-2 box 15 state employer's state ID number",
+      "sourceDocs": ["iw2"]
+    },
+    {
+      "id": "16",
+      "label": "State wages, tips, etc.",
+      "value": "$28,000.00",
+      "summary": "Your pay as counted for state income tax.",
+      "goesTo": "Your state tax return (not Form 1040)",
+      "retrievalQuery": "Form W-2 boxes 15 through 20 state wages tips state income tax",
+      "sourceDocs": ["iw2"]
+    },
+    {
+      "id": "17",
+      "label": "State income tax",
+      "value": "$950.00",
+      "summary": "State income tax already taken out of your pay.",
+      "goesTo": "Your state tax return (not Form 1040)",
+      "retrievalQuery": "Form W-2 box 17 state income tax withheld",
+      "sourceDocs": ["iw2"]
+    }
+  ]
+}

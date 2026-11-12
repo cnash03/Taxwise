@@ -1,0 +1,73 @@
+{
+  "formId": "1098t",
+  "form": "1098-T",
+  "title": "Tuition Statement",
+  "taxYear": 2025,
+  "issuerLabel": "Filer's name (school)",
+  "issuer": "Sample State University",
+  "boxes": [
+    {
+      "id": "1",
+      "label": "Payments received for qualified tuition and related expenses",
+      "value": "$9,400.00",
+      "summary": "What the school received for your tuition and required fees.",
+      "goesTo": "Form 8863 (education credits)",
+      "retrievalQuery": "Form 1098-T box 1 payments received for qualified tuition and related expenses education credit",
+      "sourceDocs": ["i1098t", "p970"]
+    },
+    {
+      "id": "4",
+      "label": "Adjustments made for a prior year",
+      "value": "$0.00",
+      "summary": "Refunds of tuition that was reported in an earlier year.",
+      "goesTo": "Not entered directly; can mean repaying a prior-year education credit",
+      "retrievalQuery": "Form 1098-T box 4 adjustments made for a prior year refund of qualified education expenses credit recapture",
+      "sourceDocs": ["i1098t", "p970"]
+    },
+    {
+      "id": "5",
+      "label": "Scholarships or grants",
+      "value": "$10,600.00",
+      "summary": "Scholarships and grants the school processed for you.",
+      "goesTo": "Reduces expenses on Form 8863; any taxable part goes on Schedule 1, line 8r",
+      "retrievalQuery": "Form 1098-T box 5 scholarships or grants taxable scholarship Schedule 1 line 8r",
+      "sourceDocs": ["i1098t", "p970"]
+    },
+    {
+      "id": "6",
+      "label": "Adjustments to scholarships or grants for a prior year",
+      "value": "$0.00",
+      "summary": "Changes to scholarships that were reported in an earlier year.",
+      "goesTo": "Not entered directly; can change a prior-year education credit",
+      "retrievalQuery": "Form 1098-T box 6 adjustments to scholarships or grants for a prior year",
+      "sourceDocs": ["i1098t", "p970"]
+    },
+    {
+      "id": "7",
+      "label": "Box 1 includes amounts for an academic period beginning January–March 2026",
+      "value": "Checked",
+      "summary": "Some payments were for a term that starts early next year.",
+      "goesTo": "Form 8863 (expenses paid in 2025 for a term starting Jan–Mar 2026 count for 2025)",
+      "retrievalQuery": "Form 1098-T box 7 academic period beginning January through March prepaid expenses",
+      "sourceDocs": ["i1098t", "p970"]
+    },
+    {
+      "id": "8",
+      "label": "Check if at least half-time student",
+      "value": "Checked",
+      "summary": "You took at least half a full course load.",
+      "goesTo": "Form 8863 (the American opportunity credit requires at least half-time enrollment)",
+      "retrievalQuery": "Form 1098-T box 8 at least half-time student American opportunity credit",
+      "sourceDocs": ["i1098t", "p970"]
+    },
+    {
+      "id": "9",
+      "label": "Check if a graduate student",
+      "value": "Not checked",
+      "summary": "Whether you were in a graduate-level program.",
+      "goesTo": "Form 8863 (helps show which education credit you can claim)",
+      "retrievalQuery": "Form 1098-T box 9 graduate student first four years of postsecondary education",
+      "sourceDocs": ["i1098t", "p970"]
+    }
+  ]
+}

@@ -8,6 +8,7 @@ public static class RepoPaths
     public static string Manifest => Path.Combine(Sources, "manifest.json");
     public static string PdfDir => Path.Combine(Sources, "pdf");
     public static string IngestReport => Path.Combine(Sources, "ingest-report.json");
+    public static string Forms => Path.Combine(Root, "data", "forms");
 
     private static string FindRoot()
     {

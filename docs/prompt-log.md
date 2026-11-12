@@ -218,3 +218,66 @@ Entries are append-only. The overall summary is in [AI_USAGE.md](AI_USAGE.md).
   - The `133e0d28` session had reported that the `ant` CLI wasn't installed, so the agents couldn't have used this path until we installed it and logged in.
   - The `ant` login is tied to a personal account and its OAuth token expires (about 8 hours here). A partner needs their own `ant auth login` or a key, and SETUP.md doesn't say so yet.
 - **Tag:** success
+
+### 2026-11-10 · Phase 3 · Claude Code (claude-opus-5-5) · @cnash03 · session `e205fac5`
+- **Role:** execution agent, Phase 3 (chat UI and plain-language mode). Branch `phase-3-chat-ui`, PR #5, commit `a4e8787`.
+- **Prompt:** "execute phase 3 plan"
+  - Follow-up: "looks right, commit and open the PR"
+- **Generated:**
+  - The Ask page (`Ask.razor`) with answer cards, citation chips, follow-up and "Quiz me" chips, loading/error/refusal states, and the plain-language toggle and tax-year picker (remembered with MAUI `Preferences`).
+  - Components `AnswerCard`, `SourcePanel`, `GlossaryText`, `TaxYearPicker`; services `TaxWiseApiClient`, `UserSettings`, `GlossaryService`, `ChatSession`; display helpers `Shared/Display/Glossary.cs` and `SourceLabels.cs`; mockup colors in `app.css`.
+  - `data/glossary.json`: 40 terms. The agent dumped every chunk from Qdrant and based each definition on a real TY2025 chunk, checked that every `chunkId` exists, and left all of them `reviewed: false` for a human.
+  - 18 new tests (term matching, chip labels, highlight splitting, the glossary file); 117 in total.
+- **Human decisions:** 2 checkpoints, both the AI's recommendation.
+  - The agent couldn't click or screenshot the desktop app, so **we clicked through the demo ourselves before the PR**, as the plan requires.
+  - With plain-language on, 1 of 3 questions cited one extra chunk (same 4 passages retrieved). The plan asks for the same chunk IDs. **We noted it in the PR as model variance** instead of tightening the prompt; Phase 7 should recheck it.
+- **Verified by:** `dotnet build` and 117/117 tests. Live API: the demo question returned 6 citations with every highlight matched, and the agent opened the PDFs with PDFKit to confirm Pub 970 p. 5 and Pub 519 p. 25 contain their highlighted sentences. Plain-language comparison on 3 questions (same chunks / one extra / refused in both modes). Our own click-through of the app.
+- **Worked?** Partly. The chat worked end to end, but a shipped UI bug and a PR-routing mistake were only found in the next session (`ce6c7853`).
+- **Human change:** nothing; we clicked through the demo and approved the PR.
+- **AI limits seen:**
+  - **A Razor binding bug shipped.** `SourcePanel Highlight="_selected?.Citation.Highlight"` has no `@`, and Razor passes a `string` parameter's plain value as literal text, so the panel was handed the text "_selected?.Citation.Highlight" instead of the quoted sentence. The agent's checks only tested highlights through the API, never in the UI. The same mistake (`Error="_error"`) broke the Phase 4 page, and that's how it was found (`ce6c7853`, screenshot of the card reading "_error"). Fixed there. Whether the Phase 3 highlight visibly failed in the app isn't settled: in `ce6c7853` we reported seeing highlights in a build that, by its DLL timestamp, didn't have the fix yet.
+  - **The PR went to the wrong place.** The agent opened PR #5 against `phase-2-query-api` (stacked on the open Phase 2 PR) and said GitHub would retarget it once #4 merged. #4 merged first, then #5 was merged into `phase-2-query-api`, so Phase 3 never reached `main`. Found at the start of `ce6c7853`; Phase 4's PR into `main` carries Phase 3 with it.
+  - "Can my parents still claim me as a dependent while I'm in college?" was refused in both modes because retrieval didn't find the right passages. The agent swapped it out of the welcome examples rather than fixing retrieval; that's left for the Phase 7 eval.
+  - It couldn't see or click the desktop app, so the UI check depended on us.
+- **Tag:** partial
+
+### 2026-11-10 · Phase 4 · Claude Code (claude-opus-5-5) · @cnash03 · session `ce6c7853`
+- **Role:** execution agent, Phase 4 (Explain my form). Started on `phase-3-chat-ui`, built on `phase-4-explain-form`. Not committed within the session.
+- **Prompt:** "start phase 4"
+  - Follow-up: "still error but thw source passage is there" (we reported that the page still failed in the app after the agent's API checks passed).
+- **Generated:**
+  - `data/forms/w2-sample.json` and `1098t-sample.json`: W-2 boxes 1–6, 12 (code DD), 15–17 and 1098-T boxes 1, 4–9, each with `goesTo`, `retrievalQuery` and `sourceDocs`. The agent looked up each `goesTo` in the text of the TY2025 IRS instructions (i1040, iW-2, i1098-T, Pub 970).
+  - API: `GET /api/forms/{form}` and `POST /api/forms/explain` (`FormLibrary`, `FormPrompt`, `FormExplainer`, `FormExplainService`, `form.system.md`, `form.schema.json`). It retrieves only from the box's `sourceDocs`, runs the same citation validator as chat, returns `goesTo` from the data rather than from the model, and caches explanations in memory. The Claude JSON call was pulled out of `ClaudeAnswerer` into a shared `ClaudeJsonClient`.
+  - App: `ExplainForm.razor` and `BoxExplanation.razor` (box grid, explanation card, "Where it goes" callout, citation chips, "Next up" card; **Upload mine** disabled) and the matching CSS. While debugging it added `PageErrorBoundary` and a Debug-only `DebugLog` that writes app failures to `last-error.txt`.
+  - 23 new tests (form data, prompt, service, endpoints); 140 in total.
+- **Human decisions:** 13 checkpoints. We took the recommendation on 9 of them.
+  - Plan approved; W-2 box 12 code **DD** (employer health coverage), as recommended.
+  - PR #5 had been merged into `phase-2-query-api`, so `main` is missing Phase 3. **PR Phase 4 into `main`** so it carries Phase 3 along (recommended).
+  - A stash left the Phase 3 session log in a merge conflict: we used the stashed copy (recommended).
+  - Mid-session `/ai-report` for Phase 3: **we first tagged it `failure`** (the AI suggested `success`) because "the app didn't work". The agent showed that the error we were seeing came from the Phase 4 page, not Phase 3, but also that Phase 3 had shipped the same kind of binding bug in its source panel. We then picked **partial** (recommended).
+  - We agreed to let the agent restart our running API with its log captured.
+- **Verified by:**
+  - `dotnet test`: one new test failed on its first run and the agent corrected the test. 140/140 after that.
+  - Live acceptance script: all 17 boxes × both modes (34 requests) returned cited explanations, none refused. After reading the sample answers the agent tweaked the prompt so the model states where the box goes instead of saying it was told.
+  - Our click-through in the app. It failed several times before it worked (see below); final state confirmed by us: explanations render, and chat highlights show on TY2025.
+- **Worked?** Partly. The API met the acceptance check on the first live run, but the page showed an error card on every box until the fifth app build.
+- **Human change:** nothing by hand; we clicked through the app at each round and reported what we saw.
+- **AI limits seen:**
+  - **The bug was invisible to every check the agent could run.** `BoxExplanation Error="_error"` has no `@`, so Razor passed the literal text "_error" and every box showed an error card. The API logs showed each request succeeding, so the agent first blamed a stale API process, then added an error boundary and log file, which stayed empty because nothing threw. It found the cause only from a screenshot of the card. The same mistake was in Phase 3's `Highlight=` binding.
+  - **A stale build cost several rounds.** `dotnet build -t:Run` reported success without recompiling, so we tested old code after the fix. The agent found it by checking the DLL timestamp and rebuilt with `--no-incremental`.
+  - **We had to answer "no it does not" twice** before the agent stopped assuming the API log meant the page worked. It asked a multiple-choice question to resolve the ambiguity.
+  - **A full-desktop screenshot captured our other apps** (Outlook). The agent deleted it straight away and switched to capturing only the TaxWise window.
+  - **The prompt tells the model `goesTo` "has been checked by a person"**, but no human has checked it yet. BUILD_PLAN requires that check before the PR merges.
+  - The session hit the usage limit at the commit step, after a permission check had blocked the commit, push and PR. They were finished in `9a1333b2`.
+- **Tag:** partial
+
+### 2026-11-10 · Ad hoc · Claude Code (claude-opus-5-5) · @cnash03 · session `7ec55ad7`
+- **Role:** ad-hoc question.
+- **Prompt:** "how do i run my app again"
+- **Generated:** nothing; it answered with the three run commands (Qdrant, API, App) from the README's Run section.
+- **Human decisions:** none.
+- **Verified by:** it read the README.
+- **Worked?** Yes, with one gap: it left out the `-p:ValidateXcodeVersion=false` flag that the README says the App build needs on newer Xcode, and this machine needs it.
+- **Human change:** none.
+- **AI limits seen:** the omission above.
+- **Tag:** success

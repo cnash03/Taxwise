@@ -1,0 +1,107 @@
+@inject GlossaryService Glossary
+
+@* The right-hand card on slide 9: box badge, title, explanation, "Where it goes" callout and citation chips. *@
+@if (Loading)
+{
+    <article class="answer-card box-explanation loading" aria-busy="true">
+        <div class="box-title"><span class="box-badge">@Box.Id</span><h2>@Box.Label</h2></div>
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+        <div class="skeleton short"></div>
+    </article>
+}
+else if (Error is not null)
+{
+    <article class="answer-card error" role="alert">
+        <div class="error-title">@(ApiUnreachable ? "TaxWise API unavailable" : "Something went wrong")</div>
+        <p>@Error</p>
+        <button class="btn" @onclick="OnRetry">Try again</button>
+    </article>
+}
+else if (Response is { } r)
+{
+    var refusal = r.Kind == AskResponse.RefusalKind;
+    <article class="answer-card box-explanation @(refusal ? "refusal" : null)">
+        <div class="box-title"><span class="box-badge">@r.BoxId</span><h2>@r.BoxLabel</h2></div>
+        @if (PlainLanguage && !refusal)
+        {
+            <div class="mode-tag">Plain language</div>
+        }
+
+        <p class="box-text">
+            @if (_segments is not null)
+            {
+                <GlossaryText Segments="_segments" />
+            }
+            else
+            {
+                @r.Explanation
+            }
+        </p>
+
+        @if (refusal && r.Links.Count > 0)
+        {
+            <div class="help-links">
+                @foreach (var link in r.Links)
+                {
+                    <button class="link-btn" @onclick="() => OnOpenLink.InvokeAsync(link.Url)">@link.Label ↗</button>
+                }
+            </div>
+        }
+
+        <div class="goes-to">
+            <div class="goes-to-label">Where it goes</div>
+            <div class="goes-to-value">@r.GoesTo</div>
+        </div>
+
+        @if (r.Citations.Count > 0)
+        {
+            <div class="chips">
+                @foreach (var c in r.Citations)
+                {
+                    var source = r.Sources.FirstOrDefault(s => s.Number == c.Number);
+                    if (source is null) continue;
+                    <button class="chip @(IsSelected(c) ? "selected" : null)"
+                            title="@source.Section"
+                            aria-pressed="@IsSelected(c)"
+                            @onclick="() => OnCite.InvokeAsync(c)">
+                        @SourceLabels.Chip(source)
+                    </button>
+                }
+            </div>
+        }
+        <footer class="disclaimer">@r.Disclaimer</footer>
+    </article>
+}
+
+@code {
+    private IReadOnlyList<TextSegment>? _segments;
+    private ExplainFormResponse? _segmentsFor;
+
+    [Parameter, EditorRequired] public FormBox Box { get; set; } = default!;
+    [Parameter] public ExplainFormResponse? Response { get; set; }
+    [Parameter] public bool Loading { get; set; }
+    [Parameter] public string? Error { get; set; }
+    [Parameter] public bool ApiUnreachable { get; set; }
+    [Parameter] public bool PlainLanguage { get; set; }
+    [Parameter] public CitationRef? Selected { get; set; }
+    [Parameter] public EventCallback<CitationRef> OnCite { get; set; }
+    [Parameter] public EventCallback<string> OnOpenLink { get; set; }
+    [Parameter] public EventCallback OnRetry { get; set; }
+
+    private bool IsSelected(CitationRef c) => Selected == c;
+
+    protected override void OnParametersSet()
+    {
+        // Glossary tooltips are part of plain-language mode (BUILD_PLAN §5.2), same as chat answers.
+        if (!PlainLanguage || Response is null || Response.Kind == AskResponse.RefusalKind)
+        {
+            _segments = null;
+            _segmentsFor = null;
+            return;
+        }
+        if (ReferenceEquals(_segmentsFor, Response)) return;
+        _segments = Glossary.Marker.Mark(Response.Explanation, new HashSet<GlossaryTerm>());
+        _segmentsFor = Response;
+    }
+}

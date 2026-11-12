@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Polly;
 using Qdrant.Client;
 using TaxWise.Rag.Answering;
+using TaxWise.Rag.Forms;
 using TaxWise.Rag.VectorStore;
 using TaxWise.Rag.Voyage;
 
@@ -31,8 +32,8 @@ public static class RagServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Adds the cited Q&amp;A pipeline on top of <see cref="AddTaxWiseRag"/>: retriever, Claude answerer and
-    /// <see cref="AskService"/>. The Anthropic key is read from <c>ANTHROPIC_API_KEY</c> (env, user-secrets or
+    /// Adds the cited Q&amp;A pipeline on top of <see cref="AddTaxWiseRag"/>: retriever, Claude answerer,
+    /// <see cref="AskService"/>, and the "Explain my form" explainer and <see cref="FormExplainService"/>. The Anthropic key is read from <c>ANTHROPIC_API_KEY</c> (env, user-secrets or
     /// App Service settings) when the client is first needed, so hosts without a key still start. Without a key the
     /// SDK falls back to the <c>ant auth login</c> profile in <c>~/.config/anthropic</c>, which is how local dev runs.
     /// </summary>
@@ -40,16 +41,21 @@ public static class RagServiceCollectionExtensions
     {
         services.Configure<AnthropicOptions>(configuration.GetSection(AnthropicOptions.SectionName));
         services.Configure<RetrievalOptions>(configuration.GetSection(RetrievalOptions.SectionName));
+        services.Configure<FormOptions>(configuration.GetSection(FormOptions.SectionName));
 
         services.AddSingleton(_ =>
         {
             var key = configuration["ANTHROPIC_API_KEY"];
-            // Retries are done by ClaudeAnswerer (once, on 5xx/connection only), so the SDK's own are off.
+            // Retries are done by ClaudeJsonClient (once, on 5xx/connection only), so the SDK's own are off.
             return string.IsNullOrWhiteSpace(key) ? new AnthropicClient { MaxRetries = 0 } : new AnthropicClient { ApiKey = key, MaxRetries = 0 };
         });
         services.AddSingleton<IRetriever, Retriever>();
+        services.AddSingleton<ClaudeJsonClient>();
         services.AddSingleton<IAnswerer, ClaudeAnswerer>();
         services.AddSingleton<AskService>();
+        services.AddSingleton<FormLibrary>();
+        services.AddSingleton<IFormExplainer, ClaudeFormExplainer>();
+        services.AddSingleton<FormExplainService>();
         return services;
     }
 
