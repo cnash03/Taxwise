@@ -1,24 +1,320 @@
 @page "/quizzes"
+@implements IDisposable
+@inject TaxWiseApiClient Api
+@inject QuizHistory History
+@inject UserSettings Settings
+@inject ILauncher Launcher
+@inject NavigationManager Nav
 
-<header class="page-header">
-    <h1>Learning quizzes</h1>
-</header>
+<div class="forms-page quiz-page">
+    <section class="forms-main">
+        <header class="chat-header">
+            <div class="chat-heading">
+                <h1 class="chat-title" title="@Topic">@(Topic is null ? "Learning quizzes" : $"Quiz · {Topic}")</h1>
+                <div class="chat-subtitle">
+                    @if (Topic is null)
+                    {
+                        <text>Quizzes are written from the IRS passages cited in your chat answers.</text>
+                    }
+                    else
+                    {
+                        <text>Tax year @_taxYear · every question comes from one IRS passage, and the answer is quoted from it.</text>
+                    }
+                </div>
+            </div>
+            <div class="chat-controls">
+                <label class="toggle">
+                    <input type="checkbox" role="switch" checked="@_plainLanguage" @onchange="TogglePlainLanguage" disabled="@_loading" />
+                    <span class="toggle-track" aria-hidden="true"></span>
+                    <span>Plain-language mode</span>
+                </label>
+                @if (Topic is not null)
+                {
+                    <button class="btn" @onclick="BackToTopics">All topics</button>
+                }
+            </div>
+        </header>
 
-<section class="empty-state">
-    @if (!string.IsNullOrWhiteSpace(Topic))
-    {
-        <p>Quizzes on <strong>@Topic</strong> are coming in Phase 6. They'll be built from the @ChunkCount IRS passages cited in your chat.</p>
-    }
-    else
-    {
-        <p>Ask a few questions first. Quizzes are built from what you've asked about.</p>
-    }
-</section>
+        <div class="quiz-body">
+            @if (Topic is null)
+            {
+                var topics = History.Topics;
+                if (topics.Count == 0)
+                {
+                    <section class="empty-state">
+                        <p>Ask a few questions first. Quizzes are built from what you've asked about.</p>
+                        <a class="btn btn-primary" href="ask">Go to Ask</a>
+                    </section>
+                }
+                else
+                {
+                    <ul class="topic-list">
+                        @foreach (var t in topics)
+                        {
+                            <li class="topic-row">
+                                <div>
+                                    <div class="topic-name">@t.Topic</div>
+                                    <div class="step-source">Tax year @t.TaxYear · @Passages(t.ChunkIds.Count) cited in chat</div>
+                                </div>
+                                <div class="topic-actions">
+                                    <button class="btn" aria-label="Forget @t.Topic" @onclick="() => History.Remove(t)">Forget</button>
+                                    <button class="btn btn-primary" @onclick="() => Start(t)">Start quiz</button>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                }
+            }
+            else if (_loading)
+            {
+                <article class="answer-card loading" aria-busy="true">
+                    <div class="status-line pending"><span class="dot"></span>Writing @QuizLimits.DefaultCount questions from the IRS passages…</div>
+                    <div class="skeleton"></div>
+                    <div class="skeleton"></div>
+                    <div class="skeleton short"></div>
+                </article>
+            }
+            else if (_error is not null)
+            {
+                <article class="answer-card error" role="alert">
+                    <div class="error-title">@(_errorUnreachable ? "TaxWise API unavailable" : "Something went wrong")</div>
+                    <p>@_error</p>
+                    <button class="btn" @onclick="LoadAsync">Try again</button>
+                </article>
+            }
+            else if (_quiz is { Items.Count: 0 })
+            {
+                <article class="answer-card refusal">
+                    <p>TaxWise couldn't write questions that passed its checks for this topic. Try again, or ask a few more questions about it first.</p>
+                    <button class="btn" @onclick="LoadAsync">Try again</button>
+                </article>
+            }
+            else if (_quiz is { } quiz && _index >= quiz.Items.Count)
+            {
+                <article class="answer-card quiz-score">
+                    <div class="goes-to-label">Quiz complete</div>
+                    <div class="big-result refund">
+                        <span class="big-amount">@_score of @quiz.Items.Count</span>
+                        <span class="big-label">correct</span>
+                    </div>
+                    <p class="box-text">@ScoreMessage(quiz.Items.Count)</p>
+                    <div class="topic-actions">
+                        <button class="btn" @onclick="BackToTopics">All topics</button>
+                        <button class="btn btn-primary" @onclick="LoadAsync">New quiz on this topic</button>
+                    </div>
+                    <footer class="disclaimer">@quiz.Disclaimer</footer>
+                </article>
+            }
+            else if (_quiz is { } q)
+            {
+                var item = q.Items[_index];
+                <div class="quiz-progress">
+                    <span>Question @(_index + 1) of @q.Items.Count</span>
+                    <div class="progress-track" role="progressbar" aria-valuemin="1" aria-valuemax="@q.Items.Count" aria-valuenow="@(_index + 1)"
+                         aria-label="Quiz progress">
+                        <div class="progress-fill" style="width: @Percent(_index + 1, q.Items.Count)%"></div>
+                    </div>
+                </div>
+
+                <article class="answer-card quiz-card">
+                    <div class="goes-to-label">Generated from your questions about @Topic</div>
+                    <h2 class="quiz-question">@item.Question</h2>
+                    <div class="quiz-options" role="group" aria-label="Answer options">
+                        @for (var i = 0; i < item.Options.Count; i++)
+                        {
+                            var option = i;
+                            <button class="quiz-option @OptionClass(item, option)" disabled="@(_answer is not null)"
+                                    aria-pressed="@(_answer == option)" @onclick="() => Answer(option)">
+                                <span class="option-letter">@Letter(option)</span>
+                                <span>@item.Options[option]</span>
+                            </button>
+                        }
+                    </div>
+                </article>
+
+                @if (_answer is { } answer)
+                {
+                    var correct = answer == item.CorrectIndex;
+                    <article class="answer-card quiz-feedback @(correct ? "correct" : "incorrect")" role="status">
+                        <div class="feedback-title">@(correct ? "Correct" : $"Incorrect. The answer is {Letter(item.CorrectIndex)}.")</div>
+                        <p class="box-text">@item.Explanation</p>
+                        <div class="chips">
+                            <button class="chip @(_showSource ? "selected" : null)" title="@item.Source.Section" aria-pressed="@_showSource"
+                                    @onclick="() => _showSource = true">
+                                @SourceLabels.Chip(item.Source)
+                            </button>
+                        </div>
+                        <div class="topic-actions">
+                            <button class="btn btn-primary" @onclick="Next">@(_index + 1 < q.Items.Count ? "Next question" : "See your score")</button>
+                        </div>
+                    </article>
+                }
+
+                @if (_openError is not null)
+                {
+                    <div class="inline-error" role="alert">@_openError</div>
+                }
+            }
+        </div>
+    </section>
+
+    <SourcePanel Source="SelectedSource" Highlight="@SelectedQuote" OnOpenPdf="OpenPdfAsync"
+                 EmptyText="Answer the question, then click its citation to see the IRS passage it came from." />
+</div>
 
 @code {
-    /// <summary>Set by "Quiz me on &lt;topic&gt;" in chat; <see cref="Chunks"/> is the chat's cited chunk IDs, comma-separated.</summary>
+    /// <summary>Set by "Quiz me on &lt;topic&gt;" in chat or a Start quiz button; the chunks come from <see cref="QuizHistory"/>.</summary>
     [SupplyParameterFromQuery] public string? Topic { get; set; }
-    [SupplyParameterFromQuery] public string? Chunks { get; set; }
+    [SupplyParameterFromQuery] public int? Year { get; set; }
 
-    private int ChunkCount => Chunks?.Split(',', StringSplitOptions.RemoveEmptyEntries).Length ?? 0;
+    private readonly CancellationTokenSource _pageCts = new();
+    private CancellationTokenSource? _requestCts;
+    private string? _loadedFor;
+    private int _taxYear;
+    private bool _plainLanguage;
+    private bool _loading;
+    private string? _error;
+    private bool _errorUnreachable;
+    private QuizResponse? _quiz;
+    private int _index;
+    private int? _answer;
+    private int _score;
+    private bool _showSource;
+    private string? _openError;
+
+    private QuizItem? Current => _quiz is { } q && _index < q.Items.Count ? q.Items[_index] : null;
+    private SourcePassage? SelectedSource => _showSource ? Current?.Source : null;
+    private string? SelectedQuote => _showSource ? Current?.Quote : null;
+
+    protected override void OnInitialized() => _plainLanguage = Settings.PlainLanguage;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // The page stays mounted when the query changes (topic list → quiz → topic list).
+        var key = Topic is null ? null : $"{Topic}|{Year}";
+        if (key == _loadedFor) return;
+        _loadedFor = key;
+        CancelRequest();
+        _quiz = null;
+        _error = null;
+        if (Topic is null) return;
+
+        _taxYear = Year is { } y && UserSettings.SupportedTaxYears.Contains(y) ? y : UserSettings.DefaultTaxYear(TaxYearFeature.Chat);
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        if (Topic is null) return;
+        CancelRequest();
+        var cts = CancellationTokenSource.CreateLinkedTokenSource(_pageCts.Token);
+        _requestCts = cts;
+
+        _loading = true;
+        _error = null;
+        _quiz = null;
+        _index = 0;
+        _answer = null;
+        _score = 0;
+        _showSource = false;
+        _openError = null;
+        StateHasChanged();
+
+        var chunkIds = History.Find(Topic, _taxYear)?.ChunkIds ?? [];
+        try
+        {
+            var quiz = await Api.QuizAsync(new QuizRequest(Topic, chunkIds, _taxYear, _plainLanguage), cts.Token);
+            if (cts != _requestCts) return; // a newer request won
+            _quiz = quiz;
+        }
+        catch (ApiException e)
+        {
+            if (cts != _requestCts) return;
+            _error = e.Message;
+            _errorUnreachable = e.ApiUnreachable;
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+        _loading = false;
+    }
+
+    private void Start(SavedQuizTopic t) =>
+        Nav.NavigateTo($"quizzes?topic={Uri.EscapeDataString(t.Topic)}&year={t.TaxYear}");
+
+    private void BackToTopics() => Nav.NavigateTo("quizzes");
+
+    private void Answer(int option)
+    {
+        if (_answer is not null || Current is not { } item) return;
+        _answer = option;
+        if (option == item.CorrectIndex) _score++;
+    }
+
+    private void Next()
+    {
+        _index++;
+        _answer = null;
+        _showSource = false;
+        _openError = null;
+    }
+
+    private string? OptionClass(QuizItem item, int option)
+    {
+        if (_answer is not { } answer) return null;
+        if (option == item.CorrectIndex) return "is-correct";
+        return option == answer ? "is-wrong" : "is-muted";
+    }
+
+    private void TogglePlainLanguage(ChangeEventArgs e)
+    {
+        _plainLanguage = e.Value is true;
+        Settings.PlainLanguage = _plainLanguage;
+    }
+
+    private static char Letter(int index) => (char)('A' + index);
+
+    private static string Passages(int n) => n == 1 ? "1 passage" : $"{n} passages";
+
+    private static string Percent(int part, int whole) => (100.0 * part / whole).ToString("0.#", System.Globalization.CultureInfo.InvariantCulture);
+
+    private string ScoreMessage(int total) => _score == total
+        ? "Every answer right. You know this topic well."
+        : "Each question's citation shows the IRS passage it came from. Ask in chat about anything that tripped you up.";
+
+    private void CancelRequest()
+    {
+        _requestCts?.Cancel();
+        _requestCts?.Dispose();
+        _requestCts = null;
+        _loading = false;
+    }
+
+    private async Task OpenPdfAsync(SourcePassage source)
+    {
+        if (!Uri.TryCreate($"{source.PdfUrl}#page={source.Page}", UriKind.Absolute, out var uri))
+        {
+            _openError = "This source has no PDF link.";
+            return;
+        }
+        _openError = null;
+        try
+        {
+            if (!await Launcher.OpenAsync(uri))
+                _openError = "Couldn't open that link on this computer.";
+        }
+        catch (Exception e) when (e is InvalidOperationException or PlatformNotSupportedException)
+        {
+            _openError = "Couldn't open that link on this computer.";
+        }
+    }
+
+    public void Dispose()
+    {
+        _requestCts?.Cancel();
+        _requestCts?.Dispose();
+        _pageCts.Cancel();
+        _pageCts.Dispose();
+    }
 }

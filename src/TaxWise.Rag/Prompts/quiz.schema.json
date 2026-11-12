@@ -1,0 +1,12 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["question", "options", "correctIndex", "explanation", "quote"],
+  "properties": {
+    "question":     { "type": "string" },
+    "options":      { "type": "array", "items": { "type": "string" }, "description": "Exactly four distinct options, A to D" },
+    "correctIndex": { "type": "integer", "enum": [0, 1, 2, 3] },
+    "explanation":  { "type": "string" },
+    "quote":        { "type": "string", "description": "Exact sentence copied from P1 that shows the correct answer" }
+  }
+}

@@ -12,7 +12,7 @@ public sealed class ApiException(string message, bool apiUnreachable) : Exceptio
 	public bool ApiUnreachable { get; } = apiUnreachable;
 }
 
-/// <summary>Calls the TaxWise API (ask, knowledge base, forms, calculator). API keys live only in the API (BUILD_PLAN §1).</summary>
+/// <summary>Calls the TaxWise API (ask, knowledge base, forms, calculator, quiz). API keys live only in the API (BUILD_PLAN §1).</summary>
 public sealed class TaxWiseApiClient(HttpClient http)
 {
 	public async Task<AskResponse> AskAsync(AskRequest request, CancellationToken cancellationToken)
@@ -49,6 +49,12 @@ public sealed class TaxWiseApiClient(HttpClient http)
 	{
 		using var response = await SendAsync(() => http.PostAsJsonAsync(ApiRoutes.CompareYears, request, cancellationToken), cancellationToken);
 		return await ReadAsync<CompareYearsResponse>(response, cancellationToken);
+	}
+
+	public async Task<QuizResponse> QuizAsync(QuizRequest request, CancellationToken cancellationToken)
+	{
+		using var response = await SendAsync(() => http.PostAsJsonAsync(ApiRoutes.Quiz, request, cancellationToken), cancellationToken);
+		return await ReadAsync<QuizResponse>(response, cancellationToken);
 	}
 
 	private static async Task<HttpResponseMessage> SendAsync(Func<Task<HttpResponseMessage>> send, CancellationToken cancellationToken)

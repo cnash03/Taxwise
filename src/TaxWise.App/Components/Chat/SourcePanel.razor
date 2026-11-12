@@ -3,7 +3,7 @@
 
     @if (Source is null)
     {
-        <p class="panel-empty">Click a numbered citation in an answer to see the exact IRS passage it came from.</p>
+        <p class="panel-empty">@EmptyText</p>
     }
     else
     {
@@ -47,6 +47,7 @@
     [Parameter] public SourcePassage? Source { get; set; }
     [Parameter] public string? Highlight { get; set; }
     [Parameter] public EventCallback<SourcePassage> OnOpenPdf { get; set; }
+    [Parameter] public string EmptyText { get; set; } = "Click a numbered citation in an answer to see the exact IRS passage it came from.";
 
     /// <summary>The rest of the doc title, e.g. "Tax Benefits for Education", plus the chapter name.</summary>
     private string Subtitle

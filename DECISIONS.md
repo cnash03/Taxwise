@@ -135,3 +135,17 @@ Design decisions for TaxWise, newest last. Each one records what we chose, what 
 **Why:** We wanted it for the demo. The session log records our choice but not our reasons, so the reasons below were written down afterwards:
 - It shows directly that the standard deduction and brackets go up each year, which is the point of supporting three tax years.
 - It was cheap to add: the calculator is pure code, so comparing years costs no model calls and needs no new guardrail.
+
+## 13. Quiz topics are the cited section, and quizzes use every cited chunk
+
+**Phase 6 · 2026-11-12 · session `73153c57`**
+
+**Decision:** A quiz topic is the section of the first passage an answer cites (e.g. "Tax-Free Scholarships and Fellowship Grants"), grouped by tax year. A quiz is built from every chunk chat cited under that topic, whatever the publication. The demo scholarship answer cites Pub 970, Pub 519 and Pub 17, so its quiz has 2 Pub 970 questions out of 5. Questions that quote the same sentence from two publications are both kept.
+
+**Alternatives considered:**
+- The conversation title as the topic, as BUILD_PLAN said.
+- Only the chunks from the topic's own publication, with fill-up limited to that document. That would meet BUILD_PLAN's "each citing a Pub 970 chunk" check for the demo.
+- Dropping questions whose quote repeats one already in the quiz.
+
+**Why:** The "Quiz me on …" button already used the cited section, which reads better in the quiz header and merges related chats. The quiz should test what the student actually read in their answers, so every cited chunk counts. The Pub 970 criterion assumed the demo answer would cite only Pub 970.
+

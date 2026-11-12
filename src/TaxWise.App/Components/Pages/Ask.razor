@@ -3,6 +3,7 @@
 @implements IDisposable
 @inject TaxWiseApiClient Api
 @inject ChatSession Chat
+@inject QuizHistory QuizHistory
 @inject UserSettings Settings
 @inject ILauncher Launcher
 @inject NavigationManager Nav
@@ -188,6 +189,7 @@
         {
             turn.Response = await Api.AskAsync(new AskRequest(turn.Question, turn.PlainLanguage, turn.TaxYear), _cts.Token);
             turn.Status = TurnStatus.Done;
+            if (turn.QuizTopic is { } topic) QuizHistory.Record(topic, turn.TaxYear, turn.CitedChunkIds);
             SelectFirstCitation(turn);
         }
         catch (ApiException e)
@@ -220,12 +222,9 @@
 
     private void Select(CitationSelection selection) => _selected = selection;
 
-    /// <summary>"Quiz me on &lt;topic&gt;" hands quizzes this chat's cited chunk IDs (BUILD_PLAN §5, Phase 3).</summary>
-    private void QuizMe(string topic)
-    {
-        var chunks = string.Join(",", Chat.CitedChunkIds);
-        Nav.NavigateTo($"quizzes?topic={Uri.EscapeDataString(topic)}&chunks={Uri.EscapeDataString(chunks)}");
-    }
+    /// <summary>"Quiz me on &lt;topic&gt;" opens a quiz on the chunks saved under that answer's topic (BUILD_PLAN §7, Phase 6).</summary>
+    private void QuizMe(ChatTurn turn) =>
+        Nav.NavigateTo($"quizzes?topic={Uri.EscapeDataString(turn.QuizTopic!)}&year={turn.TaxYear}");
 
     private async Task OpenPdfAsync(SourcePassage source)
     {
