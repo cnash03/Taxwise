@@ -80,9 +80,9 @@ else if (Turn.Response is { } r)
         </article>
 
         <div class="follow-ups">
-            @if (QuizTopic is { } topic)
+            @if (Turn.QuizTopic is { } topic)
             {
-                <button class="follow-up quiz" @onclick="() => OnQuiz.InvokeAsync(topic)">Quiz me on @topic</button>
+                <button class="follow-up quiz" @onclick="() => OnQuiz.InvokeAsync(Turn)">Quiz me on @topic</button>
             }
             @foreach (var f in r.SuggestedFollowUps)
             {
@@ -101,20 +101,9 @@ else if (Turn.Response is { } r)
     [Parameter] public bool Busy { get; set; }
     [Parameter] public EventCallback<CitationSelection> OnCite { get; set; }
     [Parameter] public EventCallback<string> OnFollowUp { get; set; }
-    [Parameter] public EventCallback<string> OnQuiz { get; set; }
+    [Parameter] public EventCallback<ChatTurn> OnQuiz { get; set; }
     [Parameter] public EventCallback<string> OnOpenLink { get; set; }
     [Parameter] public EventCallback<ChatTurn> OnRetry { get; set; }
-
-    /// <summary>The section of the first cited passage, e.g. "Scholarships and Fellowship Grants".</summary>
-    private string? QuizTopic
-    {
-        get
-        {
-            var r = Turn.Response!;
-            var first = r.Paragraphs.SelectMany(p => p.Citations).FirstOrDefault();
-            return first is null ? null : r.Sources.FirstOrDefault(s => s.Number == first.Number)?.Section;
-        }
-    }
 
     private bool IsSelected(CitationRef c) =>
         Selected is { } s && ReferenceEquals(s.Turn, Turn) && s.Citation == c;

@@ -22,6 +22,22 @@ public sealed class ChatTurn(string question, bool plainLanguage, int taxYear)
 	public bool ApiUnreachable { get; set; }
 
 	public bool IsRefusal => Response?.Kind == AskResponse.RefusalKind;
+
+	/// <summary>The section of the first cited passage, e.g. "Scholarships and Fellowship Grants"; null for refusals.</summary>
+	public string? QuizTopic
+	{
+		get
+		{
+			if (Status != TurnStatus.Done || IsRefusal || Response is not { } r) return null;
+			var first = r.Paragraphs.SelectMany(p => p.Citations).FirstOrDefault();
+			return first is null ? null : r.Sources.FirstOrDefault(s => s.Number == first.Number)?.Section;
+		}
+	}
+
+	/// <summary>Every chunk this answer cited, in citation order; saved under <see cref="QuizTopic"/> for quizzes.</summary>
+	public IReadOnlyList<string> CitedChunkIds => IsRefusal || Response is null
+		? []
+		: Response.Paragraphs.SelectMany(p => p.Citations).Select(c => c.ChunkId).Distinct().ToList();
 }
 
 /// <summary>
@@ -35,13 +51,6 @@ public sealed class ChatSession
 	public List<ChatTurn> Turns { get; } = [];
 
 	public string Title => Turns.Count == 0 ? "New conversation" : SourceLabels.Truncate(Turns[0].Question, TitleLength);
-
-	/// <summary>Every chunk cited in this chat, oldest first; "Quiz me" passes these to quizzes.</summary>
-	public IReadOnlyList<string> CitedChunkIds => Turns
-		.Where(t => t is { Status: TurnStatus.Done, IsRefusal: false })
-		.SelectMany(t => t.Response!.Paragraphs.SelectMany(p => p.Citations).Select(c => c.ChunkId))
-		.Distinct()
-		.ToList();
 
 	public void Clear() => Turns.Clear();
 }

@@ -46,6 +46,9 @@ internal sealed class FakeStore(IReadOnlyList<Chunk> hits) : IChunkStore
         return Task.FromResult<IReadOnlyList<ScoredChunk>>(hits.Take(limit).Select(c => new ScoredChunk(c, 0.5)).ToList());
     }
 
+    public Task<IReadOnlyList<Chunk>> GetAsync(IReadOnlyList<string> chunkIds, CancellationToken ct = default) =>
+        Task.FromResult<IReadOnlyList<Chunk>>(chunkIds.Select(id => hits.FirstOrDefault(c => c.Id == id)).OfType<Chunk>().ToList());
+
     public Task EnsureCollectionAsync(bool recreate, CancellationToken ct = default) => throw new NotSupportedException();
     public Task UpsertAsync(IReadOnlyList<Chunk> chunks, IReadOnlyList<float[]> vectors, CancellationToken ct = default) => throw new NotSupportedException();
     public Task DeleteAsync(string docId, int taxYear, CancellationToken ct = default) => throw new NotSupportedException();

@@ -61,6 +61,15 @@ public sealed class QdrantChunkStore(QdrantClient client, IOptions<QdrantOptions
         return hits.Select(h => new ScoredChunk(ChunkPayload.FromPayload(h.Payload), h.Score)).ToList();
     }
 
+    public async Task<IReadOnlyList<Chunk>> GetAsync(IReadOnlyList<string> chunkIds, CancellationToken ct = default)
+    {
+        if (chunkIds.Count == 0) return [];
+        var points = await client.RetrieveAsync(Collection, chunkIds.Select(id => (PointId)ChunkIds.ToPointId(id)).ToList(),
+            withPayload: true, withVectors: false, cancellationToken: ct);
+        var byId = points.Select(p => ChunkPayload.FromPayload(p.Payload)).ToDictionary(c => c.Id);
+        return chunkIds.Where(byId.ContainsKey).Select(id => byId[id]).ToList();
+    }
+
     public Task DeleteAsync(string docId, int taxYear, CancellationToken ct = default) =>
         client.DeleteAsync(Collection, new Filter { Must = { MatchKeyword(PayloadKeys.DocId, docId), Match(PayloadKeys.TaxYear, taxYear) } },
             wait: true, cancellationToken: ct);

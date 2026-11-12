@@ -5,6 +5,7 @@ using TaxWise.Rag;
 using TaxWise.Rag.Answering;
 using TaxWise.Rag.Calculator;
 using TaxWise.Rag.Forms;
+using TaxWise.Rag.Quiz;
 using TaxWise.Rag.Sources;
 using TaxWise.Rag.Voyage;
 using TaxWise.Shared;
@@ -79,6 +80,31 @@ app.MapPost("/" + ApiRoutes.Calculator, async (CalcRequest? request, CalculatorS
 app.MapPost("/" + ApiRoutes.CompareYears, (CalcRequest? request) =>
     CalcProblem(request) ?? Results.Ok(CalculatorService.Compare(request!)));
 
+app.MapPost("/" + ApiRoutes.Quiz, async (QuizRequest? request, QuizService quiz, IOptions<TaxYearOptions> years,
+    HttpContext http, ILogger<Program> logger, CancellationToken ct) =>
+{
+    if (request is null || string.IsNullOrWhiteSpace(request.Topic))
+        return Results.Problem("Choose a topic to be quizzed on.", statusCode: StatusCodes.Status400BadRequest);
+    if (request.Topic.Length > QuizLimits.MaxTopicLength)
+        return Results.Problem($"Topics can be at most {QuizLimits.MaxTopicLength} characters.", statusCode: StatusCodes.Status400BadRequest);
+    if (request.ChunkIds is null || request.ChunkIds.Count > QuizLimits.MaxChunkIds)
+        return Results.Problem($"Send at most {QuizLimits.MaxChunkIds} passage IDs.", statusCode: StatusCodes.Status400BadRequest);
+    if (request.Count is < 1 or > QuizLimits.MaxCount)
+        return Results.Problem($"A quiz can have 1 to {QuizLimits.MaxCount} questions.", statusCode: StatusCodes.Status400BadRequest);
+    if (!years.Value.Supported.Contains(request.TaxYear))
+        return Results.Problem($"Tax year {request.TaxYear} isn't supported. Choose {string.Join(", ", years.Value.Supported)}.",
+            statusCode: StatusCodes.Status400BadRequest);
+
+    return await Guarded(logger, async () =>
+    {
+        var response = await quiz.CreateAsync(request, ct);
+        return Results.Ok(response with
+        {
+            Items = response.Items.Select(i => i with { Source = AbsoluteSources(http, [i.Source])[0] }).ToList(),
+        });
+    });
+});
+
 app.MapGet("/api/sources/{docId}/pdf", (string docId, SourceLibrary library) =>
     // Only manifest doc IDs resolve to a file, so the route can't be used to read anything else.
     library.FindPdf(docId) is { } path
@@ -95,7 +121,7 @@ app.MapGet("/" + ApiRoutes.KnowledgeBase, (SourceLibrary library, IOptions<TaxYe
 
 app.Run();
 
-// Maps answerer and retrieval failures to safe ProblemDetails (429 / 502), shared by /api/ask, /api/forms/explain and /api/calculator.
+// Maps answerer and retrieval failures to safe ProblemDetails (429 / 502), shared by /api/ask, /api/forms/explain, /api/calculator and /api/quiz.
 static async Task<IResult> Guarded(ILogger logger, Func<Task<IResult>> run)
 {
     try

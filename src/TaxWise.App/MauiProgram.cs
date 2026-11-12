@@ -41,6 +41,8 @@ public static class MauiProgram
 		builder.Services.AddSingleton<UserSettings>();
 		builder.Services.AddSingleton<GlossaryService>();
 		builder.Services.AddSingleton<ChatSession>();
+		builder.Services.AddSingleton(FileSystem.Current);
+		builder.Services.AddSingleton<QuizHistory>();
 
 		builder.Services.AddMauiBlazorWebView();
 

@@ -73,6 +73,16 @@ The **Scenario calculator** page estimates a federal refund or amount owed from 
 - **Compare years** (header toggle) calls `POST /api/calculator/compare`, which runs the same inputs for 2025, 2026 and 2027 and returns numbers only, with no Claude call.
 - Not included: credits, the 2025–2028 tip and overtime deductions, other income and itemized deductions. The page says so under every result.
 
+## Learning quizzes
+
+The **Learning quizzes** page turns what you asked about in chat into multiple-choice questions:
+
+- After each chat answer, the App saves the chunk IDs it cited under a **topic**: the section of the first cited passage, e.g. "Tax-Free Scholarships and Fellowship Grants". Topics are grouped by tax year and saved as JSON (`quiz-history.json` in the App's data folder), so they survive restarts. Each topic keeps its 10 most recently cited chunks.
+- Open the page from the menu to see your saved topics, or press **Quiz me on …** under a chat answer.
+- `POST /api/quiz` (`{ topic, chunkIds[] (≤10), taxYear, plainLanguage, count = 5 }`) looks up the cited chunks. If there are fewer than `count`, it fills up from the reranked passages for the topic text. Then it makes one Claude call per passage, at most 5 at a time.
+- Every question is checked: 4 distinct options, a correct index from 0 to 3, and a quote that appears in the passage. A failing question is regenerated once and then dropped, so a quiz can have fewer than 5 questions.
+- After you answer, a feedback card shows whether you were right, the explanation and a citation chip that opens the passage with the quoted sentence highlighted. The last screen shows your score.
+
 ## Ingest the IRS documents
 
 The sources are listed in [`data/sources/manifest.json`](data/sources/manifest.json). The PDFs download to `data/sources/pdf/` (gitignored).

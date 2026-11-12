@@ -14,6 +14,9 @@ public interface IChunkStore
     Task<IReadOnlyList<ScoredChunk>> SearchAsync(float[] vector, int taxYear, int limit,
         IReadOnlyCollection<string>? docIds = null, CancellationToken ct = default);
 
+    /// <summary>The stored chunks with these IDs, in the order asked; IDs that aren't stored are skipped.</summary>
+    Task<IReadOnlyList<Chunk>> GetAsync(IReadOnlyList<string> chunkIds, CancellationToken ct = default);
+
     /// <summary>Removes one document's points for one tax year, so a re-run can't leave stale chunks behind.</summary>
     Task DeleteAsync(string docId, int taxYear, CancellationToken ct = default);
 
