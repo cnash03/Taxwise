@@ -1,0 +1,2324 @@
+{
+  "Mode": "taxwise",
+  "Date": "2026-11-12",
+  "AnswerModel": "claude-opus-5-5",
+  "JudgeModel": "claude-sonnet-5-5",
+  "ConfiguredThreshold": 0.35,
+  "Results": [
+    {
+      "Id": "o01",
+      "Persona": "out-of-scope",
+      "InScope": false,
+      "TaxYear": 2025,
+      "Question": "How do I stake crypto for yield?",
+      "TopScore": 0.34964719414711,
+      "Retrieved": [
+        {
+          "ChunkId": "i1040-ty2025-p15-028",
+          "DocId": "i1040",
+          "PageStart": 15,
+          "PageEnd": 16,
+          "Score": 0.34964719414711
+        },
+        {
+          "ChunkId": "i1040-ty2025-p92-150",
+          "DocId": "i1040",
+          "PageStart": 92,
+          "PageEnd": 92,
+          "Score": 0.34376072883605957
+        },
+        {
+          "ChunkId": "i1040-ty2025-p16-029",
+          "DocId": "i1040",
+          "PageStart": 16,
+          "PageEnd": 16,
+          "Score": 0.31636008620262146
+        },
+        {
+          "ChunkId": "i1040-ty2025-p6-007",
+          "DocId": "i1040",
+          "PageStart": 6,
+          "PageEnd": 6,
+          "Score": 0.26257094740867615
+        }
+      ],
+      "Outcome": "insufficient_sources",
+      "CitationsTotal": 0,
+      "CitationsValid": 0,
+      "LatencyMs": 4086,
+      "PipelineRefused": true
+    },
+    {
+      "Id": "o02",
+      "Persona": "out-of-scope",
+      "InScope": false,
+      "TaxYear": 2025,
+      "Question": "What are New York State income tax rates for college students?",
+      "TopScore": 0.4894861578941345,
+      "Retrieved": [
+        {
+          "ChunkId": "p17-ty2025-p127-416",
+          "DocId": "p17",
+          "PageStart": 127,
+          "PageEnd": 127,
+          "Score": 0.4894861578941345
+        },
+        {
+          "ChunkId": "p519-ty2025-p58-148",
+          "DocId": "p519",
+          "PageStart": 58,
+          "PageEnd": 59,
+          "Score": 0.4667881727218628
+        },
+        {
+          "ChunkId": "p519-ty2025-p77-191",
+          "DocId": "p519",
+          "PageStart": 77,
+          "PageEnd": 77,
+          "Score": 0.44866734743118286
+        },
+        {
+          "ChunkId": "i1040-ty2025-p36-076",
+          "DocId": "i1040",
+          "PageStart": 36,
+          "PageEnd": 36,
+          "Score": 0.445859432220459
+        }
+      ],
+      "Outcome": "insufficient_sources",
+      "CitationsTotal": 0,
+      "CitationsValid": 0,
+      "LatencyMs": 2606,
+      "PipelineRefused": true
+    },
+    {
+      "Id": "o03",
+      "Persona": "out-of-scope",
+      "InScope": false,
+      "TaxYear": 2025,
+      "Question": "How do I depreciate a commercial building I bought for my business using MACRS?",
+      "TopScore": 0.4863712191581726,
+      "Retrieved": [
+        {
+          "ChunkId": "p519-ty2025-p20-047",
+          "DocId": "p519",
+          "PageStart": 20,
+          "PageEnd": 20,
+          "Score": 0.4863712191581726
+        },
+        {
+          "ChunkId": "p17-ty2025-p19-062",
+          "DocId": "p17",
+          "PageStart": 19,
+          "PageEnd": 19,
+          "Score": 0.41306644678115845
+        },
+        {
+          "ChunkId": "rp-25-32-ty2025-p9-002",
+          "DocId": "rp-25-32",
+          "PageStart": 9,
+          "PageEnd": 10,
+          "Score": 0.4128582775592804
+        },
+        {
+          "ChunkId": "p519-ty2025-p28-068",
+          "DocId": "p519",
+          "PageStart": 28,
+          "PageEnd": 28,
+          "Score": 0.3911265432834625
+        }
+      ],
+      "Outcome": "insufficient_sources",
+      "CitationsTotal": 0,
+      "CitationsValid": 0,
+      "LatencyMs": 2945,
+      "PipelineRefused": true
+    },
+    {
+      "Id": "o04",
+      "Persona": "out-of-scope",
+      "InScope": false,
+      "TaxYear": 2025,
+      "Question": "Which stocks should I buy with my tax refund?",
+      "TopScore": 0.3858182728290558,
+      "Retrieved": [
+        {
+          "ChunkId": "p17-ty2025-p17-052",
+          "DocId": "p17",
+          "PageStart": 17,
+          "PageEnd": 17,
+          "Score": 0.3858182728290558
+        },
+        {
+          "ChunkId": "i1040-ty2025-p62-108",
+          "DocId": "i1040",
+          "PageStart": 62,
+          "PageEnd": 62,
+          "Score": 0.36841943860054016
+        },
+        {
+          "ChunkId": "p17-ty2025-p8-019",
+          "DocId": "p17",
+          "PageStart": 8,
+          "PageEnd": 8,
+          "Score": 0.3596692681312561
+        },
+        {
+          "ChunkId": "i1040-ty2025-p61-106",
+          "DocId": "i1040",
+          "PageStart": 61,
+          "PageEnd": 61,
+          "Score": 0.357471764087677
+        }
+      ],
+      "Outcome": "insufficient_sources",
+      "CitationsTotal": 0,
+      "CitationsValid": 0,
+      "LatencyMs": 3424,
+      "PipelineRefused": true
+    },
+    {
+      "Id": "o05",
+      "Persona": "out-of-scope",
+      "InScope": false,
+      "TaxYear": 2025,
+      "Question": "How do I set up an LLC in Colorado?",
+      "TopScore": 0.41544684767723083,
+      "Retrieved": [
+        {
+          "ChunkId": "p501-ty2025-p27-093",
+          "DocId": "p501",
+          "PageStart": 27,
+          "PageEnd": 27,
+          "Score": 0.41544684767723083
+        },
+        {
+          "ChunkId": "p17-ty2025-p130-425",
+          "DocId": "p17",
+          "PageStart": 130,
+          "PageEnd": 130,
+          "Score": 0.400343656539917
+        },
+        {
+          "ChunkId": "p17-ty2025-p72-266",
+          "DocId": "p17",
+          "PageStart": 72,
+          "PageEnd": 72,
+          "Score": 0.3859655559062958
+        },
+        {
+          "ChunkId": "iw2-ty2025-p29-077",
+          "DocId": "iw2",
+          "PageStart": 29,
+          "PageEnd": 30,
+          "Score": 0.3548451066017151
+        }
+      ],
+      "Outcome": "insufficient_sources",
+      "CitationsTotal": 0,
+      "CitationsValid": 0,
+      "LatencyMs": 2713,
+      "PipelineRefused": true
+    },
+    {
+      "Id": "o06",
+      "Persona": "out-of-scope",
+      "InScope": false,
+      "TaxYear": 2025,
+      "Question": "What is the property tax rate in Denver?",
+      "TopScore": 0.4195479452610016,
+      "Retrieved": [
+        {
+          "ChunkId": "p17-ty2025-p100-370",
+          "DocId": "p17",
+          "PageStart": 100,
+          "PageEnd": 100,
+          "Score": 0.4195479452610016
+        },
+        {
+          "ChunkId": "p17-ty2025-p100-372",
+          "DocId": "p17",
+          "PageStart": 100,
+          "PageEnd": 100,
+          "Score": 0.4163900911808014
+        },
+        {
+          "ChunkId": "p17-ty2025-p102-377",
+          "DocId": "p17",
+          "PageStart": 102,
+          "PageEnd": 102,
+          "Score": 0.4085901081562042
+        },
+        {
+          "ChunkId": "p17-ty2025-p101-376",
+          "DocId": "p17",
+          "PageStart": 101,
+          "PageEnd": 102,
+          "Score": 0.40329667925834656
+        }
+      ],
+      "Outcome": "insufficient_sources",
+      "CitationsTotal": 0,
+      "CitationsValid": 0,
+      "LatencyMs": 2300,
+      "PipelineRefused": true
+    },
+    {
+      "Id": "o07",
+      "Persona": "out-of-scope",
+      "InScope": false,
+      "TaxYear": 2025,
+      "Question": "How do I file my taxes in Canada as an exchange student in Toronto?",
+      "TopScore": 0.5068415999412537,
+      "Retrieved": [
+        {
+          "ChunkId": "p519-ty2025-p48-121",
+          "DocId": "p519",
+          "PageStart": 48,
+          "PageEnd": 48,
+          "Score": 0.5068415999412537
+        },
+        {
+          "ChunkId": "p17-ty2025-p18-059",
+          "DocId": "p17",
+          "PageStart": 18,
+          "PageEnd": 19,
+          "Score": 0.4832548201084137
+        },
+        {
+          "ChunkId": "p970-ty2025-p6-014",
+          "DocId": "p970",
+          "PageStart": 6,
+          "PageEnd": 7,
+          "Score": 0.4707627594470978
+        },
+        {
+          "ChunkId": "p519-ty2025-p77-191",
+          "DocId": "p519",
+          "PageStart": 77,
+          "PageEnd": 77,
+          "Score": 0.44133830070495605
+        }
+      ],
+      "Outcome": "insufficient_sources",
+      "CitationsTotal": 0,
+      "CitationsValid": 0,
+      "LatencyMs": 2605,
+      "PipelineRefused": true
+    },
+    {
+      "Id": "o08",
+      "Persona": "out-of-scope",
+      "InScope": false,
+      "TaxYear": 2025,
+      "Question": "Which student credit card has the best rewards?",
+      "TopScore": 0.3114900588989258,
+      "Retrieved": [
+        {
+          "ChunkId": "p970-ty2025-p3-006",
+          "DocId": "p970",
+          "PageStart": 3,
+          "PageEnd": 3,
+          "Score": 0.3114900588989258
+        },
+        {
+          "ChunkId": "p970-ty2025-p9-020",
+          "DocId": "p970",
+          "PageStart": 9,
+          "PageEnd": 9,
+          "Score": 0.3064965307712555
+        },
+        {
+          "ChunkId": "p970-ty2025-p21-049",
+          "DocId": "p970",
+          "PageStart": 21,
+          "PageEnd": 22,
+          "Score": 0.3048020303249359
+        },
+        {
+          "ChunkId": "p970-ty2025-p22-050",
+          "DocId": "p970",
+          "PageStart": 22,
+          "PageEnd": 22,
+          "Score": 0.30266955494880676
+        }
+      ],
+      "Outcome": "insufficient_sources",
+      "CitationsTotal": 0,
+      "CitationsValid": 0,
+      "LatencyMs": 3028,
+      "PipelineRefused": true
+    },
+    {
+      "Id": "o09",
+      "Persona": "out-of-scope",
+      "InScope": false,
+      "TaxYear": 2025,
+      "Question": "How is federal estate tax calculated on a $20 million estate?",
+      "TopScore": 0.48891255259513855,
+      "Retrieved": [
+        {
+          "ChunkId": "i1040-ty2025-p80-121",
+          "DocId": "i1040",
+          "PageStart": 80,
+          "PageEnd": 80,
+          "Score": 0.48891255259513855
+        },
+        {
+          "ChunkId": "i1040-ty2025-p80-122",
+          "DocId": "i1040",
+          "PageStart": 80,
+          "PageEnd": 81,
+          "Score": 0.4369184076786041
+        },
+        {
+          "ChunkId": "i1040-ty2025-p99-165",
+          "DocId": "i1040",
+          "PageStart": 99,
+          "PageEnd": 99,
+          "Score": 0.4186669886112213
+        },
+        {
+          "ChunkId": "p17-ty2025-p109-400",
+          "DocId": "p17",
+          "PageStart": 109,
+          "PageEnd": 109,
+          "Score": 0.40449821949005127
+        }
+      ],
+      "Outcome": "insufficient_sources",
+      "CitationsTotal": 0,
+      "CitationsValid": 0,
+      "LatencyMs": 3141,
+      "PipelineRefused": true
+    },
+    {
+      "Id": "o10",
+      "Persona": "out-of-scope",
+      "InScope": false,
+      "TaxYear": 2025,
+      "Question": "What is the sales tax rate in California?",
+      "TopScore": 0.4878338873386383,
+      "Retrieved": [
+        {
+          "ChunkId": "p17-ty2025-p99-367",
+          "DocId": "p17",
+          "PageStart": 99,
+          "PageEnd": 99,
+          "Score": 0.4878338873386383
+        },
+        {
+          "ChunkId": "p17-ty2025-p99-368",
+          "DocId": "p17",
+          "PageStart": 99,
+          "PageEnd": 99,
+          "Score": 0.4743638038635254
+        },
+        {
+          "ChunkId": "p17-ty2025-p102-379",
+          "DocId": "p17",
+          "PageStart": 102,
+          "PageEnd": 102,
+          "Score": 0.4735282063484192
+        },
+        {
+          "ChunkId": "p17-ty2025-p101-376",
+          "DocId": "p17",
+          "PageStart": 101,
+          "PageEnd": 102,
+          "Score": 0.4405844807624817
+        }
+      ],
+      "Outcome": "insufficient_sources",
+      "CitationsTotal": 0,
+      "CitationsValid": 0,
+      "LatencyMs": 2331,
+      "PipelineRefused": true
+    },
+    {
+      "Id": "q01",
+      "Persona": "w2-first-timer",
+      "InScope": true,
+      "TaxYear": 2025,
+      "Question": "I'm single and only earned $9,000 from a part-time job in 2025. Do I have to file a tax return?",
+      "TopScore": 0.8522217869758606,
+      "Retrieved": [
+        {
+          "ChunkId": "p501-ty2025-p5-012",
+          "DocId": "p501",
+          "PageStart": 5,
+          "PageEnd": 6,
+          "Score": 0.8522217869758606
+        },
+        {
+          "ChunkId": "i1040-ty2025-p11-016",
+          "DocId": "i1040",
+          "PageStart": 11,
+          "PageEnd": 11,
+          "Score": 0.8446764945983887
+        },
+        {
+          "ChunkId": "p17-ty2025-p11-032",
+          "DocId": "p17",
+          "PageStart": 11,
+          "PageEnd": 12,
+          "Score": 0.815805971622467
+        },
+        {
+          "ChunkId": "p17-ty2025-p11-031",
+          "DocId": "p17",
+          "PageStart": 11,
+          "PageEnd": 11,
+          "Score": 0.7975466251373291
+        }
+      ],
+      "HitAt4": false,
+      "Outcome": "answered",
+      "CitationsTotal": 5,
+      "CitationsValid": 5,
+      "AnswerText": "The answer depends on whether your parents (or someone else) can claim you as a dependent. The passages include the filing rules for dependents, but they do not include the general filing threshold for single filers who are not dependents. If no one can claim you, these sources can't fully answer your question.\n\nIf you are a single dependent under 65 and not blind, you must file if any of these apply: your unearned income was more than $1,350, your earned income was more than $15,750, or your gross income was more than the larger of $1,350 or your earned income (up to $15,300) plus $450. Wages count as earned income. If your only income was $9,000 in wages, that is below the $15,750 earned income limit. It is also below the gross income test, which for you would be $9,000 plus $450.\n\nEven if your income is under these limits, you must still file if certain other situations apply. These include having net earnings from self-employment of at least $400 (for example, freelance or gig work rather than a W-2 job), owing special taxes such as Social Security or Medicare tax on unreported tips, or having advance payments of the premium tax credit made for Marketplace health coverage. Taxable scholarship or grant money also counts as earned income, so include it when you check the limits.",
+      "LatencyMs": 12091,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "q02",
+      "Persona": "w2-first-timer",
+      "InScope": true,
+      "TaxYear": 2025,
+      "Question": "What does box 1 on my W-2 show?",
+      "TopScore": 0.9041575193405151,
+      "Retrieved": [
+        {
+          "ChunkId": "iw2-ty2025-p17-042",
+          "DocId": "iw2",
+          "PageStart": 17,
+          "PageEnd": 17,
+          "Score": 0.9041575193405151
+        },
+        {
+          "ChunkId": "i1040-ty2025-p24-047",
+          "DocId": "i1040",
+          "PageStart": 24,
+          "PageEnd": 24,
+          "Score": 0.6947386264801025
+        },
+        {
+          "ChunkId": "i1040-ty2025-p25-049",
+          "DocId": "i1040",
+          "PageStart": 25,
+          "PageEnd": 25,
+          "Score": 0.6338650584220886
+        },
+        {
+          "ChunkId": "iw2-ty2025-p18-044",
+          "DocId": "iw2",
+          "PageStart": 18,
+          "PageEnd": 18,
+          "Score": 0.6245418190956116
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 8,
+      "CitationsValid": 8,
+      "AnswerText": "Box 1 of your Form W-2 shows your total taxable wages, tips, and other compensation your employer paid you during the year. This includes things like regular wages, bonuses (including signing bonuses), prizes, and awards.\n\nBox 1 also includes certain other items, such as total noncash payments (including certain fringe benefits), tips you reported to your employer, and payments for non-job-related education expenses unless they're excludable under an educational assistance program.\n\nSome amounts are left out of box 1. Elective deferrals, such as your contributions to a 401(k) or 403(b) plan, generally aren't included. Allocated tips also aren't included in box 1; they appear in box 8, and you may need to report them yourself on Form 1040, line 1c.",
+      "LatencyMs": 7290,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "q03",
+      "Persona": "w2-first-timer",
+      "InScope": true,
+      "TaxYear": 2025,
+      "Question": "Why is the amount in box 3 of my W-2 different from box 1?",
+      "TopScore": 0.7655373811721802,
+      "Retrieved": [
+        {
+          "ChunkId": "iw2-ty2025-p17-043",
+          "DocId": "iw2",
+          "PageStart": 17,
+          "PageEnd": 18,
+          "Score": 0.7655373811721802
+        },
+        {
+          "ChunkId": "iw2-ty2025-p18-045",
+          "DocId": "iw2",
+          "PageStart": 18,
+          "PageEnd": 18,
+          "Score": 0.7415052652359009
+        },
+        {
+          "ChunkId": "iw2-ty2025-p25-064",
+          "DocId": "iw2",
+          "PageStart": 25,
+          "PageEnd": 25,
+          "Score": 0.6323719024658203
+        },
+        {
+          "ChunkId": "iw2-ty2025-p33-083",
+          "DocId": "iw2",
+          "PageStart": 33,
+          "PageEnd": 33,
+          "Score": 0.6287229657173157
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 6,
+      "CitationsValid": 6,
+      "AnswerText": "Box 1 and box 3 follow different rules, so they often don't match. Box 3 shows wages subject to employee social security tax, measured before payroll deductions, and it leaves out tips.\n\nRetirement contributions are a common reason for the difference. If you put part of your pay into a plan like a 401(k) as an elective deferral, that amount is included in box 3 but not in box 1. This makes box 3 higher than box 1.\n\nTips can also cause a difference. Tips you reported to your employer are included in box 1, but social security tips go in box 7, not box 3. This can make box 3 lower than box 1.\n\nThere is also a cap on box 3. Box 3 plus box 7 cannot exceed the 2025 social security wage base of $176,100. If you earned more than that, box 3 stops at the limit.",
+      "LatencyMs": 12068,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "q04",
+      "Persona": "w2-first-timer",
+      "InScope": true,
+      "TaxYear": 2025,
+      "Question": "What is the standard deduction for a single filer for 2025?",
+      "TopScore": 0.906786322593689,
+      "Retrieved": [
+        {
+          "ChunkId": "p17-ty2025-p3-003",
+          "DocId": "p17",
+          "PageStart": 3,
+          "PageEnd": 3,
+          "Score": 0.906786322593689
+        },
+        {
+          "ChunkId": "p17-ty2025-p96-360",
+          "DocId": "p17",
+          "PageStart": 96,
+          "PageEnd": 97,
+          "Score": 0.9062002897262573
+        },
+        {
+          "ChunkId": "p501-ty2025-p25-088",
+          "DocId": "p501",
+          "PageStart": 25,
+          "PageEnd": 26,
+          "Score": 0.8927237391471863
+        },
+        {
+          "ChunkId": "rp-25-32-ty2025-p9-001",
+          "DocId": "rp-25-32",
+          "PageStart": 9,
+          "PageEnd": 9,
+          "Score": 0.8629438281059265
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 7,
+      "CitationsValid": 7,
+      "AnswerText": "For tax year 2025, the standard deduction for a Single filer is $15,750. This is the same amount as for Married filing separately, and it reflects an increase for all filers in 2025.\n\nThat $15,750 figure comes from the Standard Deduction Chart for Most People. Don't use that chart if you were born before January 2, 1961, are blind, or if someone else can claim you as a dependent. Many college students fall into that last group because a parent can claim them. In that case, you use the Standard Deduction Worksheet for Dependents instead, and your standard deduction may be smaller.\n\nOn the dependent worksheet, you start with your earned income and add $450. You compare that result with a minimum standard deduction of $1,350 and take the larger amount. Your standard deduction is then the smaller of that amount or $15,750 for Single filers. Earned income includes wages, tips, and any taxable scholarship or fellowship grant.",
+      "LatencyMs": 7343,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "q05",
+      "Persona": "w2-first-timer",
+      "InScope": true,
+      "TaxYear": 2025,
+      "Question": "I earned less than the filing requirement but my employer withheld federal income tax. Should I still file?",
+      "TopScore": 0.8695337772369385,
+      "Retrieved": [
+        {
+          "ChunkId": "p501-ty2025-p5-011",
+          "DocId": "p501",
+          "PageStart": 5,
+          "PageEnd": 5,
+          "Score": 0.8695337772369385
+        },
+        {
+          "ChunkId": "i1040-ty2025-p7-010",
+          "DocId": "i1040",
+          "PageStart": 7,
+          "PageEnd": 8,
+          "Score": 0.7677455544471741
+        },
+        {
+          "ChunkId": "p501-ty2025-p5-012",
+          "DocId": "p501",
+          "PageStart": 5,
+          "PageEnd": 6,
+          "Score": 0.6610164642333984
+        },
+        {
+          "ChunkId": "i1040-ty2025-p11-016",
+          "DocId": "i1040",
+          "PageStart": 11,
+          "PageEnd": 11,
+          "Score": 0.6551352739334106
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 8,
+      "CitationsValid": 8,
+      "AnswerText": "Yes, you should still file. Even if your income is below the filing requirement, the IRS says you should file a return if you can get money back, and having income tax withheld from your pay is one of the listed examples.\n\nThe Form 1040 Instructions say the same thing: filing a return is how you get a refund of any federal income tax that was withheld. IRS e-file is described as the fastest way to get your refund, and it's free if you're eligible.\n\nAlso check whether you qualify for refundable credits such as the earned income credit or the American opportunity credit, which is a common one for college students. The instructions say you should also file if you're eligible for these credits.\n\nFinally, earning less than the filing threshold doesn't always mean you're off the hook. You may actually be required to file in certain other situations, for example if you had net earnings from self-employment of at least $400, or if advance payments of the premium tax credit were made for your Marketplace coverage.",
+      "LatencyMs": 7309,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "q06",
+      "Persona": "w2-first-timer",
+      "InScope": true,
+      "TaxYear": 2025,
+      "Question": "When is the deadline to file my 2025 federal tax return?",
+      "TopScore": 0.875365674495697,
+      "Retrieved": [
+        {
+          "ChunkId": "p17-ty2025-p12-033",
+          "DocId": "p17",
+          "PageStart": 12,
+          "PageEnd": 12,
+          "Score": 0.875365674495697
+        },
+        {
+          "ChunkId": "p519-ty2025-p50-127",
+          "DocId": "p519",
+          "PageStart": 50,
+          "PageEnd": 50,
+          "Score": 0.8032654523849487
+        },
+        {
+          "ChunkId": "p17-ty2025-p13-039",
+          "DocId": "p17",
+          "PageStart": 13,
+          "PageEnd": 14,
+          "Score": 0.7953088879585266
+        },
+        {
+          "ChunkId": "p17-ty2025-p3-002",
+          "DocId": "p17",
+          "PageStart": 3,
+          "PageEnd": 3,
+          "Score": 0.7945329546928406
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 9,
+      "CitationsValid": 9,
+      "AnswerText": "For most students who use the calendar year, the deadline to file your 2025 federal income tax return is April 15, 2026.\n\nIf you can't file by then, you can request an automatic 6-month extension by filing Form 4868 (or using an electronic filing option) by the regular due date. This moves your filing deadline to October 15, 2026.\n\nKeep in mind that an extension gives you more time to file, not more time to pay. If you don't pay your tax by the original due date, you will owe interest on the unpaid tax and may owe penalties.\n\nIf you are a U.S. citizen or resident who is living outside the United States and Puerto Rico on the due date (for example, while studying or working abroad, as long as your main place of business or post of duty is also outside the U.S. and Puerto Rico), you get an automatic 2-month extension to June 15, 2026. You don't need to file Form 4868 for it. However, interest is still charged on any tax paid after April 15.",
+      "LatencyMs": 8252,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "q07",
+      "Persona": "w2-first-timer",
+      "InScope": true,
+      "TaxYear": 2025,
+      "Question": "What does code DD in box 12 of my W-2 mean? Is it taxable?",
+      "TopScore": 0.8992470502853394,
+      "Retrieved": [
+        {
+          "ChunkId": "iw2-ty2025-p21-055",
+          "DocId": "iw2",
+          "PageStart": 21,
+          "PageEnd": 22,
+          "Score": 0.8992470502853394
+        },
+        {
+          "ChunkId": "iw2-ty2025-p30-079",
+          "DocId": "iw2",
+          "PageStart": 30,
+          "PageEnd": 31,
+          "Score": 0.7955520749092102
+        },
+        {
+          "ChunkId": "iw2-ty2025-p19-049",
+          "DocId": "iw2",
+          "PageStart": 19,
+          "PageEnd": 20,
+          "Score": 0.5950922966003418
+        },
+        {
+          "ChunkId": "p17-ty2025-p50-179",
+          "DocId": "p17",
+          "PageStart": 50,
+          "PageEnd": 50,
+          "Score": 0.5722880363464355
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 3,
+      "CitationsValid": 3,
+      "AnswerText": "Code DD in box 12 of your Form W-2 shows the cost of employer-sponsored health coverage. In other words, it reports how much your health coverage through your employer costs.\n\nNo, it's not taxable. The amount reported with code DD is for information only, so it doesn't add to your taxable income.\n\nIf you want more detail, the IRS points to its Affordable Care Act (ACA) Tax Provisions page on IRS.gov for additional guidance about this reporting.",
+      "LatencyMs": 4744,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "q08",
+      "Persona": "scholarship",
+      "InScope": true,
+      "TaxYear": 2025,
+      "Question": "Is my scholarship taxable if it only paid tuition?",
+      "TopScore": 0.7743754386901855,
+      "Retrieved": [
+        {
+          "ChunkId": "p519-ty2025-p25-059",
+          "DocId": "p519",
+          "PageStart": 25,
+          "PageEnd": 25,
+          "Score": 0.7743754386901855
+        },
+        {
+          "ChunkId": "p970-ty2025-p5-010",
+          "DocId": "p970",
+          "PageStart": 5,
+          "PageEnd": 5,
+          "Score": 0.7570382952690125
+        },
+        {
+          "ChunkId": "p17-ty2025-p79-297",
+          "DocId": "p17",
+          "PageStart": 79,
+          "PageEnd": 79,
+          "Score": 0.7427931427955627
+        },
+        {
+          "ChunkId": "p519-ty2025-p25-060",
+          "DocId": "p519",
+          "PageStart": 25,
+          "PageEnd": 25,
+          "Score": 0.7412043809890747
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 6,
+      "CitationsValid": 6,
+      "AnswerText": "Generally, no. A scholarship used only for tuition is usually tax free, as long as you are a candidate for a degree. Tuition and fees required to enroll at or attend an eligible educational institution count as qualified education expenses, and a degree candidate can exclude a qualified scholarship from income.\n\nYou are a candidate for a degree if, for example, you are pursuing a degree at a college or university. Your school must also be an eligible educational institution, meaning one with a regular faculty, a curriculum, and regularly enrolled students.\n\nThere are other conditions. The scholarship is tax free only to the extent it doesn't exceed your qualified education expenses. It also can't be designated for other purposes, such as room and board. If the scholarship only covered your tuition, these conditions are usually met.\n\nOne important exception is payment for services. If you had to teach, do research, or perform other services to receive the scholarship, the part that represents payment for those services is taxable. This is true even if it went toward tuition. For example, if $1,000 of a $2,500 scholarship is payment for work as a teaching assistant, no more than $1,500 can be excluded.",
+      "LatencyMs": 10560,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "q09",
+      "Persona": "scholarship",
+      "InScope": true,
+      "TaxYear": 2025,
+      "Question": "Part of my scholarship pays for my dorm room and meal plan. Is that part taxable?",
+      "TopScore": 0.8011427521705627,
+      "Retrieved": [
+        {
+          "ChunkId": "p519-ty2025-p25-059",
+          "DocId": "p519",
+          "PageStart": 25,
+          "PageEnd": 25,
+          "Score": 0.8011427521705627
+        },
+        {
+          "ChunkId": "p970-ty2025-p5-010",
+          "DocId": "p970",
+          "PageStart": 5,
+          "PageEnd": 5,
+          "Score": 0.7919148802757263
+        },
+        {
+          "ChunkId": "p519-ty2025-p25-060",
+          "DocId": "p519",
+          "PageStart": 25,
+          "PageEnd": 25,
+          "Score": 0.7647980451583862
+        },
+        {
+          "ChunkId": "p970-ty2025-p5-011",
+          "DocId": "p970",
+          "PageStart": 5,
+          "PageEnd": 5,
+          "Score": 0.7149704098701477
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 7,
+      "CitationsValid": 7,
+      "AnswerText": "Yes. The part of your scholarship that pays for your dorm room and meal plan is generally taxable. Qualified education expenses specifically exclude room and board, and scholarship money used to pay for expenses that don't qualify is taxable.\n\nThis is true even if your school requires you to pay for housing or a meal plan as a condition of enrollment or attendance.\n\nA scholarship is tax free only if you are a candidate for a degree at an eligible educational institution. Even then, it is tax free only to the extent it doesn't exceed your qualified education expenses and isn't designated or earmarked for other purposes, such as room and board. Qualified education expenses are tuition and fees required to enroll, plus course-related expenses such as books, supplies, and equipment required of all students in your course of instruction.\n\nTo figure how much of your scholarship you can exclude from gross income, the IRS points you to Worksheet 1-1 in Pub 970. To estimate any tax you might owe on the taxable part, try the Scenario calculator.",
+      "LatencyMs": 7732,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "q10",
+      "Persona": "scholarship",
+      "InScope": true,
+      "TaxYear": 2025,
+      "Question": "Which expenses count as qualified education expenses for a tax-free scholarship?",
+      "TopScore": 0.9395016431808472,
+      "Retrieved": [
+        {
+          "ChunkId": "p970-ty2025-p5-011",
+          "DocId": "p970",
+          "PageStart": 5,
+          "PageEnd": 5,
+          "Score": 0.9395016431808472
+        },
+        {
+          "ChunkId": "p519-ty2025-p25-059",
+          "DocId": "p519",
+          "PageStart": 25,
+          "PageEnd": 25,
+          "Score": 0.9237464666366577
+        },
+        {
+          "ChunkId": "p970-ty2025-p57-125",
+          "DocId": "p970",
+          "PageStart": 57,
+          "PageEnd": 57,
+          "Score": 0.8232288360595703
+        },
+        {
+          "ChunkId": "p970-ty2025-p13-029",
+          "DocId": "p970",
+          "PageStart": 13,
+          "PageEnd": 14,
+          "Score": 0.8086243867874146
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 8,
+      "CitationsValid": 8,
+      "AnswerText": "For a scholarship or fellowship grant to be tax-free, it must be used for qualified education expenses. These are tuition and fees required to enroll at or attend an eligible educational institution.\n\nCourse-related expenses also count, such as fees, books, supplies, and equipment required for your courses. The key condition is that these items must be required of all students in your course of instruction, not just optional or recommended.\n\nSeveral costs don't qualify: room and board, travel, research, clerical help, and equipment or other expenses that aren't required for enrollment or attendance. Scholarship money used to pay these costs is taxable, even if the fee must be paid to the school as a condition of enrollment or attendance.\n\nThe scholarship's own terms also matter. If the scholarship requires that it be used for other purposes, such as room and board, or says it can't be used for tuition or course-related expenses, those expenses won't count as qualified for that scholarship.\n\nFinally, you generally can't exclude from income any part of a scholarship that is payment for teaching, research, or other services required as a condition of receiving it.",
+      "LatencyMs": 7795,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "q11",
+      "Persona": "scholarship",
+      "InScope": true,
+      "TaxYear": 2025,
+      "Question": "What is the most I can get from the American opportunity credit?",
+      "TopScore": 0.884809136390686,
+      "Retrieved": [
+        {
+          "ChunkId": "p970-ty2025-p19-042",
+          "DocId": "p970",
+          "PageStart": 19,
+          "PageEnd": 19,
+          "Score": 0.884809136390686
+        },
+        {
+          "ChunkId": "p970-ty2025-p9-022",
+          "DocId": "p970",
+          "PageStart": 9,
+          "PageEnd": 10,
+          "Score": 0.8463696837425232
+        },
+        {
+          "ChunkId": "p970-ty2025-p9-020",
+          "DocId": "p970",
+          "PageStart": 9,
+          "PageEnd": 9,
+          "Score": 0.837594211101532
+        },
+        {
+          "ChunkId": "p970-ty2025-p16-035",
+          "DocId": "p970",
+          "PageStart": 16,
+          "PageEnd": 16,
+          "Score": 0.8090227246284485
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 8,
+      "CitationsValid": 8,
+      "AnswerText": "For 2025, the American opportunity credit is worth up to $2,500 per eligible student. The amount is the sum of 100% of the first $2,000 of qualified education expenses you paid for the student, plus 25% of the next $2,000. That means you need at least $4,000 of adjusted qualified education expenses for a student to reach the full $2,500.\n\nIf you're paying for more than one eligible student, the maximum is $2,500 multiplied by the number of eligible students.\n\nUp to 40% of the credit may be refundable. If the refundable portion is more than your tax, the excess is refunded to you. The rest is nonrefundable and may be limited by the amount of your tax.\n\nYour income can also reduce the credit. The MAGI limit is $90,000 if you file as single, head of household, or qualifying surviving spouse, and $180,000 if married filing jointly. The credit is also available only for 4 tax years per eligible student.\n\nYour actual amount depends on your expenses, income, and tax. To see what applies in your situation, try the Scenario calculator.",
+      "LatencyMs": 7833,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "q12",
+      "Persona": "scholarship",
+      "InScope": true,
+      "TaxYear": 2025,
+      "Question": "How much is the lifetime learning credit worth?",
+      "TopScore": 0.8380733728408813,
+      "Retrieved": [
+        {
+          "ChunkId": "p970-ty2025-p21-049",
+          "DocId": "p970",
+          "PageStart": 21,
+          "PageEnd": 22,
+          "Score": 0.8380733728408813
+        },
+        {
+          "ChunkId": "p970-ty2025-p28-064",
+          "DocId": "p970",
+          "PageStart": 28,
+          "PageEnd": 28,
+          "Score": 0.8295750617980957
+        },
+        {
+          "ChunkId": "p970-ty2025-p22-050",
+          "DocId": "p970",
+          "PageStart": 22,
+          "PageEnd": 22,
+          "Score": 0.7977657914161682
+        },
+        {
+          "ChunkId": "p970-ty2025-p27-060",
+          "DocId": "p970",
+          "PageStart": 27,
+          "PageEnd": 27,
+          "Score": 0.7691648006439209
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 8,
+      "CitationsValid": 8,
+      "AnswerText": "The lifetime learning credit can be worth up to $2,000 per tax return for 2025. It equals 20% of the first $10,000 of qualified education expenses you paid for all eligible students combined, so the $2,000 maximum applies to the whole return, not to each student.\n\nFor example, Bruce and Toni paid $5,000 of qualified education expenses in 2025, so they can claim a $1,000 credit (20% × $5,000). There is also no limit on the number of years you can claim the credit for the same student.\n\nYour actual credit may be smaller than 20% of your expenses. The credit can be reduced based on your modified adjusted gross income (MAGI). The MAGI limit is $90,000 if you file as single, head of household, or qualifying surviving spouse, and $180,000 if you are married filing jointly.\n\nThe credit is also nonrefundable. It can lower your tax to zero, but you won't get any leftover credit back as a refund.\n\nA scholarship that is excluded from your income can also lower the expenses you can count. In Judy's example, a $1,500 tax-free scholarship reduced her credit from $900 to $600. To estimate your own credit, try the Scenario calculator.",
+      "LatencyMs": 11334,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "q13",
+      "Persona": "scholarship",
+      "InScope": true,
+      "TaxYear": 2025,
+      "Question": "What is reported in box 1 of Form 1098-T?",
+      "TopScore": 0.8860841393470764,
+      "Retrieved": [
+        {
+          "ChunkId": "i1098t-ty2025-p3-009",
+          "DocId": "i1098t",
+          "PageStart": 3,
+          "PageEnd": 4,
+          "Score": 0.8860841393470764
+        },
+        {
+          "ChunkId": "i1098t-ty2025-p2-005",
+          "DocId": "i1098t",
+          "PageStart": 2,
+          "PageEnd": 2,
+          "Score": 0.8338474035263062
+        },
+        {
+          "ChunkId": "i1098t-ty2025-p4-010",
+          "DocId": "i1098t",
+          "PageStart": 4,
+          "PageEnd": 4,
+          "Score": 0.603131115436554
+        },
+        {
+          "ChunkId": "p17-ty2025-p63-235",
+          "DocId": "p17",
+          "PageStart": 63,
+          "PageEnd": 63,
+          "Score": 0.5054117441177368
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 4,
+      "CitationsValid": 4,
+      "AnswerText": "Box 1 of Form 1098-T, titled \"Payments Received for Qualified Tuition and Related Expenses,\" shows the total amount of payments your school received for qualified tuition and related expenses from all sources during the calendar year.\n\nThis amount is reduced by any reimbursements or refunds made during the same calendar year that relate to those payments. However, it is not reduced by scholarships and grants, which are reported separately in box 5.\n\nBox 1 can also include payments of past-due qualified tuition or related expenses from a previous calendar year, but only if the school previously billed you for those amounts.",
+      "LatencyMs": 5243,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "q14",
+      "Persona": "scholarship",
+      "InScope": true,
+      "TaxYear": 2025,
+      "Question": "Can I deduct the interest I paid on my student loans, and what is the maximum?",
+      "TopScore": 0.8803468942642212,
+      "Retrieved": [
+        {
+          "ChunkId": "p970-ty2025-p30-069",
+          "DocId": "p970",
+          "PageStart": 30,
+          "PageEnd": 30,
+          "Score": 0.8803468942642212
+        },
+        {
+          "ChunkId": "p970-ty2025-p33-077",
+          "DocId": "p970",
+          "PageStart": 33,
+          "PageEnd": 34,
+          "Score": 0.8699369430541992
+        },
+        {
+          "ChunkId": "p970-ty2025-p30-068",
+          "DocId": "p970",
+          "PageStart": 30,
+          "PageEnd": 30,
+          "Score": 0.840888500213623
+        },
+        {
+          "ChunkId": "p970-ty2025-p33-075",
+          "DocId": "p970",
+          "PageStart": 33,
+          "PageEnd": 33,
+          "Score": 0.8327229619026184
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 12,
+      "CitationsValid": 12,
+      "AnswerText": "Yes, you may be able to deduct the interest you paid during the year on a qualified student loan, including both required and voluntary payments. Normally, personal interest isn't deductible, but student loan interest is a special exception. It's claimed as an adjustment to income, so you can take it even if you don't itemize deductions on Schedule A.\n\nThe maximum is $2,500. Your deduction is generally the smaller of $2,500 or the interest you actually paid during the tax year.\n\nTo claim the deduction, you generally must meet all of these requirements: your filing status is anything except married filing separately; no one else is claiming you as a dependent on their tax return; you are legally obligated to pay interest on a qualified student loan; and you actually paid that interest. As a student, the dependent rule is especially important. If a parent lists you as a dependent on their Form 1040, you can't take this deduction.\n\nThe loan itself must be a qualified student loan. That means you took it out solely to pay qualified education expenses for you, your spouse, or your dependent. Loans from a related person or from a qualified employer plan don't count.\n\nYour income can also reduce or eliminate the deduction. It is phased out (gradually reduced) if your MAGI is between $85,000 and $100,000, or between $170,000 and $200,000 on a joint return. You can't claim it at all if your MAGI is $100,000 or more ($200,000 or more for a joint return). Worksheet 4-1 in Pub 970 can help you figure your MAGI and your deduction. To see how these rules apply to your own numbers, try the Scenario calculator.\n\nIf you paid $600 or more in interest to a lender, you should receive Form 1098-E showing that amount. You can also deduct qualifying interest that isn't shown on the form. However, some items don't count as interest. These include loan origination fees that are payments for services such as processing costs, and interest paid through certain loan repayment assistance programs.",
+      "LatencyMs": 10883,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "q15",
+      "Persona": "dependent",
+      "InScope": true,
+      "TaxYear": 2025,
+      "Question": "I'm 22 and a full-time college student. Can my parents still claim me as a dependent?",
+      "TopScore": 0.7901178002357483,
+      "Retrieved": [
+        {
+          "ChunkId": "i1040-ty2025-p17-031",
+          "DocId": "i1040",
+          "PageStart": 17,
+          "PageEnd": 17,
+          "Score": 0.7901178002357483
+        },
+        {
+          "ChunkId": "p17-ty2025-p30-105",
+          "DocId": "p17",
+          "PageStart": 30,
+          "PageEnd": 30,
+          "Score": 0.7400093674659729
+        },
+        {
+          "ChunkId": "p17-ty2025-p30-104",
+          "DocId": "p17",
+          "PageStart": 30,
+          "PageEnd": 30,
+          "Score": 0.7333304286003113
+        },
+        {
+          "ChunkId": "i1040-ty2025-p21-039",
+          "DocId": "i1040",
+          "PageStart": 21,
+          "PageEnd": 21,
+          "Score": 0.6627861857414246
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 10,
+      "CitationsValid": 10,
+      "AnswerText": "Possibly, yes. Your parents may be able to claim you as their qualifying child if you meet all of the tests described below. As their son or daughter, you meet the relationship test.\n\nAge test: At 22, you are past the general under-19 limit. However, a full-time student can still qualify if they are under age 24 at the end of 2025 and younger than the parent claiming them (or younger than either spouse if your parents file jointly).\n\nStudent requirement: To count as a full-time student, you must have been enrolled full-time during some part of each of any 5 calendar months of 2025. Those months don't have to be consecutive. \"Full-time\" means the number of hours or courses your school considers full-time attendance. A college or university counts as a school, but a school offering courses only through the Internet does not.\n\nOther tests you must also meet:\n• Support: You must not have provided over half of your own support for 2025.\n• Joint return: You must not be filing a joint return, unless the return is filed only to claim a refund of withheld or estimated tax.\n• Residency: You must have lived with your parents for more than half of 2025.\n\nIf you didn't live with them for that long (for example, because you live at school), the instructions point to an \"Exception to time lived with you.\" The details of that exception aren't included in these passages.\n\nIf you qualify, your parents would check the \"Full-time student\" box for you in the Dependents section of their Form 1040.",
+      "LatencyMs": 17635,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "q16",
+      "Persona": "dependent",
+      "InScope": true,
+      "TaxYear": 2025,
+      "Question": "What is my standard deduction if my parents can claim me as a dependent?",
+      "TopScore": 0.9304831624031067,
+      "Retrieved": [
+        {
+          "ChunkId": "p17-ty2025-p95-357",
+          "DocId": "p17",
+          "PageStart": 95,
+          "PageEnd": 95,
+          "Score": 0.9304831624031067
+        },
+        {
+          "ChunkId": "p501-ty2025-p24-084",
+          "DocId": "p501",
+          "PageStart": 24,
+          "PageEnd": 24,
+          "Score": 0.9073036909103394
+        },
+        {
+          "ChunkId": "p17-ty2025-p95-358",
+          "DocId": "p17",
+          "PageStart": 95,
+          "PageEnd": 95,
+          "Score": 0.8613035082817078
+        },
+        {
+          "ChunkId": "p501-ty2025-p24-085",
+          "DocId": "p501",
+          "PageStart": 24,
+          "PageEnd": 24,
+          "Score": 0.8261478543281555
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 9,
+      "CitationsValid": 9,
+      "AnswerText": "If your parents can claim you as a dependent, your standard deduction is generally limited to the greater of $1,350, or your earned income for the year plus $450. It can't be more than the regular standard deduction amount, which is generally $15,750. You figure the exact amount using the dependent standard deduction worksheet (Table 10-3 in Pub 17, or Table 8 in Pub 501).\n\nEarned income means pay for work you actually perform, such as salaries, wages, tips, and professional fees. For this purpose, earned income also includes any part of a taxable scholarship or fellowship grant. Unearned income, like interest, doesn't count. In one IRS example, a dependent student has $780 of interest and $150 of wages. Only the $150 is used, and the student's standard deduction ends up at $1,350.\n\nHere is an example closer to a typical college student. A 22-year-old dependent student has $3,800 in wages and $1,500 in interest income. That student's standard deduction is $4,250, which is $3,800 plus $450. If you have a business loss, it reduces the earned income figure. In another example, a student with $7,000 in wages and a $3,000 business loss enters $4,000 as earned income.\n\nIf you are 65 or older or blind, your standard deduction may be higher. In the IRS example, a blind 18-year-old dependent adds $2,000 on line 7b of the worksheet, for a total standard deduction of $5,350. To find your own exact amount, try plugging your numbers into the Scenario calculator.",
+      "LatencyMs": 10251,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "q17",
+      "Persona": "dependent",
+      "InScope": true,
+      "TaxYear": 2025,
+      "Question": "My parents claim me as a dependent. Can I claim my own American opportunity credit?",
+      "TopScore": 0.8546488881111145,
+      "Retrieved": [
+        {
+          "ChunkId": "p970-ty2025-p11-025",
+          "DocId": "p970",
+          "PageStart": 11,
+          "PageEnd": 11,
+          "Score": 0.8546488881111145
+        },
+        {
+          "ChunkId": "p970-ty2025-p19-041",
+          "DocId": "p970",
+          "PageStart": 19,
+          "PageEnd": 19,
+          "Score": 0.8275333046913147
+        },
+        {
+          "ChunkId": "p970-ty2025-p18-040",
+          "DocId": "p970",
+          "PageStart": 18,
+          "PageEnd": 19,
+          "Score": 0.8238322734832764
+        },
+        {
+          "ChunkId": "p970-ty2025-p11-024",
+          "DocId": "p970",
+          "PageStart": 11,
+          "PageEnd": 11,
+          "Score": 0.8173456192016602
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 5,
+      "CitationsValid": 5,
+      "AnswerText": "No. If your parents claim you as a dependent on their 2025 return, you can't claim the American opportunity credit yourself. Being claimed as a dependent on another person's return, such as your parent's, is one of the situations that disqualifies you from the credit.\n\nOnly one of you can take the credit for your expenses in a given year: either your parents or you, but not both. Because your parents claim you on their return, only they can claim the credit based on your expenses.\n\nExpenses you pay yourself still count. They are treated as if your parents paid them, and your parents include them when figuring their American opportunity credit.\n\nPayments made by someone else, such as a grandparent paying your school directly, follow the same rule. If anyone else claims you as a dependent, they may be able to use those expenses, and you can't claim the credit.\n\nThe situation is different if your parents don't actually claim you on their return. In that case, you can claim the credit, even if they were entitled to claim you.",
+      "LatencyMs": 7017,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "q18",
+      "Persona": "dependent",
+      "InScope": true,
+      "TaxYear": 2025,
+      "Question": "I'm a dependent with only interest income. When do I have to file a return?",
+      "TopScore": 0.8523170351982117,
+      "Retrieved": [
+        {
+          "ChunkId": "p501-ty2025-p4-010",
+          "DocId": "p501",
+          "PageStart": 4,
+          "PageEnd": 5,
+          "Score": 0.8523170351982117
+        },
+        {
+          "ChunkId": "p501-ty2025-p3-009",
+          "DocId": "p501",
+          "PageStart": 3,
+          "PageEnd": 4,
+          "Score": 0.8235411047935486
+        },
+        {
+          "ChunkId": "i1040-ty2025-p10-015",
+          "DocId": "i1040",
+          "PageStart": 10,
+          "PageEnd": 10,
+          "Score": 0.8117949366569519
+        },
+        {
+          "ChunkId": "p17-ty2025-p11-031",
+          "DocId": "p17",
+          "PageStart": 11,
+          "PageEnd": 11,
+          "Score": 0.8084118962287903
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 7,
+      "CitationsValid": 7,
+      "AnswerText": "As a dependent, your interest counts as unearned income. The IRS dependent filing tables say unearned income includes taxable interest, ordinary dividends, and capital gain distributions.\n\nIf you're a single dependent who is under 65 and not blind, you must file a return if your unearned income was more than $1,350 for 2025. Because your only income is interest, your gross income equals your unearned income. That means the gross income test also comes out to more than $1,350.\n\nIf you're a married dependent, the same $1,350 unearned income threshold applies. You must also file if your gross income was at least $5 and your spouse files a separate return and itemizes deductions.\n\nYour parent may be able to report your interest on their own return instead. If they do, you won't have to file. Several conditions must all be met for this election. You must have been under age 19, or under 24 if a student, at the end of 2025. Your interest and dividend income must have been less than $13,500. Other conditions are listed in Form 8814.",
+      "LatencyMs": 11191,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "q19",
+      "Persona": "dependent",
+      "InScope": true,
+      "TaxYear": 2025,
+      "Question": "What counts as being a full-time student for the dependency rules?",
+      "TopScore": 0.8765328526496887,
+      "Retrieved": [
+        {
+          "ChunkId": "i1040-ty2025-p44-095",
+          "DocId": "i1040",
+          "PageStart": 44,
+          "PageEnd": 44,
+          "Score": 0.8765328526496887
+        },
+        {
+          "ChunkId": "i1040-ty2025-p21-039",
+          "DocId": "i1040",
+          "PageStart": 21,
+          "PageEnd": 21,
+          "Score": 0.8582809567451477
+        },
+        {
+          "ChunkId": "p17-ty2025-p30-105",
+          "DocId": "p17",
+          "PageStart": 30,
+          "PageEnd": 30,
+          "Score": 0.8571993708610535
+        },
+        {
+          "ChunkId": "p501-ty2025-p13-039",
+          "DocId": "p501",
+          "PageStart": 13,
+          "PageEnd": 13,
+          "Score": 0.8556153774261475
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 8,
+      "CitationsValid": 8,
+      "AnswerText": "For the dependency rules, a child counts as a student if, during some part of each of any 5 calendar months of the year, they were either a full-time student at a qualifying school or taking a full-time, on-farm training course given by a qualifying school or by a state, county, or local government agency. The 5 months don't have to be consecutive, and the child only needs to be enrolled during some part of each month, not the whole month.\n\nWhat counts as \"full-time\" is set by the school: a full-time student is one enrolled for the number of hours or courses the school considers to be full-time attendance.\n\nThe school must have a regular teaching staff and course of study, and a regularly enrolled student body. A school can be an elementary school, a junior or senior high school, a college, a university, or a technical, trade, or mechanical school. However, an on-the-job training course, a correspondence school, or a school offering courses only through the Internet doesn't count as a school.\n\nThere is also a special rule for vocational high school students. Students who work on \"co-op\" jobs in private industry as part of a school's regular course of classroom and practical training are considered full-time students.",
+      "LatencyMs": 8231,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "q20",
+      "Persona": "dependent",
+      "InScope": true,
+      "TaxYear": 2025,
+      "Question": "What is the support test for a qualifying child?",
+      "TopScore": 0.8975930213928223,
+      "Retrieved": [
+        {
+          "ChunkId": "p17-ty2025-p32-113",
+          "DocId": "p17",
+          "PageStart": 32,
+          "PageEnd": 32,
+          "Score": 0.8975930213928223
+        },
+        {
+          "ChunkId": "p501-ty2025-p15-047",
+          "DocId": "p501",
+          "PageStart": 15,
+          "PageEnd": 15,
+          "Score": 0.8938699960708618
+        },
+        {
+          "ChunkId": "p17-ty2025-p36-132",
+          "DocId": "p17",
+          "PageStart": 36,
+          "PageEnd": 37,
+          "Score": 0.7953461408615112
+        },
+        {
+          "ChunkId": "p17-ty2025-p32-116",
+          "DocId": "p17",
+          "PageStart": 32,
+          "PageEnd": 33,
+          "Score": 0.7685475945472717
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 8,
+      "CitationsValid": 8,
+      "AnswerText": "To pass the support test for a qualifying child, the child can't have provided more than half of their own support for the year. Note that this test is different from the support test for a qualifying relative, but that test's section explains what does and doesn't count as support.\n\nFor example, if you provided $4,000 toward your 16-year-old child's support and the child provided $6,000, the child provided more than half of their own support, so the child isn't your qualifying child.\n\nIf you're not sure whether the child provided more than half of their own support, Worksheet 3-1 (in Pub 17) can help. On the worksheet, if the amount the person provided for their own support (line 21) is not more than half of total support (line 20), you meet the support test.\n\nFor foster children, payments you receive from a child placement agency or from a state or county count as support provided by that agency or government, not by you. If you're in the trade or business of providing foster care, your unreimbursed expenses aren't considered support provided by you.",
+      "LatencyMs": 6151,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "q21",
+      "Persona": "dependent",
+      "InScope": true,
+      "TaxYear": 2025,
+      "Question": "If my parents can claim me as a dependent, can I claim someone else as my dependent?",
+      "TopScore": 0.8798574805259705,
+      "Retrieved": [
+        {
+          "ChunkId": "p17-ty2025-p28-100",
+          "DocId": "p17",
+          "PageStart": 28,
+          "PageEnd": 29,
+          "Score": 0.8798574805259705
+        },
+        {
+          "ChunkId": "p501-ty2025-p11-033",
+          "DocId": "p501",
+          "PageStart": 11,
+          "PageEnd": 11,
+          "Score": 0.8624165058135986
+        },
+        {
+          "ChunkId": "p17-ty2025-p34-119",
+          "DocId": "p17",
+          "PageStart": 34,
+          "PageEnd": 34,
+          "Score": 0.7911877632141113
+        },
+        {
+          "ChunkId": "p501-ty2025-p17-053",
+          "DocId": "p501",
+          "PageStart": 17,
+          "PageEnd": 17,
+          "Score": 0.7905675768852234
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 5,
+      "CitationsValid": 5,
+      "AnswerText": "Generally, no. Under the Dependent Taxpayer Test, if another taxpayer (such as your parents) can claim you as a dependent, you can't claim anyone else as a dependent. This applies even if the person you want to claim would otherwise be your qualifying child or qualifying relative.\n\nThere is one exception: you can claim someone else as a dependent if the person who can claim you files a return only to claim a refund of income tax withheld or estimated tax paid.\n\nFor example, the IRS describes an 18-year-old who didn't provide more than half of their own support, which makes them their parent's qualifying child. If the parent can claim that student as a dependent, the student can't claim their own child as a dependent unless the parent files only to get a refund of withheld or estimated tax.\n\nIf you're married and filing a joint return, the same rule applies to your spouse: if your spouse can be claimed as a dependent by another taxpayer, you and your spouse can't claim any dependents on your joint return.",
+      "LatencyMs": 6748,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "q22",
+      "Persona": "gig",
+      "InScope": true,
+      "TaxYear": 2025,
+      "Question": "I made money doing food delivery as an independent contractor. When do I owe self-employment tax?",
+      "TopScore": 0.7174745202064514,
+      "Retrieved": [
+        {
+          "ChunkId": "p17-ty2025-p10-026",
+          "DocId": "p17",
+          "PageStart": 10,
+          "PageEnd": 10,
+          "Score": 0.7174745202064514
+        },
+        {
+          "ChunkId": "p519-ty2025-p62-157",
+          "DocId": "p519",
+          "PageStart": 62,
+          "PageEnd": 62,
+          "Score": 0.6335271000862122
+        },
+        {
+          "ChunkId": "i1040-ty2025-p11-016",
+          "DocId": "i1040",
+          "PageStart": 11,
+          "PageEnd": 11,
+          "Score": 0.6216665506362915
+        },
+        {
+          "ChunkId": "p17-ty2025-p12-035",
+          "DocId": "p17",
+          "PageStart": 12,
+          "PageEnd": 13,
+          "Score": 0.543447732925415
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 6,
+      "CitationsValid": 6,
+      "AnswerText": "As an independent contractor doing food delivery, you're considered self-employed. The IRS lists being an independent contractor as one of the ways you can be self-employed, and this can include part-time work done alongside a regular job.\n\nThe key threshold is $400. If your net earnings from self-employment were $400 or more in 2025, you must file a return (Form 1040 or 1040-SR) along with Schedule SE, which is where self-employment tax is figured. This applies even if your income would otherwise be too low to require filing.\n\nSelf-employment tax is comparable to the social security and Medicare tax that an employer would withhold from an employee's wages. Once you figure it on Schedule SE, you enter the tax on Schedule 2 (Form 1040), line 4, and attach Schedule SE to your return.\n\nIf your self-employment income is very high, you may also owe a 0.9% Additional Medicare Tax. For a single filer, this applies to self-employment income above $200,000. To estimate how much self-employment tax you might owe, try the Scenario calculator.",
+      "LatencyMs": 7097,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "q23",
+      "Persona": "gig",
+      "InScope": true,
+      "TaxYear": 2025,
+      "Question": "I got a Form 1099-NEC for freelance work. How do I report that income?",
+      "TopScore": 0.773766040802002,
+      "Retrieved": [
+        {
+          "ChunkId": "p17-ty2025-p77-289",
+          "DocId": "p17",
+          "PageStart": 77,
+          "PageEnd": 77,
+          "Score": 0.773766040802002
+        },
+        {
+          "ChunkId": "i1040-ty2025-p108-186",
+          "DocId": "i1040",
+          "PageStart": 108,
+          "PageEnd": 108,
+          "Score": 0.732778012752533
+        },
+        {
+          "ChunkId": "i1040-ty2025-p89-144",
+          "DocId": "i1040",
+          "PageStart": 89,
+          "PageEnd": 90,
+          "Score": 0.7124428153038025
+        },
+        {
+          "ChunkId": "i1040-ty2025-p92-149",
+          "DocId": "i1040",
+          "PageStart": 92,
+          "PageEnd": 92,
+          "Score": 0.6300490498542786
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 7,
+      "CitationsValid": 7,
+      "AnswerText": "A Form 1099-NEC reports nonemployee compensation. If you aren't an employee and a single payer paid you $600 or more for your services during the year in the course of their trade or business, that payer should send you a 1099-NEC. All fees for your services count as income, and you may need to report them as self-employment income.\n\nIf your freelance work is self-employment, report it on Schedule C (Form 1040), not on the \"Other Income\" lines 8a through 8z of Schedule 1. You must use Schedule C even if you don't have any business expenses.\n\nThe exception: nonemployee compensation that isn't self-employment income, such as income from a hobby, isn't subject to that rule. To figure out whether you're considered self-employed, Pub 17 points you to the \"Self-Employed Persons\" discussion in chapter 1. That section isn't included in the passages here.\n\nBox 1 of your 1099-NEC shows your nonemployee compensation. If any of it is qualified overtime compensation, enter only that overtime portion on Schedule 1-A, line 14b. Do not enter the total box 1 amount there. If you're unsure what you'll owe, try the Scenario calculator.",
+      "LatencyMs": 8290,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "q24",
+      "Persona": "gig",
+      "InScope": true,
+      "TaxYear": 2025,
+      "Question": "Do I need to make estimated tax payments on my side-gig income?",
+      "TopScore": 0.6996110677719116,
+      "Retrieved": [
+        {
+          "ChunkId": "p17-ty2025-p43-161",
+          "DocId": "p17",
+          "PageStart": 43,
+          "PageEnd": 44,
+          "Score": 0.6996110677719116
+        },
+        {
+          "ChunkId": "p519-ty2025-p63-159",
+          "DocId": "p519",
+          "PageStart": 63,
+          "PageEnd": 63,
+          "Score": 0.6782543063163757
+        },
+        {
+          "ChunkId": "p17-ty2025-p44-163",
+          "DocId": "p17",
+          "PageStart": 44,
+          "PageEnd": 44,
+          "Score": 0.636166512966156
+        },
+        {
+          "ChunkId": "p17-ty2025-p44-165",
+          "DocId": "p17",
+          "PageStart": 44,
+          "PageEnd": 45,
+          "Score": 0.6336914896965027
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 8,
+      "CitationsValid": 8,
+      "AnswerText": "It depends on how much tax you'll owe. Side-gig income usually has no tax withheld, which is why estimated tax may come up. The first test is whether you'll owe $1,000 or more for 2026 after subtracting your withholding (for example, from a regular W-2 job) and refundable credits from your total tax. If you won't, you're not required to pay estimated tax.\n\nIf you will owe $1,000 or more, you still may not need to pay estimated tax. You're covered if your withholding and refundable credits will be at least the smaller of 90% of the tax on your 2026 return or 100% of the tax shown on your 2025 return. The 2025 return must have covered a full 12-month period. The 100% figure becomes 110% if your 2025 adjusted gross income was more than $150,000 ($75,000 if married filing separately). If your withholding falls short of both amounts, you must make estimated tax payments.\n\nIf you do need to pay, you don't have to start until you actually have income you'll owe tax on. If your side gig doesn't begin until a later payment period, make your first payment by the due date for that period. You can pay by direct bank transfer, by debit or credit card, or by check or money order with a Form 1040-ES voucher.\n\nTo see whether your side-gig income would push you over the $1,000 threshold, try the Scenario calculator with your expected income and withholding.",
+      "LatencyMs": 15863,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "q25",
+      "Persona": "gig",
+      "InScope": true,
+      "TaxYear": 2025,
+      "Question": "Are the tips I get as a server taxable?",
+      "TopScore": 0.7848110198974609,
+      "Retrieved": [
+        {
+          "ChunkId": "i1040-ty2025-p102-170",
+          "DocId": "i1040",
+          "PageStart": 102,
+          "PageEnd": 102,
+          "Score": 0.7848110198974609
+        },
+        {
+          "ChunkId": "p17-ty2025-p68-252",
+          "DocId": "p17",
+          "PageStart": 68,
+          "PageEnd": 69,
+          "Score": 0.7842652797698975
+        },
+        {
+          "ChunkId": "i1040-ty2025-p102-171",
+          "DocId": "i1040",
+          "PageStart": 102,
+          "PageEnd": 103,
+          "Score": 0.764484703540802
+        },
+        {
+          "ChunkId": "i1040-ty2025-p101-168",
+          "DocId": "i1040",
+          "PageStart": 101,
+          "PageEnd": 102,
+          "Score": 0.7257341146469116
+        }
+      ],
+      "HitAt4": false,
+      "Outcome": "answered",
+      "CitationsTotal": 8,
+      "CitationsValid": 8,
+      "AnswerText": "These passages don't list tips as an item you can leave out of income. The general rule is that you must include all income you receive on your return unless the tax law says otherwise. What the passages describe for tax year 2025 is a new deduction for qualified tips, not an exclusion from income.\n\nAs a server, you're likely in a qualifying occupation. Qualified tips must come from customers, or through a tip-sharing arrangement if you're an employee, in an occupation that customarily and regularly received tips on or before December 31, 2024. \"Wait Staff\" is on that list.\n\nThe tips themselves must also qualify. They have to be cash tips that are paid voluntarily, not the subject of negotiation, and determined by the customer. Cash tips can be paid by cash, credit card, debit card, or a payment app. Non-cash items like meals or event tickets don't count. For example, a tip the customer chooses on a point-of-sale device with a no-tip option is a qualified tip.\n\nThere are limits on the deduction. You can't deduct more than $25,000 of qualified tips. The deduction is also reduced if your MAGI is above $150,000 (single) or $300,000 (married filing jointly). To estimate how this affects what you owe, try the Scenario calculator.",
+      "LatencyMs": 14284,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "q26",
+      "Persona": "gig",
+      "InScope": true,
+      "TaxYear": 2025,
+      "Question": "I sell my art online as a hobby, not a business. Is that income taxable and can I deduct my costs?",
+      "TopScore": 0.7120115160942078,
+      "Retrieved": [
+        {
+          "ChunkId": "p17-ty2025-p78-293",
+          "DocId": "p17",
+          "PageStart": 78,
+          "PageEnd": 78,
+          "Score": 0.7120115160942078
+        },
+        {
+          "ChunkId": "p17-ty2025-p104-385",
+          "DocId": "p17",
+          "PageStart": 104,
+          "PageEnd": 104,
+          "Score": 0.6852518320083618
+        },
+        {
+          "ChunkId": "p17-ty2025-p79-297",
+          "DocId": "p17",
+          "PageStart": 79,
+          "PageEnd": 79,
+          "Score": 0.5965596437454224
+        },
+        {
+          "ChunkId": "p519-ty2025-p37-092",
+          "DocId": "p519",
+          "PageStart": 37,
+          "PageEnd": 38,
+          "Score": 0.504492998123169
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 6,
+      "CitationsValid": 6,
+      "AnswerText": "Yes, income from selling hobby items can be taxable. Pub 17 says that if you sell items you collect as a hobby, your gain is taxable as a capital gain. Its example is someone who sold a painting on an online auction website for more than they paid for it, and that gain is reported as a capital gain on Schedule D (Form 1040).\n\nNote that these passages describe selling items from a collection, such as a painting you bought earlier. They don't specifically cover how to report income from selling artwork you create yourself as a hobby. Check the IRS resources on hobby income, or ask a tax professional, to confirm how your sales should be reported.\n\nYou can't deduct your costs. Hobby expenses are miscellaneous itemized deductions, which can no longer be deducted. A hobby isn't treated as a business because it isn't carried on to make a profit.\n\nYou also can't use hobby losses to reduce your other income, such as wages from a campus job. If you sell an item from your collection for less than you paid, you can't deduct that loss either.",
+      "LatencyMs": 11462,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "q27",
+      "Persona": "gig",
+      "InScope": true,
+      "TaxYear": 2025,
+      "Question": "Is there a new deduction for tips for 2025, and how much can I deduct?",
+      "TopScore": 0.8921520113945007,
+      "Retrieved": [
+        {
+          "ChunkId": "p17-ty2025-p3-004",
+          "DocId": "p17",
+          "PageStart": 3,
+          "PageEnd": 3,
+          "Score": 0.8921520113945007
+        },
+        {
+          "ChunkId": "i1040-ty2025-p6-007",
+          "DocId": "i1040",
+          "PageStart": 6,
+          "PageEnd": 6,
+          "Score": 0.8879733681678772
+        },
+        {
+          "ChunkId": "i1040-ty2025-p101-168",
+          "DocId": "i1040",
+          "PageStart": 101,
+          "PageEnd": 102,
+          "Score": 0.8276584148406982
+        },
+        {
+          "ChunkId": "p519-ty2025-p2-003",
+          "DocId": "p519",
+          "PageStart": 2,
+          "PageEnd": 3,
+          "Score": 0.766943633556366
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 10,
+      "CitationsValid": 10,
+      "AnswerText": "Yes. Beginning in 2025, there is a new \"no tax on tips\" deduction. It's one of four new deductions created by recent legislation, and you can claim it whether you take the standard deduction or itemize on Schedule A (Form 1040). Details are in the instructions for Schedule 1-A.\n\nThe most you can deduct is $25,000 of qualified tips, regardless of your filing status. If you're married filing jointly and both spouses have qualified tips, the $25,000 limit applies to your combined tips. It is not a per-spouse limit.\n\nYour deduction is reduced if your modified adjusted gross income (MAGI) is more than $150,000 ($300,000 if married filing jointly). To be eligible, you and/or your spouse who received the tips must have a valid SSN. If you're married, you must file a joint return.\n\nOnly qualified tips count. These are tips received from customers or through a tip-sharing arrangement in an occupation that customarily and regularly received tips on or before December 31, 2024. The tips must be cash tips, paid voluntarily, not negotiated, and determined by the customer. \"Cash tips\" include cash, check, credit or debit card, and payment apps denominated in cash. Non-cash items like meals or event tickets don't count.\n\nIf you're self-employed, your tips from your trade or business count toward the deduction only to the extent you had net income from that business. To see how the deduction affects your own taxes, try the Scenario calculator.",
+      "LatencyMs": 10850,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "q28",
+      "Persona": "international",
+      "InScope": true,
+      "TaxYear": 2025,
+      "Question": "I'm on an F-1 student visa. Am I a resident or nonresident alien for tax purposes?",
+      "TopScore": 0.871086835861206,
+      "Retrieved": [
+        {
+          "ChunkId": "p519-ty2025-p77-191",
+          "DocId": "p519",
+          "PageStart": 77,
+          "PageEnd": 77,
+          "Score": 0.871086835861206
+        },
+        {
+          "ChunkId": "p519-ty2025-p61-154",
+          "DocId": "p519",
+          "PageStart": 61,
+          "PageEnd": 61,
+          "Score": 0.8132006525993347
+        },
+        {
+          "ChunkId": "p519-ty2025-p6-013",
+          "DocId": "p519",
+          "PageStart": 6,
+          "PageEnd": 7,
+          "Score": 0.7431023120880127
+        },
+        {
+          "ChunkId": "p519-ty2025-p7-015",
+          "DocId": "p519",
+          "PageStart": 7,
+          "PageEnd": 7,
+          "Score": 0.7290962338447571
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 7,
+      "CitationsValid": 7,
+      "AnswerText": "It depends mainly on how long you have been in the U.S. as a student. Your status is decided by the substantial presence test, and the answer matters. Resident aliens are taxed on their worldwide income, like U.S. citizens. Nonresident aliens are generally taxed only on their U.S. source income.\n\nAs an F-1 student, you are usually an \"exempt individual.\" This does not mean you are exempt from U.S. tax. It means you do not count the days you were in the U.S. as a student during your first 5 years when applying the substantial presence test. In practice, F-1 students in their first 5 calendar years generally do not count toward resident alien status through their days of presence.\n\nTo be an exempt student, you must substantially comply with your visa requirements. That means you must not engage in activities prohibited by U.S. immigration laws that could cost you your visa status.\n\nAfter 5 years, the rule changes. You will not be an exempt student in 2025 if you have been exempt as a teacher, trainee, or student for any part of more than 5 calendar years, unless you meet two conditions. First, you must show you do not intend to reside permanently in the U.S. Second, you must have substantially complied with your visa. If you are not exempt, your days start counting, and you could become a resident alien even though you are still on an F-1 visa.\n\nIf you qualify to exclude your days of presence as a student, you must file Form 8843 with the IRS.",
+      "LatencyMs": 14926,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "q29",
+      "Persona": "international",
+      "InScope": true,
+      "TaxYear": 2025,
+      "Question": "How does the substantial presence test work?",
+      "TopScore": 0.8445935845375061,
+      "Retrieved": [
+        {
+          "ChunkId": "p519-ty2025-p5-010",
+          "DocId": "p519",
+          "PageStart": 5,
+          "PageEnd": 5,
+          "Score": 0.8445935845375061
+        },
+        {
+          "ChunkId": "p519-ty2025-p4-009",
+          "DocId": "p519",
+          "PageStart": 4,
+          "PageEnd": 5,
+          "Score": 0.8096469044685364
+        },
+        {
+          "ChunkId": "p519-ty2025-p9-021",
+          "DocId": "p519",
+          "PageStart": 9,
+          "PageEnd": 10,
+          "Score": 0.7701898217201233
+        },
+        {
+          "ChunkId": "p519-ty2025-p12-029",
+          "DocId": "p519",
+          "PageStart": 12,
+          "PageEnd": 13,
+          "Score": 0.7065093517303467
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 8,
+      "CitationsValid": 8,
+      "AnswerText": "The substantial presence test is one way to determine whether you are treated as a U.S. resident for tax purposes. You meet it for 2025 if you were physically present in the United States on at least 31 days during 2025 AND at least 183 days during the 3-year period of 2025, 2024, and 2023. For the 183-day count, you use all the days you were present in 2025, 1/3 of the days you were present in 2024, and 1/6 of the days you were present in 2023.\n\nExample: If you were present 120 days in each of 2025, 2024, and 2023, you count 120 days for 2025, 40 days for 2024 (1/3 of 120), and 20 days for 2023 (1/6 of 120). That totals 180 days, which is short of 183, so you would not be a resident under the test for 2025.\n\nGenerally, any day you are physically present in the country at any time during the day counts. For this test, \"United States\" includes the 50 states, D.C., and U.S. territorial waters, but not U.S. territories or U.S. airspace.\n\nSome days are not counted. These include days you regularly commute to work from Canada or Mexico, days in transit between two foreign places for less than 24 hours, days as a crew member of a foreign vessel, days you can't leave because of a medical condition that arose while you were in the United States, certain NATO visa days, and days you are an \"exempt individual.\" The \"exempt individual\" category is especially relevant to many international students, but these passages don't explain who qualifies. Pub 519 discusses the specific rules for each category separately.\n\nIf you meet the test in your first year of residency, your residency starting date is generally the first day you were present in the United States that year. You are a nonresident alien for the part of the year before that date. You may be able to disregard up to 10 days of presence when setting your starting date if you had a closer connection to, and your tax home in, a foreign country. However, those days still count toward meeting the test itself.",
+      "LatencyMs": 10074,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "q30",
+      "Persona": "international",
+      "InScope": true,
+      "TaxYear": 2025,
+      "Question": "What is Form 8843 and do I need to file it as an international student?",
+      "TopScore": 0.8270941376686096,
+      "Retrieved": [
+        {
+          "ChunkId": "p519-ty2025-p7-016",
+          "DocId": "p519",
+          "PageStart": 7,
+          "PageEnd": 8,
+          "Score": 0.8270941376686096
+        },
+        {
+          "ChunkId": "p519-ty2025-p7-015",
+          "DocId": "p519",
+          "PageStart": 7,
+          "PageEnd": 7,
+          "Score": 0.7772504091262817
+        },
+        {
+          "ChunkId": "p519-ty2025-p7-014",
+          "DocId": "p519",
+          "PageStart": 7,
+          "PageEnd": 7,
+          "Score": 0.7117975950241089
+        },
+        {
+          "ChunkId": "p519-ty2025-p67-169",
+          "DocId": "p519",
+          "PageStart": 67,
+          "PageEnd": 68,
+          "Score": 0.5792540907859802
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 7,
+      "CitationsValid": 7,
+      "AnswerText": "Based on these passages, Form 8843 is a form you file with the IRS when you exclude days of presence in the United States because you belong to certain exempt categories. One of those categories is being temporarily in the U.S. as a student on an F, J, M, or Q visa. The passages don't describe the form's contents in detail. They focus on who must file it and when.\n\nYou need to file it if you qualify as an exempt individual as a student. That means you are temporarily in the U.S. on an F, J, M, or Q visa and you substantially comply with your visa's requirements. Substantial compliance means you haven't engaged in activities that are prohibited by U.S. immigration laws and could cost you your visa status. Immediate family members of exempt students are also included.\n\nThere is a time limit. You generally won't be an exempt student in 2025 if you have been exempt as a teacher, trainee, or student for any part of more than 5 calendar years. The exception is if you meet both of two requirements: you establish that you don't intend to reside permanently in the U.S., and you have substantially complied with your visa's requirements.\n\nHow to file: if you file a 2025 income tax return, attach Form 8843 to it. If you don't have to file a return, mail Form 8843 by itself to the Department of the Treasury, Internal Revenue Service Center, Austin, TX 73301-0215. Either way, it's due by the due date for filing Form 1040-NR, which Pub 519 discusses in chapter 7.",
+      "LatencyMs": 14835,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "q31",
+      "Persona": "international",
+      "InScope": true,
+      "TaxYear": 2025,
+      "Question": "Which tax return form does a nonresident alien file?",
+      "TopScore": 0.8976309299468994,
+      "Retrieved": [
+        {
+          "ChunkId": "p519-ty2025-p49-124",
+          "DocId": "p519",
+          "PageStart": 49,
+          "PageEnd": 49,
+          "Score": 0.8976309299468994
+        },
+        {
+          "ChunkId": "p519-ty2025-p36-089",
+          "DocId": "p519",
+          "PageStart": 36,
+          "PageEnd": 36,
+          "Score": 0.8034041523933411
+        },
+        {
+          "ChunkId": "p519-ty2025-p48-120",
+          "DocId": "p519",
+          "PageStart": 48,
+          "PageEnd": 48,
+          "Score": 0.7954493165016174
+        },
+        {
+          "ChunkId": "p519-ty2025-p4-007",
+          "DocId": "p519",
+          "PageStart": 4,
+          "PageEnd": 4,
+          "Score": 0.7930843830108643
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 7,
+      "CitationsValid": 7,
+      "AnswerText": "A nonresident alien who is required to file a U.S. income tax return should use Form 1040-NR, the U.S. Nonresident Alien Income Tax Return.\n\nThere are a few special situations. If you are a nonresident alien married to a U.S. citizen or resident, you can choose to be treated as a resident and file a joint return on Form 1040 or 1040-SR instead. If you don't make that choice, you file Form 1040-NR.\n\nIf you were both a nonresident and a resident during the same year (dual status), the form depends on your status at year end. If you are not a U.S. resident on the last day of the tax year, you file Form 1040-NR. If you become a resident and are a U.S. resident on the last day of the year, you file Form 1040 or 1040-SR. Note that dual-status taxpayers cannot e-file for tax year 2025.",
+      "LatencyMs": 7075,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "q32",
+      "Persona": "international",
+      "InScope": true,
+      "TaxYear": 2025,
+      "Question": "Can a nonresident alien student take the standard deduction?",
+      "TopScore": 0.8721312284469604,
+      "Retrieved": [
+        {
+          "ChunkId": "p519-ty2025-p78-195",
+          "DocId": "p519",
+          "PageStart": 78,
+          "PageEnd": 79,
+          "Score": 0.8721312284469604
+        },
+        {
+          "ChunkId": "p519-ty2025-p39-097",
+          "DocId": "p519",
+          "PageStart": 39,
+          "PageEnd": 39,
+          "Score": 0.8596413135528564
+        },
+        {
+          "ChunkId": "p519-ty2025-p39-096",
+          "DocId": "p519",
+          "PageStart": 39,
+          "PageEnd": 39,
+          "Score": 0.8330205678939819
+        },
+        {
+          "ChunkId": "p519-ty2025-p58-148",
+          "DocId": "p519",
+          "PageStart": 58,
+          "PageEnd": 59,
+          "Score": 0.8151649236679077
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 7,
+      "CitationsValid": 7,
+      "AnswerText": "Generally, no. As a nonresident alien, you cannot claim the standard deduction. This also applies if you are a dual-status taxpayer: you cannot claim the standard deduction allowed on Form 1040 or 1040-SR, though you can itemize any allowable deductions.\n\nThere is a special exception for students and business apprentices from India. If you are eligible for the benefits of Article 21(2) of the United States-India Income Tax Treaty, you can claim the standard deduction, as long as you do not claim itemized deductions. You use Worksheet 5-1 to figure it, and the 2025 standard deduction amount is $15,000. However, if you are married and your spouse files a return and itemizes deductions, you cannot take the standard deduction.\n\nIf the India exception does not apply to you, you may be able to claim itemized deductions instead. However, nonresident aliens can itemize only if they have income effectively connected with their U.S. trade or business. Certain charitable contributions and casualty and theft losses are an exception: you can deduct them even if they do not relate to your effectively connected income. Itemized deductions are claimed on Schedule A (Form 1040-NR).",
+      "LatencyMs": 7099,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "q33",
+      "Persona": "international",
+      "InScope": true,
+      "TaxYear": 2025,
+      "Question": "I'm an F-1 student with an on-campus job. Do I pay social security and Medicare taxes?",
+      "TopScore": 0.9332061409950256,
+      "Retrieved": [
+        {
+          "ChunkId": "p519-ty2025-p61-154",
+          "DocId": "p519",
+          "PageStart": 61,
+          "PageEnd": 61,
+          "Score": 0.9332061409950256
+        },
+        {
+          "ChunkId": "p519-ty2025-p61-155",
+          "DocId": "p519",
+          "PageStart": 61,
+          "PageEnd": 62,
+          "Score": 0.7902107834815979
+        },
+        {
+          "ChunkId": "p519-ty2025-p60-153",
+          "DocId": "p519",
+          "PageStart": 60,
+          "PageEnd": 61,
+          "Score": 0.7035745978355408
+        },
+        {
+          "ChunkId": "p519-ty2025-p60-152",
+          "DocId": "p519",
+          "PageStart": 60,
+          "PageEnd": 60,
+          "Score": 0.7000340223312378
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 9,
+      "CitationsValid": 9,
+      "AnswerText": "Generally, no. As an F-1 student who is a nonresident alien, your on-campus job is considered work performed to carry out the purpose for which you were admitted to the United States, so it is not covered under the social security program. That means your employer should not withhold social security or Medicare tax from this pay.\n\n\"On-campus work\" means work performed on the school's premises. It also includes work at an off-campus location that is educationally affiliated with the school. Work under the terms of a scholarship, fellowship, or assistantship also counts. USCIS permits this work for F-1 students as long as it does not displace a U.S. resident.\n\nThe important exception is residency status for tax purposes. If you are considered a resident alien, social security and Medicare taxes will be withheld, even though you still hold F-1 status. Separately, any student who is enrolled and regularly attending classes may be exempt from these taxes on pay for work done for their own school.\n\nIf these taxes were withheld in error, first ask your employer for a refund. If you can't get a full refund from your employer, you can file a claim with the IRS on Form 843 and attach the required documents. For an F-1 student, these include a copy of your W-2, your visa, Form I-94, and a complete copy of your Form I-20.",
+      "LatencyMs": 9216,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "q34",
+      "Persona": "international",
+      "InScope": true,
+      "TaxYear": 2025,
+      "Question": "Can a tax treaty make my scholarship tax-free as a nonresident student?",
+      "TopScore": 0.8019790649414062,
+      "Retrieved": [
+        {
+          "ChunkId": "p519-ty2025-p67-169",
+          "DocId": "p519",
+          "PageStart": 67,
+          "PageEnd": 68,
+          "Score": 0.8019790649414062
+        },
+        {
+          "ChunkId": "p519-ty2025-p24-058",
+          "DocId": "p519",
+          "PageStart": 24,
+          "PageEnd": 25,
+          "Score": 0.7975781559944153
+        },
+        {
+          "ChunkId": "p519-ty2025-p67-168",
+          "DocId": "p519",
+          "PageStart": 67,
+          "PageEnd": 67,
+          "Score": 0.7784426212310791
+        },
+        {
+          "ChunkId": "p519-ty2025-p58-148",
+          "DocId": "p519",
+          "PageStart": 58,
+          "PageEnd": 59,
+          "Score": 0.7371476888656616
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 11,
+      "CitationsValid": 11,
+      "AnswerText": "Yes. Income of any kind that a U.S. tax treaty exempts from U.S. tax is excluded from your gross income. Treaty exemptions for scholarship, fellowship, and research grants are generally available to nonresident alien students. Note the difference: if a treaty only limits the tax on income rather than exempting it, that income is still included in gross income.\n\nMany treaties limit how many years you can claim the exemption. For students, the limit is usually 4–5 years, and once you reach it you can no longer claim the exemption. Check the specific treaty or Pub. 901 for the time limit that applies to your country.\n\nIf you later become a resident alien, you generally can no longer claim the treaty exemption. The exception is when the treaty's saving clause provides an exception for it and you still meet the treaty's requirements. For example, a Chinese student kept the Article 20 scholarship exemption after becoming a resident alien because of such an exception.\n\nSeparately from treaties, a scholarship may also be excludable under U.S. law. This applies only if you are a degree candidate at an eligible educational institution and you use the money for qualified education expenses. Also, a nonresident alien's grant that is not from U.S. sources is not subject to U.S. tax.\n\nReporting: if your scholarship was reported as taxable on a form such as Form 1042-S, report it on the appropriate line of your return. Then enter the amount for which you claim treaty benefits, in parentheses, on Schedule 1 (Form 1040), line 8z. Write \"Exempt income,\" the treaty country, and the treaty article that provides the exemption.",
+      "LatencyMs": 10868,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "t01",
+      "Persona": "year-trap",
+      "InScope": false,
+      "TaxYear": 2025,
+      "Question": "What will the standard deduction be for a single filer in 2027?",
+      "TopScore": 0.7665831446647644,
+      "Retrieved": [
+        {
+          "ChunkId": "p501-ty2025-p25-088",
+          "DocId": "p501",
+          "PageStart": 25,
+          "PageEnd": 26,
+          "Score": 0.7665831446647644
+        },
+        {
+          "ChunkId": "rp-25-32-ty2025-p9-001",
+          "DocId": "rp-25-32",
+          "PageStart": 9,
+          "PageEnd": 9,
+          "Score": 0.704966127872467
+        },
+        {
+          "ChunkId": "p17-ty2025-p96-360",
+          "DocId": "p17",
+          "PageStart": 96,
+          "PageEnd": 97,
+          "Score": 0.67305988073349
+        },
+        {
+          "ChunkId": "i1040-ty2025-p5-005",
+          "DocId": "i1040",
+          "PageStart": 5,
+          "PageEnd": 6,
+          "Score": 0.6642743349075317
+        }
+      ],
+      "Outcome": "insufficient_sources",
+      "CitationsTotal": 0,
+      "CitationsValid": 0,
+      "LatencyMs": 2903,
+      "PipelineRefused": true
+    },
+    {
+      "Id": "t02",
+      "Persona": "year-trap",
+      "InScope": false,
+      "TaxYear": 2025,
+      "Question": "What are the 2027 income tax brackets for single filers?",
+      "TopScore": 0.6473252177238464,
+      "Retrieved": [
+        {
+          "ChunkId": "p17-ty2025-p127-416",
+          "DocId": "p17",
+          "PageStart": 127,
+          "PageEnd": 127,
+          "Score": 0.6473252177238464
+        },
+        {
+          "ChunkId": "i1040-ty2025-p80-121",
+          "DocId": "i1040",
+          "PageStart": 80,
+          "PageEnd": 80,
+          "Score": 0.646035373210907
+        },
+        {
+          "ChunkId": "i1040-ty2025-p9-014",
+          "DocId": "i1040",
+          "PageStart": 9,
+          "PageEnd": 9,
+          "Score": 0.6322687268257141
+        },
+        {
+          "ChunkId": "p17-ty2025-p112-414",
+          "DocId": "p17",
+          "PageStart": 112,
+          "PageEnd": 125,
+          "Score": 0.5815702676773071
+        }
+      ],
+      "Outcome": "insufficient_sources",
+      "CitationsTotal": 0,
+      "CitationsValid": 0,
+      "LatencyMs": 6290,
+      "PipelineRefused": true
+    },
+    {
+      "Id": "y01",
+      "Persona": "year-specific",
+      "InScope": true,
+      "TaxYear": 2027,
+      "Question": "What is the 2027 standard deduction for a single filer?",
+      "TopScore": 0.8967994451522827,
+      "Retrieved": [
+        {
+          "ChunkId": "rp-26-35-ty2027-p13-019",
+          "DocId": "rp-26-35",
+          "PageStart": 13,
+          "PageEnd": 13,
+          "Score": 0.8967994451522827
+        },
+        {
+          "ChunkId": "rp-26-35-ty2027-p20-041",
+          "DocId": "rp-26-35",
+          "PageStart": 20,
+          "PageEnd": 20,
+          "Score": 0.7615076303482056
+        },
+        {
+          "ChunkId": "rp-26-35-ty2027-p5-003",
+          "DocId": "rp-26-35",
+          "PageStart": 5,
+          "PageEnd": 6,
+          "Score": 0.6344215273857117
+        },
+        {
+          "ChunkId": "rp-26-35-ty2027-p11-015",
+          "DocId": "rp-26-35",
+          "PageStart": 11,
+          "PageEnd": 12,
+          "Score": 0.5721604228019714
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 2,
+      "CitationsValid": 2,
+      "AnswerText": "For tax year 2027, the standard deduction for a single filer is $16,600. The IRS calls this status \"Unmarried Individuals (other than Surviving Spouses and Heads of Households).\" For comparison, it is $33,200 for married couples filing jointly and surviving spouses, $24,925 for heads of households, and $16,600 for married individuals filing separately.\n\nMany college students should check whether a parent or someone else can claim them as a dependent. If so, a different rule applies. Your standard deduction cannot exceed the greater of $1,400 or your earned income plus $500. This means it may be lower than $16,600.",
+      "LatencyMs": 11007,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "y02",
+      "Persona": "year-specific",
+      "InScope": true,
+      "TaxYear": 2026,
+      "Question": "What's the 2026 minimum standard deduction for someone who can be claimed as a dependent?",
+      "TopScore": 0.9262479543685913,
+      "Retrieved": [
+        {
+          "ChunkId": "rp-25-32-ty2026-p18-018",
+          "DocId": "rp-25-32",
+          "PageStart": 18,
+          "PageEnd": 18,
+          "Score": 0.9262479543685913
+        },
+        {
+          "ChunkId": "rp-25-32-ty2026-p24-039",
+          "DocId": "rp-25-32",
+          "PageStart": 24,
+          "PageEnd": 24,
+          "Score": 0.6497092843055725
+        },
+        {
+          "ChunkId": "rp-25-32-ty2026-p20-027",
+          "DocId": "rp-25-32",
+          "PageStart": 20,
+          "PageEnd": 21,
+          "Score": 0.5932909846305847
+        },
+        {
+          "ChunkId": "rp-25-32-ty2026-p17-015",
+          "DocId": "rp-25-32",
+          "PageStart": 17,
+          "PageEnd": 17,
+          "Score": 0.5361044406890869
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 2,
+      "CitationsValid": 2,
+      "AnswerText": "For tax year 2026, the standard deduction for someone who can be claimed as a dependent by another taxpayer is limited. It cannot exceed the greater of $1,350 or the sum of $450 plus the individual's earned income. Because the rule uses whichever figure is greater, $1,350 works as the effective minimum. A dependent with little or no earned income can still use a $1,350 standard deduction.\n\nFor comparison, the regular 2026 standard deduction for unmarried individuals (other than surviving spouses and heads of households) is $16,100. If you have earned income, for example from a job, the $450-plus-earned-income figure may give you a larger amount than $1,350. To see how this applies to your own income, try the Scenario calculator.",
+      "LatencyMs": 9907,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "y03",
+      "Persona": "year-specific",
+      "InScope": true,
+      "TaxYear": 2026,
+      "Question": "What is the 2026 standard deduction for a single filer?",
+      "TopScore": 0.898518979549408,
+      "Retrieved": [
+        {
+          "ChunkId": "rp-25-32-ty2026-p18-018",
+          "DocId": "rp-25-32",
+          "PageStart": 18,
+          "PageEnd": 18,
+          "Score": 0.898518979549408
+        },
+        {
+          "ChunkId": "rp-25-32-ty2026-p24-039",
+          "DocId": "rp-25-32",
+          "PageStart": 24,
+          "PageEnd": 24,
+          "Score": 0.7558763027191162
+        },
+        {
+          "ChunkId": "rp-25-32-ty2026-p16-014",
+          "DocId": "rp-25-32",
+          "PageStart": 16,
+          "PageEnd": 17,
+          "Score": 0.583293616771698
+        },
+        {
+          "ChunkId": "rp-25-32-ty2026-p20-027",
+          "DocId": "rp-25-32",
+          "PageStart": 20,
+          "PageEnd": 21,
+          "Score": 0.46529385447502136
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 2,
+      "CitationsValid": 2,
+      "AnswerText": "For tax year 2026, the standard deduction for a single filer is $16,100. Single filers fall under the category \"Unmarried Individuals (other than Surviving Spouses and Heads of Households).\" In the passage's table, the amounts appear in the same order as the filing statuses: $32,200 for married filing jointly and surviving spouses, $24,150 for heads of households, $16,100 for unmarried individuals, and $16,100 for married filing separately.\n\nA different rule applies if someone else, such as a parent, can claim you as a dependent. In that case, your standard deduction can't exceed the greater of (1) $1,350 or (2) $450 plus your earned income. This limit applies even if you file as single.",
+      "LatencyMs": 8977,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "y04",
+      "Persona": "year-specific",
+      "InScope": true,
+      "TaxYear": 2027,
+      "Question": "What's the 2027 minimum standard deduction for a dependent?",
+      "TopScore": 0.9140529632568359,
+      "Retrieved": [
+        {
+          "ChunkId": "rp-26-35-ty2027-p13-019",
+          "DocId": "rp-26-35",
+          "PageStart": 13,
+          "PageEnd": 13,
+          "Score": 0.9140529632568359
+        },
+        {
+          "ChunkId": "rp-26-35-ty2027-p20-041",
+          "DocId": "rp-26-35",
+          "PageStart": 20,
+          "PageEnd": 20,
+          "Score": 0.6644358038902283
+        },
+        {
+          "ChunkId": "rp-26-35-ty2027-p12-016",
+          "DocId": "rp-26-35",
+          "PageStart": 12,
+          "PageEnd": 12,
+          "Score": 0.5604187846183777
+        },
+        {
+          "ChunkId": "rp-26-35-ty2027-p16-032",
+          "DocId": "rp-26-35",
+          "PageStart": 16,
+          "PageEnd": 17,
+          "Score": 0.5530562996864319
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 2,
+      "CitationsValid": 2,
+      "AnswerText": "For tax year 2027, if you can be claimed as a dependent by another taxpayer (for example, your parents), your standard deduction is limited. It cannot exceed the greater of (1) $1,400, or (2) the sum of $500 and your earned income. In practice, this means the floor is $1,400: even with little or no earned income, your standard deduction is at least $1,400. If $500 plus your earned income is more than $1,400, that larger amount applies instead.\n\nThere is also an upper limit. A dependent's standard deduction can't go above the regular amount for their filing status. For example, that amount is $16,600 for unmarried individuals (other than surviving spouses and heads of households). To see how this applies to your own earnings, try the Scenario calculator.",
+      "LatencyMs": 6635,
+      "PipelineRefused": false
+    },
+    {
+      "Id": "y05",
+      "Persona": "year-specific",
+      "InScope": true,
+      "TaxYear": 2026,
+      "Question": "For 2026, up to what taxable income does the 10% bracket apply for a single filer?",
+      "TopScore": 0.8205587267875671,
+      "Retrieved": [
+        {
+          "ChunkId": "rp-25-32-ty2026-p10-002",
+          "DocId": "rp-25-32",
+          "PageStart": 10,
+          "PageEnd": 11,
+          "Score": 0.8205587267875671
+        },
+        {
+          "ChunkId": "rp-25-32-ty2026-p11-004",
+          "DocId": "rp-25-32",
+          "PageStart": 11,
+          "PageEnd": 12,
+          "Score": 0.7134749889373779
+        },
+        {
+          "ChunkId": "rp-25-32-ty2026-p13-007",
+          "DocId": "rp-25-32",
+          "PageStart": 13,
+          "PageEnd": 13,
+          "Score": 0.6765429377555847
+        },
+        {
+          "ChunkId": "rp-25-32-ty2026-p12-006",
+          "DocId": "rp-25-32",
+          "PageStart": 12,
+          "PageEnd": 13,
+          "Score": 0.6717074513435364
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "insufficient_sources",
+      "CitationsTotal": 0,
+      "CitationsValid": 0,
+      "LatencyMs": 6809,
+      "PipelineRefused": true
+    },
+    {
+      "Id": "y06",
+      "Persona": "year-specific",
+      "InScope": true,
+      "TaxYear": 2027,
+      "Question": "In 2027, at what income does the student loan interest deduction start to phase out?",
+      "TopScore": 0.9482089281082153,
+      "Retrieved": [
+        {
+          "ChunkId": "rp-26-35-ty2027-p18-035",
+          "DocId": "rp-26-35",
+          "PageStart": 18,
+          "PageEnd": 18,
+          "Score": 0.9482089281082153
+        },
+        {
+          "ChunkId": "rp-26-35-ty2027-p14-023",
+          "DocId": "rp-26-35",
+          "PageStart": 14,
+          "PageEnd": 14,
+          "Score": 0.6435743570327759
+        },
+        {
+          "ChunkId": "rp-26-35-ty2027-p11-015",
+          "DocId": "rp-26-35",
+          "PageStart": 11,
+          "PageEnd": 12,
+          "Score": 0.5854186415672302
+        },
+        {
+          "ChunkId": "rp-26-35-ty2027-p20-041",
+          "DocId": "rp-26-35",
+          "PageStart": 20,
+          "PageEnd": 20,
+          "Score": 0.5797114372253418
+        }
+      ],
+      "HitAt4": true,
+      "Outcome": "answered",
+      "CitationsTotal": 2,
+      "CitationsValid": 2,
+      "AnswerText": "For tax year 2027, the maximum deduction for interest paid on qualified education loans is $2,500. This deduction begins to phase out once your modified adjusted gross income (MAGI) exceeds $90,000, or $180,000 if you file a joint return.\n\nThe deduction is completely phased out once your MAGI reaches $105,000 or more ($210,000 or more for joint returns). If your MAGI falls between these two amounts, you get a reduced deduction. To see what that means for your own return, try the Scenario calculator.",
+      "LatencyMs": 5770,
+      "PipelineRefused": false
+    }
+  ]
+}

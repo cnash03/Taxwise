@@ -10,7 +10,8 @@
       "eval/TaxWise.Eval/TaxWise.Eval.csproj",
       "tests/TaxWise.Core.Tests/TaxWise.Core.Tests.csproj",
       "tests/TaxWise.Rag.Tests/TaxWise.Rag.Tests.csproj",
-      "tests/TaxWise.Api.Tests/TaxWise.Api.Tests.csproj"
+      "tests/TaxWise.Api.Tests/TaxWise.Api.Tests.csproj",
+      "tests/TaxWise.Eval.Tests/TaxWise.Eval.Tests.csproj"
     ]
   }
 }

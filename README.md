@@ -83,6 +83,46 @@ The **Learning quizzes** page turns what you asked about in chat into multiple-c
 - Every question is checked: 4 distinct options, a correct index from 0 to 3, and a quote that appears in the passage. A failing question is regenerated once and then dropped, so a quiz can have fewer than 5 questions.
 - After you answer, a feedback card shows whether you were right, the explanation and a citation chip that opens the passage with the quoted sentence highlighted. The last screen shows your score.
 
+## Evaluation
+
+The gold set, [`eval/gold.jsonl`](eval/gold.jsonl), has 52 questions:
+- 34 in-scope questions across the five personas (W-2 first-timer, scholarship, dependent, gig, international).
+- 6 year-specific questions (TY2026 and TY2027).
+- 2 year-trap questions, which ask about 2027 while 2025 is selected.
+- 10 out-of-scope questions.
+
+Each question names its expected document and PDF pages. A person writes each `goldAnswer` from the publications and sets `goldStatus` to `approved`. Until then that question isn't judged.
+
+```bash
+dotnet run --project eval/TaxWise.Eval -- --mode taxwise    # the real pipeline: retrieve → Claude → validate
+dotnet run --project eval/TaxWise.Eval -- --mode baseline   # same model, no retrieval
+dotnet run --project eval/TaxWise.Eval -- --rejudge eval/results/<date>-taxwise.json   # judge newly written gold answers only
+```
+
+Options: `--only q01,q08`, `--limit N` (both write a `-smoke` report), `--concurrency N` (default 3), `--judge-model`.
+
+- The runner uses the API's `appsettings.json` and the shared `taxwise-dev` user secrets, and needs Qdrant running.
+- Each question runs **once with the rerank threshold off**. The `MinRerankScore` sweep over {0.2, 0.3, 0.35, 0.4, 0.5} is scored afterwards from the saved top scores.
+- The chosen threshold refuses the most out-of-scope questions while wrongly refusing at most 10% of in-scope ones.
+- **Metrics:**
+  - hit@4: a top-4 chunk is from an expected doc and within ±1 page of an expected page.
+  - Citation validity: the passage ID is real and the quote is found, counted before the validator drops anything.
+  - Answer correctness: judged by `claude-sonnet-5-5`, with 10 verdicts listed for a human spot-check.
+  - Refusal recall and precision.
+- Reports go to `eval/results/YYYY-MM-DD-{mode}.md` and `.json`.
+
+**Results, 2026-11-12** ([taxwise](eval/results/2026-11-12-taxwise.md), [baseline](eval/results/2026-11-12-baseline.md)):
+
+| | TaxWise | Plain chatbot (same model, no retrieval) |
+|---|---|---|
+| Retrieval hit@4 | 95% (38/40) | – |
+| Citation validity (before the validator) | 100% (262/262) | – |
+| Out-of-scope and year-trap questions refused | 100% (12/12) | 8.3% (1/12) |
+| In-scope questions wrongly refused | 2.5% (1/40) | 0% |
+| Answer correctness | pending gold answers | pending gold answers |
+
+`MinRerankScore` is **0.50**: 9 of the 12 out-of-scope questions are refused without calling Claude (DECISIONS #14). For "2027 standard deduction" with 2025 selected, the plain chatbot said the 2027 amounts weren't published yet, though Rev. Proc. 2026-35 came out on Nov 5. TaxWise refused.
+
 ## Ingest the IRS documents
 
 The sources are listed in [`data/sources/manifest.json`](data/sources/manifest.json). The PDFs download to `data/sources/pdf/` (gitignored).
