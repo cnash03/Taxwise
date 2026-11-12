@@ -32,6 +32,9 @@
             </div>
         </header>
 
+        @* The disabled picker's tooltip doesn't show in every WebView, so the reason is also on the page. *@
+        <div class="banner" role="note">@YearLockedNotice</div>
+
         <div class="forms-body">
             <article class="form-card">
                 @if (_form is { } form)
@@ -124,6 +127,8 @@
 
     /// <summary>BUILD_PLAN §1a: line numbers can change, so forms stay on TY2025 until the 2026 instructions are out.</summary>
     private const int FormTaxYear = 2025;
+    private const string YearLockedNotice =
+        "Tax year 2025 only. The IRS hasn't released the 2026 Form W-2, 1098-T and 1040 instructions yet, and box and line numbers can change.";
     private const string YearLockedTooltip =
         "Explain my form uses tax year 2025 until the IRS releases the 2026 Form W-2, 1098-T and 1040 instructions, because box and line numbers can change.";
 

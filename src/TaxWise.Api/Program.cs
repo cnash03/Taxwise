@@ -1,7 +1,9 @@
 using Microsoft.Extensions.Options;
 using TaxWise.Api;
+using TaxWise.Core.Calculator;
 using TaxWise.Rag;
 using TaxWise.Rag.Answering;
+using TaxWise.Rag.Calculator;
 using TaxWise.Rag.Forms;
 using TaxWise.Rag.Sources;
 using TaxWise.Rag.Voyage;
@@ -58,6 +60,25 @@ app.MapPost("/" + ApiRoutes.ExplainForm, async (ExplainFormRequest? request, For
     });
 });
 
+app.MapPost("/" + ApiRoutes.Calculator, async (CalcRequest? request, CalculatorService calculator,
+    HttpContext http, ILogger<Program> logger, CancellationToken ct) =>
+{
+    if (CalcProblem(request) is { } problem) return problem;
+    if (TaxYearRegistry.Get(request!.TaxYear) is not { } rules)
+        return Results.Problem($"Tax year {request.TaxYear} isn't supported. Choose {string.Join(", ", TaxYearRegistry.Supported)}.",
+            statusCode: StatusCodes.Status400BadRequest);
+
+    return await Guarded(logger, async () =>
+    {
+        var response = await calculator.CalculateAsync(rules, request, ct);
+        return Results.Ok(response with { Sources = AbsoluteSources(http, response.Sources) });
+    });
+});
+
+// Numbers only, for every supported year; TaxYear in the body is ignored.
+app.MapPost("/" + ApiRoutes.CompareYears, (CalcRequest? request) =>
+    CalcProblem(request) ?? Results.Ok(CalculatorService.Compare(request!)));
+
 app.MapGet("/api/sources/{docId}/pdf", (string docId, SourceLibrary library) =>
     // Only manifest doc IDs resolve to a file, so the route can't be used to read anything else.
     library.FindPdf(docId) is { } path
@@ -74,7 +95,7 @@ app.MapGet("/" + ApiRoutes.KnowledgeBase, (SourceLibrary library, IOptions<TaxYe
 
 app.Run();
 
-// Maps answerer and retrieval failures to safe ProblemDetails (429 / 502), shared by /api/ask and /api/forms/explain.
+// Maps answerer and retrieval failures to safe ProblemDetails (429 / 502), shared by /api/ask, /api/forms/explain and /api/calculator.
 static async Task<IResult> Guarded(ILogger logger, Func<Task<IResult>> run)
 {
     try
@@ -94,6 +115,19 @@ static async Task<IResult> Guarded(ILogger logger, Func<Task<IResult>> run)
         logger.LogError("Retrieval failed: {Type}: {Message}", e.GetType().Name, e.Message);
         return Results.Problem("The search service is unavailable. Please try again.", statusCode: StatusCodes.Status502BadGateway);
     }
+}
+
+// Shared input checks for the calculator endpoints; null when the request is fine.
+static IResult? CalcProblem(CalcRequest? request)
+{
+    if (request is null)
+        return Results.Problem("Enter your wages and withholding.", statusCode: StatusCodes.Status400BadRequest);
+    if (!Enum.IsDefined(request.FilingStatus))
+        return Results.Problem("Choose a filing status.", statusCode: StatusCodes.Status400BadRequest);
+    if (request.Wages is < 0 or > CalcLimits.MaxAmount || request.FederalWithholding is < 0 or > CalcLimits.MaxAmount)
+        return Results.Problem($"Wages and withholding must be between $0 and ${CalcLimits.MaxAmount:N0}.",
+            statusCode: StatusCodes.Status400BadRequest);
+    return null;
 }
 
 static List<SourcePassage> AbsoluteSources(HttpContext http, IEnumerable<SourcePassage> sources) =>

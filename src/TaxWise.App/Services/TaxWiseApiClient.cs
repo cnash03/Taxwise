@@ -12,7 +12,7 @@ public sealed class ApiException(string message, bool apiUnreachable) : Exceptio
 	public bool ApiUnreachable { get; } = apiUnreachable;
 }
 
-/// <summary>Calls the TaxWise API (ask, knowledge base, forms). API keys live only in the API (BUILD_PLAN §1).</summary>
+/// <summary>Calls the TaxWise API (ask, knowledge base, forms, calculator). API keys live only in the API (BUILD_PLAN §1).</summary>
 public sealed class TaxWiseApiClient(HttpClient http)
 {
 	public async Task<AskResponse> AskAsync(AskRequest request, CancellationToken cancellationToken)
@@ -37,6 +37,18 @@ public sealed class TaxWiseApiClient(HttpClient http)
 	{
 		using var response = await SendAsync(() => http.PostAsJsonAsync(ApiRoutes.ExplainForm, request, cancellationToken), cancellationToken);
 		return await ReadAsync<ExplainFormResponse>(response, cancellationToken);
+	}
+
+	public async Task<CalcResponse> CalculateAsync(CalcRequest request, CancellationToken cancellationToken)
+	{
+		using var response = await SendAsync(() => http.PostAsJsonAsync(ApiRoutes.Calculator, request, cancellationToken), cancellationToken);
+		return await ReadAsync<CalcResponse>(response, cancellationToken);
+	}
+
+	public async Task<CompareYearsResponse> CompareYearsAsync(CalcRequest request, CancellationToken cancellationToken)
+	{
+		using var response = await SendAsync(() => http.PostAsJsonAsync(ApiRoutes.CompareYears, request, cancellationToken), cancellationToken);
+		return await ReadAsync<CompareYearsResponse>(response, cancellationToken);
 	}
 
 	private static async Task<HttpResponseMessage> SendAsync(Func<Task<HttpResponseMessage>> send, CancellationToken cancellationToken)

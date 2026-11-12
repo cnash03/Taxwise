@@ -16,3 +16,9 @@ public static class AskLimits
 {
     public const int MaxQuestionLength = 1000;
 }
+
+public static class CalcLimits
+{
+    /// <summary>Upper bound for wages and withholding; well above any student scenario.</summary>
+    public const decimal MaxAmount = 10_000_000m;
+}

@@ -93,3 +93,33 @@ Design decisions for TaxWise, newest last. Each one records what we chose, what 
 - Students with part-time or campus jobs are more likely to see DD than retirement deferrals.
 - It's informational only and not entered on Form 1040. That shows the most important lesson about box 12: not every number on a W-2 goes on your return.
 - D and E bring in retirement-plan rules that are outside the app's student scope.
+
+## 9. The calculator uses the IRS Tax Table method, not the exact bracket formula
+
+**Phase 5 · 2026-11-12 · session `71ffadc8`**
+
+**Decision:** Below $100,000 of taxable income, the tax comes from the Tax Table method: the brackets applied to the midpoint of the row, rounded to the dollar. Slide 11's demo ($12,250 taxable, single, TY2025) now shows **$1,235**, the official table value, not the mockup's $1,231.50.
+
+**Alternatives considered:** Match the mockup with the exact bracket formula. Also considered: show both numbers.
+
+**Why:** A 1040 filer under $100,000 has to use the Tax Table, so $1,235 is the number on a real return. The method reproduces all 2,062 rows of the 2025 Tax Table in every filing status, so it is also the most defensible way to estimate 2026 and 2027 before their tables come out.
+
+## 10. The TY2025 golden data is the whole Tax Table, extracted by the agent and checked by a person
+
+**Phase 5 · 2026-11-12 · session `71ffadc8`**
+
+**Decision:** The agent extracted every row of the 2025 Tax Table from the Form 1040 instructions PDF with PdfPig into a CSV, which the tests check row by row. The 14 named golden scenarios list their PDF page so a person can check them. The 2026 and 2027 tests use the base tax at every breakpoint, copied from the Rev. Procs.
+
+**Alternatives considered:** A person types in about 10 rows by hand, as BUILD_PLAN said.
+
+**Why:** Checking the whole table catches row-boundary and rounding mistakes that 10 rows would miss. The human check moves from typing values in to spot-checking rows against the PDF, which is listed in the PR.
+
+## 11. Explanations may only repeat numbers the code computed
+
+**Phase 5 · 2026-11-12 · session `71ffadc8`**
+
+**Decision:** `DollarAmountValidator` checks every `$X` and comma-thousands number in Claude's explanation against a list of known amounts. That list holds the step table, the bracket breakdown, the year's thresholds, the deduction constants and the $100,000 cutoff. One stricter retry; then a canned explanation. The numbers on screen never come from the model.
+
+**Alternatives considered:** Only the step table amounts, as BUILD_PLAN first said.
+
+**Why:** Live testing showed Claude correctly naming the $100,000 cutoff and the row bounds from the passages. Rejecting those would push correct explanations onto the canned text. Every amount on the list is still produced by code.

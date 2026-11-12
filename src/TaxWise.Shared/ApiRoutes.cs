@@ -6,6 +6,8 @@ public static class ApiRoutes
     public const string Ask = "api/ask";
     public const string KnowledgeBase = "api/knowledge-base";
     public const string ExplainForm = "api/forms/explain";
+    public const string Calculator = "api/calculator";
+    public const string CompareYears = "api/calculator/compare";
 
     /// <summary>A sample form and its boxes, e.g. <c>api/forms/w2</c>.</summary>
     public static string Form(string formId) => $"api/forms/{Uri.EscapeDataString(formId)}";
