@@ -60,13 +60,14 @@ public class EvalRunnerTests
         var runner = Runner(new FakeRetriever(0.1, Chunk("p970", 6, "Scholarships can be tax free.")), answerer, judge);
         GoldItem[] gold =
         [
-            new("q01", "scholarship", true, "Q?", ["p970"], [6], "Yes, if it pays tuition."),
+            new("q01", "scholarship", true, "Q?", ["p970"], [6], "Yes, if it pays tuition.", GoldItem.Approved),
+            new("q03", "scholarship", true, "Q3?", ["p970"], [6], "Drafted, not approved.", GoldItem.Draft), // not judged
             new("q02", "scholarship", true, "Q2?", ["p970"], [6]), // no gold answer yet: not judged
         ];
 
         var results = await runner.RunAsync(EvalModes.TaxWise, gold, concurrency: 2);
 
-        Assert.Equal(2, answerer.Calls);
+        Assert.Equal(3, answerer.Calls);
         var r = results.Single(x => x.Id == "q01");
         Assert.Equal(Outcomes.Answered, r.Outcome);
         Assert.Equal(0.1, r.TopScore);
@@ -76,6 +77,7 @@ public class EvalRunnerTests
         Assert.True(Metrics.IsRefused(r, 0.35));
         Assert.False(Metrics.IsRefused(r, 0.05));
         Assert.Null(results.Single(x => x.Id == "q02").Judge);
+        Assert.Null(results.Single(x => x.Id == "q03").Judge);
     }
 
     [Fact]
@@ -98,7 +100,7 @@ public class EvalRunnerTests
         var judge = new FakeJudge(Verdicts.Partial);
         var runner = Runner(new FakeRetriever(0.9), new FakeAnswerer(Draft), judge);
         var unjudged = MetricsTests.Result("q01", true, 0.9);
-        var gold = new GoldItem("q01", "p", true, "Q?", ["p970"], [6], "Now written.");
+        var gold = new GoldItem("q01", "p", true, "Q?", ["p970"], [6], "Now written.", GoldItem.Approved);
 
         var judged = await runner.JudgeAsync(unjudged, gold);
         var again = await runner.JudgeAsync(judged with { Judge = new JudgeVerdict(Verdicts.Correct, "kept") }, gold);

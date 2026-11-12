@@ -5,7 +5,7 @@ namespace TaxWise.Eval.Tests;
 public class MetricsTests
 {
     private static GoldItem Gold(string id = "q01", bool inScope = true, string[]? docs = null, int[]? pages = null, string gold = "") =>
-        new(id, "scholarship", inScope, "Is my scholarship taxable?", docs ?? ["p970"], pages ?? [6], gold);
+        new(id, "scholarship", inScope, "Is my scholarship taxable?", docs ?? ["p970"], pages ?? [6], gold, gold == "" ? GoldItem.Pending : GoldItem.Approved);
 
     private static RetrievedRef Ref(string doc, int start, int end = 0) => new($"{doc}-p{start}", doc, start, end == 0 ? start : end, 0.5);
 

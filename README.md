@@ -91,7 +91,7 @@ The gold set, [`eval/gold.jsonl`](eval/gold.jsonl), has 52 questions:
 - 2 year-trap questions, which ask about 2027 while 2025 is selected.
 - 10 out-of-scope questions.
 
-Each question names its expected document and PDF pages. A person writes each `goldAnswer` from the publications and sets `goldStatus` to `approved`. Until then that question isn't judged.
+Each question names its expected document and PDF pages. Each `goldAnswer` is drafted from the cited pages (`goldStatus: draft`). A person checks it against the publication and sets `goldStatus` to `approved`. Only approved answers are judged.
 
 ```bash
 dotnet run --project eval/TaxWise.Eval -- --mode taxwise    # the real pipeline: retrieve → Claude → validate
@@ -119,7 +119,8 @@ Options: `--only q01,q08`, `--limit N` (both write a `-smoke` report), `--concur
 | Citation validity (before the validator) | 100% (262/262) | – |
 | Out-of-scope and year-trap questions refused | 100% (12/12) | 8.3% (1/12) |
 | In-scope questions wrongly refused | 2.5% (1/40) | 0% |
-| Answer correctness | pending gold answers | pending gold answers |
+| Answer correctness (judge: `claude-sonnet-5-5`) | 80% correct (32/40), 6 partial, 1 incorrect, 1 refused | 90% correct (36/40), 1 partial, 3 incorrect |
+| TY2027 questions correct | 3/3 | 0/3 (says the 2027 amounts aren't published) |
 
 `MinRerankScore` is **0.50**: 9 of the 12 out-of-scope questions are refused without calling Claude (DECISIONS #14). For "2027 standard deduction" with 2025 selected, the plain chatbot said the 2027 amounts weren't published yet, though Rev. Proc. 2026-35 came out on Nov 5. TaxWise refused.
 

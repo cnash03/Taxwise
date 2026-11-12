@@ -5,8 +5,8 @@ namespace TaxWise.Eval;
 
 /// <summary>
 /// One line of <c>eval/gold.jsonl</c> (BUILD_PLAN §8). <see cref="ExpectedPages"/> are PDF page numbers, the same
-/// numbering as chunk pages and the <c>#page=N</c> links. <see cref="GoldAnswer"/> is written by a human; until then it
-/// is empty and the question isn't judged.
+/// numbering as chunk pages and the <c>#page=N</c> links. <see cref="GoldAnswer"/> may be drafted by the agent
+/// (<c>goldStatus: draft</c>), but a question is only judged once a human sets <c>goldStatus</c> to <c>approved</c>.
 /// </summary>
 public sealed record GoldItem(
     [property: JsonPropertyName("id")] string Id,
@@ -21,10 +21,12 @@ public sealed record GoldItem(
     [property: JsonPropertyName("sourceHint")] string? SourceHint = null)
 {
     public const string Pending = "pending";
+    public const string Draft = "draft";
     public const string Approved = "approved";
     public const int DefaultTaxYear = 2025;
 
-    public bool HasGoldAnswer => !string.IsNullOrWhiteSpace(GoldAnswer);
+    /// <summary>A human-approved gold answer exists, so the judge may compare against it.</summary>
+    public bool HasGoldAnswer => !string.IsNullOrWhiteSpace(GoldAnswer) && GoldStatus == Approved;
 }
 
 public static class GoldSet

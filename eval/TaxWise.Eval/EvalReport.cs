@@ -68,7 +68,7 @@ public static class ReportWriter
         sb.AppendLine($"| Answer correctness{at} | {Pct(correctness.Correct, correctness.Judged)} correct · {correctness.Partial} partial · " +
                       $"{correctness.Incorrect} incorrect · {correctness.Refused} refused (of {correctness.Judged} judged) |");
         if (correctness.NotJudged > 0)
-            sb.AppendLine($"| Not judged yet | {correctness.NotJudged} in-scope questions have no `goldAnswer` |");
+            sb.AppendLine($"| Not judged yet | {correctness.NotJudged} in-scope questions have no approved `goldAnswer` |");
         var errors = results.Count(r => r.Outcome == Outcomes.Error);
         if (errors > 0) sb.AppendLine($"| Errors | {errors} (counted as refusals) |");
         var lat = results.Select(r => r.LatencyMs).Order().ToList();

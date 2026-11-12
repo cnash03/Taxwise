@@ -477,6 +477,10 @@
       "CitationsTotal": 5,
       "CitationsValid": 5,
       "AnswerText": "The answer depends on whether your parents (or someone else) can claim you as a dependent. The passages include the filing rules for dependents, but they do not include the general filing threshold for single filers who are not dependents. If no one can claim you, these sources can't fully answer your question.\n\nIf you are a single dependent under 65 and not blind, you must file if any of these apply: your unearned income was more than $1,350, your earned income was more than $15,750, or your gross income was more than the larger of $1,350 or your earned income (up to $15,300) plus $450. Wages count as earned income. If your only income was $9,000 in wages, that is below the $15,750 earned income limit. It is also below the gross income test, which for you would be $9,000 plus $450.\n\nEven if your income is under these limits, you must still file if certain other situations apply. These include having net earnings from self-employment of at least $400 (for example, freelance or gig work rather than a W-2 job), owing special taxes such as Social Security or Medicare tax on unreported tips, or having advance payments of the premium tax credit made for Marketplace health coverage. Taxable scholarship or grant money also counts as earned income, so include it when you check the limits.",
+      "Judge": {
+        "Verdict": "partial",
+        "Reason": "The candidate says a $9,000 wage earner is below the dependent filing limits and lists the $400 self-employment exception, but it never gives the non-dependent single-filer threshold ($15,750) or a clear \"no, you generally don't have to file,\" saying instead that the sources can't fully answer the question; it also gives dependent-specific figures and a muddled gross income test."
+      },
       "LatencyMs": 12091,
       "PipelineRefused": false
     },
@@ -522,6 +526,10 @@
       "CitationsTotal": 8,
       "CitationsValid": 8,
       "AnswerText": "Box 1 of your Form W-2 shows your total taxable wages, tips, and other compensation your employer paid you during the year. This includes things like regular wages, bonuses (including signing bonuses), prizes, and awards.\n\nBox 1 also includes certain other items, such as total noncash payments (including certain fringe benefits), tips you reported to your employer, and payments for non-job-related education expenses unless they're excludable under an educational assistance program.\n\nSome amounts are left out of box 1. Elective deferrals, such as your contributions to a 401(k) or 403(b) plan, generally aren't included. Allocated tips also aren't included in box 1; they appear in box 8, and you may need to report them yourself on Form 1040, line 1c.",
+      "Judge": {
+        "Verdict": "correct",
+        "Reason": "The candidate says box 1 shows total taxable wages, tips, and other compensation and that pre-tax elective deferrals such as 401(k) contributions are excluded, matching the reference; the extra details on bonuses, noncash payments, and allocated tips are accurate."
+      },
       "LatencyMs": 7290,
       "PipelineRefused": false
     },
@@ -567,6 +575,10 @@
       "CitationsTotal": 6,
       "CitationsValid": 6,
       "AnswerText": "Box 1 and box 3 follow different rules, so they often don't match. Box 3 shows wages subject to employee social security tax, measured before payroll deductions, and it leaves out tips.\n\nRetirement contributions are a common reason for the difference. If you put part of your pay into a plan like a 401(k) as an elective deferral, that amount is included in box 3 but not in box 1. This makes box 3 higher than box 1.\n\nTips can also cause a difference. Tips you reported to your employer are included in box 1, but social security tips go in box 7, not box 3. This can make box 3 lower than box 1.\n\nThere is also a cap on box 3. Box 3 plus box 7 cannot exceed the 2025 social security wage base of $176,100. If you earned more than that, box 3 stops at the limit.",
+      "Judge": {
+        "Verdict": "correct",
+        "Reason": "The candidate covers the same key facts as the reference: box 3 is social security wages before payroll deductions, 401(k) deferrals reduce box 1 but not box 3, tips (box 7) are excluded from box 3, and the 2025 wage base cap is $176,100. Nothing it says contradicts the reference."
+      },
       "LatencyMs": 12068,
       "PipelineRefused": false
     },
@@ -612,6 +624,10 @@
       "CitationsTotal": 7,
       "CitationsValid": 7,
       "AnswerText": "For tax year 2025, the standard deduction for a Single filer is $15,750. This is the same amount as for Married filing separately, and it reflects an increase for all filers in 2025.\n\nThat $15,750 figure comes from the Standard Deduction Chart for Most People. Don't use that chart if you were born before January 2, 1961, are blind, or if someone else can claim you as a dependent. Many college students fall into that last group because a parent can claim them. In that case, you use the Standard Deduction Worksheet for Dependents instead, and your standard deduction may be smaller.\n\nOn the dependent worksheet, you start with your earned income and add $450. You compare that result with a minimum standard deduction of $1,350 and take the larger amount. Your standard deduction is then the smaller of that amount or $15,750 for Single filers. Earned income includes wages, tips, and any taxable scholarship or fellowship grant.",
+      "Judge": {
+        "Verdict": "correct",
+        "Reason": "The candidate gives the correct 2025 single-filer standard deduction of $15,750 and correctly notes the exceptions for age 65+, blindness, and dependents, with accurate 2025 dependent-worksheet figures ($450 added, $1,350 minimum)."
+      },
       "LatencyMs": 7343,
       "PipelineRefused": false
     },
@@ -657,6 +673,10 @@
       "CitationsTotal": 8,
       "CitationsValid": 8,
       "AnswerText": "Yes, you should still file. Even if your income is below the filing requirement, the IRS says you should file a return if you can get money back, and having income tax withheld from your pay is one of the listed examples.\n\nThe Form 1040 Instructions say the same thing: filing a return is how you get a refund of any federal income tax that was withheld. IRS e-file is described as the fastest way to get your refund, and it's free if you're eligible.\n\nAlso check whether you qualify for refundable credits such as the earned income credit or the American opportunity credit, which is a common one for college students. The instructions say you should also file if you're eligible for these credits.\n\nFinally, earning less than the filing threshold doesn't always mean you're off the hook. You may actually be required to file in certain other situations, for example if you had net earnings from self-employment of at least $400, or if advance payments of the premium tax credit were made for your Marketplace coverage.",
+      "Judge": {
+        "Verdict": "correct",
+        "Reason": "The candidate says yes, file to get back withheld federal income tax, matching the reference; the extra details on refundable credits and other filing triggers are accurate and don't contradict it."
+      },
       "LatencyMs": 7309,
       "PipelineRefused": false
     },
@@ -702,6 +722,10 @@
       "CitationsTotal": 9,
       "CitationsValid": 9,
       "AnswerText": "For most students who use the calendar year, the deadline to file your 2025 federal income tax return is April 15, 2026.\n\nIf you can't file by then, you can request an automatic 6-month extension by filing Form 4868 (or using an electronic filing option) by the regular due date. This moves your filing deadline to October 15, 2026.\n\nKeep in mind that an extension gives you more time to file, not more time to pay. If you don't pay your tax by the original due date, you will owe interest on the unpaid tax and may owe penalties.\n\nIf you are a U.S. citizen or resident who is living outside the United States and Puerto Rico on the due date (for example, while studying or working abroad, as long as your main place of business or post of duty is also outside the U.S. and Puerto Rico), you get an automatic 2-month extension to June 15, 2026. You don't need to file Form 4868 for it. However, interest is still charged on any tax paid after April 15.",
+      "Judge": {
+        "Verdict": "correct",
+        "Reason": "The candidate gives April 15, 2026 as the deadline and notes interest and penalties for paying late; the extra details on the Form 4868 extension to October 15, 2026 and the June 15 abroad extension are accurate and do not contradict the reference."
+      },
       "LatencyMs": 8252,
       "PipelineRefused": false
     },
@@ -747,6 +771,10 @@
       "CitationsTotal": 3,
       "CitationsValid": 3,
       "AnswerText": "Code DD in box 12 of your Form W-2 shows the cost of employer-sponsored health coverage. In other words, it reports how much your health coverage through your employer costs.\n\nNo, it's not taxable. The amount reported with code DD is for information only, so it doesn't add to your taxable income.\n\nIf you want more detail, the IRS points to its Affordable Care Act (ACA) Tax Provisions page on IRS.gov for additional guidance about this reporting.",
+      "Judge": {
+        "Verdict": "correct",
+        "Reason": "The candidate correctly says code DD reports the cost of employer-sponsored health coverage and that it is informational only and not taxable, matching the reference."
+      },
       "LatencyMs": 4744,
       "PipelineRefused": false
     },
@@ -792,6 +820,10 @@
       "CitationsTotal": 6,
       "CitationsValid": 6,
       "AnswerText": "Generally, no. A scholarship used only for tuition is usually tax free, as long as you are a candidate for a degree. Tuition and fees required to enroll at or attend an eligible educational institution count as qualified education expenses, and a degree candidate can exclude a qualified scholarship from income.\n\nYou are a candidate for a degree if, for example, you are pursuing a degree at a college or university. Your school must also be an eligible educational institution, meaning one with a regular faculty, a curriculum, and regularly enrolled students.\n\nThere are other conditions. The scholarship is tax free only to the extent it doesn't exceed your qualified education expenses. It also can't be designated for other purposes, such as room and board. If the scholarship only covered your tuition, these conditions are usually met.\n\nOne important exception is payment for services. If you had to teach, do research, or perform other services to receive the scholarship, the part that represents payment for those services is taxable. This is true even if it went toward tuition. For example, if $1,000 of a $2,500 scholarship is payment for work as a teaching assistant, no more than $1,500 can be excluded.",
+      "Judge": {
+        "Verdict": "correct",
+        "Reason": "The candidate says generally not taxable and gives the same conditions as the reference: degree candidate at an eligible institution, amount not above qualified expenses, not earmarked for other costs, and payment for services is taxable. It contradicts nothing."
+      },
       "LatencyMs": 10560,
       "PipelineRefused": false
     },
@@ -837,6 +869,10 @@
       "CitationsTotal": 7,
       "CitationsValid": 7,
       "AnswerText": "Yes. The part of your scholarship that pays for your dorm room and meal plan is generally taxable. Qualified education expenses specifically exclude room and board, and scholarship money used to pay for expenses that don't qualify is taxable.\n\nThis is true even if your school requires you to pay for housing or a meal plan as a condition of enrollment or attendance.\n\nA scholarship is tax free only if you are a candidate for a degree at an eligible educational institution. Even then, it is tax free only to the extent it doesn't exceed your qualified education expenses and isn't designated or earmarked for other purposes, such as room and board. Qualified education expenses are tuition and fees required to enroll, plus course-related expenses such as books, supplies, and equipment required of all students in your course of instruction.\n\nTo figure how much of your scholarship you can exclude from gross income, the IRS points you to Worksheet 1-1 in Pub 970. To estimate any tax you might owe on the taxable part, try the Scenario calculator.",
+      "Judge": {
+        "Verdict": "correct",
+        "Reason": "The candidate says the room-and-board portion of the scholarship is taxable because room and board are not qualified education expenses, which matches the reference. The extra detail about degree-candidate status and earmarking is accurate and does not contradict it."
+      },
       "LatencyMs": 7732,
       "PipelineRefused": false
     },
@@ -882,6 +918,10 @@
       "CitationsTotal": 8,
       "CitationsValid": 8,
       "AnswerText": "For a scholarship or fellowship grant to be tax-free, it must be used for qualified education expenses. These are tuition and fees required to enroll at or attend an eligible educational institution.\n\nCourse-related expenses also count, such as fees, books, supplies, and equipment required for your courses. The key condition is that these items must be required of all students in your course of instruction, not just optional or recommended.\n\nSeveral costs don't qualify: room and board, travel, research, clerical help, and equipment or other expenses that aren't required for enrollment or attendance. Scholarship money used to pay these costs is taxable, even if the fee must be paid to the school as a condition of enrollment or attendance.\n\nThe scholarship's own terms also matter. If the scholarship requires that it be used for other purposes, such as room and board, or says it can't be used for tuition or course-related expenses, those expenses won't count as qualified for that scholarship.\n\nFinally, you generally can't exclude from income any part of a scholarship that is payment for teaching, research, or other services required as a condition of receiving it.",
+      "Judge": {
+        "Verdict": "correct",
+        "Reason": "The candidate lists the same qualifying expenses (required tuition and fees, and course-related fees, books, supplies and equipment required of all students) and the same non-qualifying ones (room and board, travel, research, clerical help, and equipment not required for enrollment or attendance), with only accurate extra detail."
+      },
       "LatencyMs": 7795,
       "PipelineRefused": false
     },
@@ -927,6 +967,10 @@
       "CitationsTotal": 8,
       "CitationsValid": 8,
       "AnswerText": "For 2025, the American opportunity credit is worth up to $2,500 per eligible student. The amount is the sum of 100% of the first $2,000 of qualified education expenses you paid for the student, plus 25% of the next $2,000. That means you need at least $4,000 of adjusted qualified education expenses for a student to reach the full $2,500.\n\nIf you're paying for more than one eligible student, the maximum is $2,500 multiplied by the number of eligible students.\n\nUp to 40% of the credit may be refundable. If the refundable portion is more than your tax, the excess is refunded to you. The rest is nonrefundable and may be limited by the amount of your tax.\n\nYour income can also reduce the credit. The MAGI limit is $90,000 if you file as single, head of household, or qualifying surviving spouse, and $180,000 if married filing jointly. The credit is also available only for 4 tax years per eligible student.\n\nYour actual amount depends on your expenses, income, and tax. To see what applies in your situation, try the Scenario calculator.",
+      "Judge": {
+        "Verdict": "correct",
+        "Reason": "The candidate gives the same $2,500 per student maximum, the 100% of the first $2,000 plus 25% of the next $2,000 formula, and the $90,000/$180,000 upper MAGI limits. The extra details (40% refundable, 4 tax years) are accurate and nothing contradicts the reference."
+      },
       "LatencyMs": 7833,
       "PipelineRefused": false
     },
@@ -972,6 +1016,10 @@
       "CitationsTotal": 8,
       "CitationsValid": 8,
       "AnswerText": "The lifetime learning credit can be worth up to $2,000 per tax return for 2025. It equals 20% of the first $10,000 of qualified education expenses you paid for all eligible students combined, so the $2,000 maximum applies to the whole return, not to each student.\n\nFor example, Bruce and Toni paid $5,000 of qualified education expenses in 2025, so they can claim a $1,000 credit (20% × $5,000). There is also no limit on the number of years you can claim the credit for the same student.\n\nYour actual credit may be smaller than 20% of your expenses. The credit can be reduced based on your modified adjusted gross income (MAGI). The MAGI limit is $90,000 if you file as single, head of household, or qualifying surviving spouse, and $180,000 if you are married filing jointly.\n\nThe credit is also nonrefundable. It can lower your tax to zero, but you won't get any leftover credit back as a refund.\n\nA scholarship that is excluded from your income can also lower the expenses you can count. In Judy's example, a $1,500 tax-free scholarship reduced her credit from $900 to $600. To estimate your own credit, try the Scenario calculator.",
+      "Judge": {
+        "Verdict": "partial",
+        "Reason": "The candidate matches the reference on the $2,000 per-return maximum, the 20% of the first $10,000 rule, the MAGI reduction, and the unlimited years. It also gives MAGI limits of $90,000 and $180,000, but those are the upper phase-out figures for 2025 only if the credit phases out between $80,000 and $90,000 (single) and $160,000 and $180,000 (joint), which the candidate does not state, so the wording that \"MAGI limit is $90,000\" is imprecise; these figures are accurate as the end of the phase-out range, so the error is minor."
+      },
       "LatencyMs": 11334,
       "PipelineRefused": false
     },
@@ -1017,6 +1065,10 @@
       "CitationsTotal": 4,
       "CitationsValid": 4,
       "AnswerText": "Box 1 of Form 1098-T, titled \"Payments Received for Qualified Tuition and Related Expenses,\" shows the total amount of payments your school received for qualified tuition and related expenses from all sources during the calendar year.\n\nThis amount is reduced by any reimbursements or refunds made during the same calendar year that relate to those payments. However, it is not reduced by scholarships and grants, which are reported separately in box 5.\n\nBox 1 can also include payments of past-due qualified tuition or related expenses from a previous calendar year, but only if the school previously billed you for those amounts.",
+      "Judge": {
+        "Verdict": "correct",
+        "Reason": "The candidate matches the reference: box 1 shows total payments received from all sources for qualified tuition and related expenses in the calendar year, reduced by same-year refunds or reimbursements, and not reduced by scholarships or grants (box 5). The extra detail about past-due amounts is accurate and does not contradict the reference."
+      },
       "LatencyMs": 5243,
       "PipelineRefused": false
     },
@@ -1062,6 +1114,10 @@
       "CitationsTotal": 12,
       "CitationsValid": 12,
       "AnswerText": "Yes, you may be able to deduct the interest you paid during the year on a qualified student loan, including both required and voluntary payments. Normally, personal interest isn't deductible, but student loan interest is a special exception. It's claimed as an adjustment to income, so you can take it even if you don't itemize deductions on Schedule A.\n\nThe maximum is $2,500. Your deduction is generally the smaller of $2,500 or the interest you actually paid during the tax year.\n\nTo claim the deduction, you generally must meet all of these requirements: your filing status is anything except married filing separately; no one else is claiming you as a dependent on their tax return; you are legally obligated to pay interest on a qualified student loan; and you actually paid that interest. As a student, the dependent rule is especially important. If a parent lists you as a dependent on their Form 1040, you can't take this deduction.\n\nThe loan itself must be a qualified student loan. That means you took it out solely to pay qualified education expenses for you, your spouse, or your dependent. Loans from a related person or from a qualified employer plan don't count.\n\nYour income can also reduce or eliminate the deduction. It is phased out (gradually reduced) if your MAGI is between $85,000 and $100,000, or between $170,000 and $200,000 on a joint return. You can't claim it at all if your MAGI is $100,000 or more ($200,000 or more for a joint return). Worksheet 4-1 in Pub 970 can help you figure your MAGI and your deduction. To see how these rules apply to your own numbers, try the Scenario calculator.\n\nIf you paid $600 or more in interest to a lender, you should receive Form 1098-E showing that amount. You can also deduct qualifying interest that isn't shown on the form. However, some items don't count as interest. These include loan origination fees that are payments for services such as processing costs, and interest paid through certain loan repayment assistance programs.",
+      "Judge": {
+        "Verdict": "correct",
+        "Reason": "The candidate matches the reference on all key facts: yes, deductible up to $2,500 as an adjustment to income without itemizing, with the 2025 MAGI phase-out of $85,000-$100,000 ($170,000-$200,000 joint). Its extra detail on eligibility rules is accurate and doesn't contradict the reference."
+      },
       "LatencyMs": 10883,
       "PipelineRefused": false
     },
@@ -1107,6 +1163,10 @@
       "CitationsTotal": 10,
       "CitationsValid": 10,
       "AnswerText": "Possibly, yes. Your parents may be able to claim you as their qualifying child if you meet all of the tests described below. As their son or daughter, you meet the relationship test.\n\nAge test: At 22, you are past the general under-19 limit. However, a full-time student can still qualify if they are under age 24 at the end of 2025 and younger than the parent claiming them (or younger than either spouse if your parents file jointly).\n\nStudent requirement: To count as a full-time student, you must have been enrolled full-time during some part of each of any 5 calendar months of 2025. Those months don't have to be consecutive. \"Full-time\" means the number of hours or courses your school considers full-time attendance. A college or university counts as a school, but a school offering courses only through the Internet does not.\n\nOther tests you must also meet:\n• Support: You must not have provided over half of your own support for 2025.\n• Joint return: You must not be filing a joint return, unless the return is filed only to claim a refund of withheld or estimated tax.\n• Residency: You must have lived with your parents for more than half of 2025.\n\nIf you didn't live with them for that long (for example, because you live at school), the instructions point to an \"Exception to time lived with you.\" The details of that exception aren't included in these passages.\n\nIf you qualify, your parents would check the \"Full-time student\" box for you in the Dependents section of their Form 1040.",
+      "Judge": {
+        "Verdict": "correct",
+        "Reason": "The candidate says yes (possibly) and states the age test (under 24 at year end, full-time student, younger than the claiming parent), and it lists the other required tests (relationship, residency, support, joint return), matching the reference without contradiction; the extra student-definition detail and temporary-absence mention are accurate."
+      },
       "LatencyMs": 17635,
       "PipelineRefused": false
     },
@@ -1152,6 +1212,10 @@
       "CitationsTotal": 9,
       "CitationsValid": 9,
       "AnswerText": "If your parents can claim you as a dependent, your standard deduction is generally limited to the greater of $1,350, or your earned income for the year plus $450. It can't be more than the regular standard deduction amount, which is generally $15,750. You figure the exact amount using the dependent standard deduction worksheet (Table 10-3 in Pub 17, or Table 8 in Pub 501).\n\nEarned income means pay for work you actually perform, such as salaries, wages, tips, and professional fees. For this purpose, earned income also includes any part of a taxable scholarship or fellowship grant. Unearned income, like interest, doesn't count. In one IRS example, a dependent student has $780 of interest and $150 of wages. Only the $150 is used, and the student's standard deduction ends up at $1,350.\n\nHere is an example closer to a typical college student. A 22-year-old dependent student has $3,800 in wages and $1,500 in interest income. That student's standard deduction is $4,250, which is $3,800 plus $450. If you have a business loss, it reduces the earned income figure. In another example, a student with $7,000 in wages and a $3,000 business loss enters $4,000 as earned income.\n\nIf you are 65 or older or blind, your standard deduction may be higher. In the IRS example, a blind 18-year-old dependent adds $2,000 on line 7b of the worksheet, for a total standard deduction of $5,350. To find your own exact amount, try plugging your numbers into the Scenario calculator.",
+      "Judge": {
+        "Verdict": "correct",
+        "Reason": "The candidate states the same rule as the reference: the greater of $1,350 or earned income plus $450, capped at the regular $15,750 single amount. The extra examples are arithmetically consistent and don't contradict it."
+      },
       "LatencyMs": 10251,
       "PipelineRefused": false
     },
@@ -1197,6 +1261,10 @@
       "CitationsTotal": 5,
       "CitationsValid": 5,
       "AnswerText": "No. If your parents claim you as a dependent on their 2025 return, you can't claim the American opportunity credit yourself. Being claimed as a dependent on another person's return, such as your parent's, is one of the situations that disqualifies you from the credit.\n\nOnly one of you can take the credit for your expenses in a given year: either your parents or you, but not both. Because your parents claim you on their return, only they can claim the credit based on your expenses.\n\nExpenses you pay yourself still count. They are treated as if your parents paid them, and your parents include them when figuring their American opportunity credit.\n\nPayments made by someone else, such as a grandparent paying your school directly, follow the same rule. If anyone else claims you as a dependent, they may be able to use those expenses, and you can't claim the credit.\n\nThe situation is different if your parents don't actually claim you on their return. In that case, you can claim the credit, even if they were entitled to claim you.",
+      "Judge": {
+        "Verdict": "correct",
+        "Reason": "The candidate says no, only the parents can claim the credit for expenses once they claim you as a dependent, and expenses you pay are treated as paid by them. It also says you can claim the credit if no one actually claims you, which matches the reference."
+      },
       "LatencyMs": 7017,
       "PipelineRefused": false
     },
@@ -1242,6 +1310,10 @@
       "CitationsTotal": 7,
       "CitationsValid": 7,
       "AnswerText": "As a dependent, your interest counts as unearned income. The IRS dependent filing tables say unearned income includes taxable interest, ordinary dividends, and capital gain distributions.\n\nIf you're a single dependent who is under 65 and not blind, you must file a return if your unearned income was more than $1,350 for 2025. Because your only income is interest, your gross income equals your unearned income. That means the gross income test also comes out to more than $1,350.\n\nIf you're a married dependent, the same $1,350 unearned income threshold applies. You must also file if your gross income was at least $5 and your spouse files a separate return and itemizes deductions.\n\nYour parent may be able to report your interest on their own return instead. If they do, you won't have to file. Several conditions must all be met for this election. You must have been under age 19, or under 24 if a student, at the end of 2025. Your interest and dividend income must have been less than $13,500. Other conditions are listed in Form 8814.",
+      "Judge": {
+        "Verdict": "correct",
+        "Reason": "The candidate gives the same key threshold for a single dependent under 65 and not blind (unearned income over $1,350 for 2025) and correctly notes that with only interest income the gross income test yields the same result. The extra details on married dependents and the Form 8814 election do not contradict the reference."
+      },
       "LatencyMs": 11191,
       "PipelineRefused": false
     },
@@ -1287,6 +1359,10 @@
       "CitationsTotal": 8,
       "CitationsValid": 8,
       "AnswerText": "For the dependency rules, a child counts as a student if, during some part of each of any 5 calendar months of the year, they were either a full-time student at a qualifying school or taking a full-time, on-farm training course given by a qualifying school or by a state, county, or local government agency. The 5 months don't have to be consecutive, and the child only needs to be enrolled during some part of each month, not the whole month.\n\nWhat counts as \"full-time\" is set by the school: a full-time student is one enrolled for the number of hours or courses the school considers to be full-time attendance.\n\nThe school must have a regular teaching staff and course of study, and a regularly enrolled student body. A school can be an elementary school, a junior or senior high school, a college, a university, or a technical, trade, or mechanical school. However, an on-the-job training course, a correspondence school, or a school offering courses only through the Internet doesn't count as a school.\n\nThere is also a special rule for vocational high school students. Students who work on \"co-op\" jobs in private industry as part of a school's regular course of classroom and practical training are considered full-time students.",
+      "Judge": {
+        "Verdict": "correct",
+        "Reason": "The candidate matches the reference's key facts: full-time status as defined by the school, during some part of each of any 5 calendar months, at a school with a regular teaching staff, course of study and student body, plus the on-farm training exception; its extra details are accurate and do not contradict the reference."
+      },
       "LatencyMs": 8231,
       "PipelineRefused": false
     },
@@ -1332,6 +1408,10 @@
       "CitationsTotal": 8,
       "CitationsValid": 8,
       "AnswerText": "To pass the support test for a qualifying child, the child can't have provided more than half of their own support for the year. Note that this test is different from the support test for a qualifying relative, but that test's section explains what does and doesn't count as support.\n\nFor example, if you provided $4,000 toward your 16-year-old child's support and the child provided $6,000, the child provided more than half of their own support, so the child isn't your qualifying child.\n\nIf you're not sure whether the child provided more than half of their own support, Worksheet 3-1 (in Pub 17) can help. On the worksheet, if the amount the person provided for their own support (line 21) is not more than half of total support (line 20), you meet the support test.\n\nFor foster children, payments you receive from a child placement agency or from a state or county count as support provided by that agency or government, not by you. If you're in the trade or business of providing foster care, your unreimbursed expenses aren't considered support provided by you.",
+      "Judge": {
+        "Verdict": "correct",
+        "Reason": "The candidate states the same key rule as the reference (the child can't have provided more than half of their own support), and the added example and worksheet details are consistent with it."
+      },
       "LatencyMs": 6151,
       "PipelineRefused": false
     },
@@ -1377,6 +1457,10 @@
       "CitationsTotal": 5,
       "CitationsValid": 5,
       "AnswerText": "Generally, no. Under the Dependent Taxpayer Test, if another taxpayer (such as your parents) can claim you as a dependent, you can't claim anyone else as a dependent. This applies even if the person you want to claim would otherwise be your qualifying child or qualifying relative.\n\nThere is one exception: you can claim someone else as a dependent if the person who can claim you files a return only to claim a refund of income tax withheld or estimated tax paid.\n\nFor example, the IRS describes an 18-year-old who didn't provide more than half of their own support, which makes them their parent's qualifying child. If the parent can claim that student as a dependent, the student can't claim their own child as a dependent unless the parent files only to get a refund of withheld or estimated tax.\n\nIf you're married and filing a joint return, the same rule applies to your spouse: if your spouse can be claimed as a dependent by another taxpayer, you and your spouse can't claim any dependents on your joint return.",
+      "Judge": {
+        "Verdict": "correct",
+        "Reason": "The candidate says generally no and gives the same exception (the claimant files only to get a refund of withheld or estimated tax), and its extra details on the example and joint returns do not contradict the reference."
+      },
       "LatencyMs": 6748,
       "PipelineRefused": false
     },
@@ -1422,6 +1506,10 @@
       "CitationsTotal": 6,
       "CitationsValid": 6,
       "AnswerText": "As an independent contractor doing food delivery, you're considered self-employed. The IRS lists being an independent contractor as one of the ways you can be self-employed, and this can include part-time work done alongside a regular job.\n\nThe key threshold is $400. If your net earnings from self-employment were $400 or more in 2025, you must file a return (Form 1040 or 1040-SR) along with Schedule SE, which is where self-employment tax is figured. This applies even if your income would otherwise be too low to require filing.\n\nSelf-employment tax is comparable to the social security and Medicare tax that an employer would withhold from an employee's wages. Once you figure it on Schedule SE, you enter the tax on Schedule 2 (Form 1040), line 4, and attach Schedule SE to your return.\n\nIf your self-employment income is very high, you may also owe a 0.9% Additional Medicare Tax. For a single filer, this applies to self-employment income above $200,000. To estimate how much self-employment tax you might owe, try the Scenario calculator.",
+      "Judge": {
+        "Verdict": "correct",
+        "Reason": "The candidate states the same key fact as the reference, that net self-employment earnings of $400 or more require filing Schedule SE and paying self-employment tax, and the added details (Schedule 2 line 4, 0.9% Additional Medicare Tax above $200,000 for single filers) are accurate and do not contradict it."
+      },
       "LatencyMs": 7097,
       "PipelineRefused": false
     },
@@ -1467,6 +1555,10 @@
       "CitationsTotal": 7,
       "CitationsValid": 7,
       "AnswerText": "A Form 1099-NEC reports nonemployee compensation. If you aren't an employee and a single payer paid you $600 or more for your services during the year in the course of their trade or business, that payer should send you a 1099-NEC. All fees for your services count as income, and you may need to report them as self-employment income.\n\nIf your freelance work is self-employment, report it on Schedule C (Form 1040), not on the \"Other Income\" lines 8a through 8z of Schedule 1. You must use Schedule C even if you don't have any business expenses.\n\nThe exception: nonemployee compensation that isn't self-employment income, such as income from a hobby, isn't subject to that rule. To figure out whether you're considered self-employed, Pub 17 points you to the \"Self-Employed Persons\" discussion in chapter 1. That section isn't included in the passages here.\n\nBox 1 of your 1099-NEC shows your nonemployee compensation. If any of it is qualified overtime compensation, enter only that overtime portion on Schedule 1-A, line 14b. Do not enter the total box 1 amount there. If you're unsure what you'll owe, try the Scenario calculator.",
+      "Judge": {
+        "Verdict": "partial",
+        "Reason": "The candidate correctly says to report freelance 1099-NEC income on Schedule C, but it never mentions Schedule SE or the $400 net-earnings threshold for self-employment tax, which is a key part of the reference."
+      },
       "LatencyMs": 8290,
       "PipelineRefused": false
     },
@@ -1512,6 +1604,10 @@
       "CitationsTotal": 8,
       "CitationsValid": 8,
       "AnswerText": "It depends on how much tax you'll owe. Side-gig income usually has no tax withheld, which is why estimated tax may come up. The first test is whether you'll owe $1,000 or more for 2026 after subtracting your withholding (for example, from a regular W-2 job) and refundable credits from your total tax. If you won't, you're not required to pay estimated tax.\n\nIf you will owe $1,000 or more, you still may not need to pay estimated tax. You're covered if your withholding and refundable credits will be at least the smaller of 90% of the tax on your 2026 return or 100% of the tax shown on your 2025 return. The 2025 return must have covered a full 12-month period. The 100% figure becomes 110% if your 2025 adjusted gross income was more than $150,000 ($75,000 if married filing separately). If your withholding falls short of both amounts, you must make estimated tax payments.\n\nIf you do need to pay, you don't have to start until you actually have income you'll owe tax on. If your side gig doesn't begin until a later payment period, make your first payment by the due date for that period. You can pay by direct bank transfer, by debit or credit card, or by check or money order with a Form 1040-ES voucher.\n\nTo see whether your side-gig income would push you over the $1,000 threshold, try the Scenario calculator with your expected income and withholding.",
+      "Judge": {
+        "Verdict": "incorrect",
+        "Reason": "The question is for tax year 2025, but the candidate applies the rules to a 2026 return and treats 2025 as the prior year, so it uses the wrong tax year even though the $1,000 and 90%/100% tests match the reference."
+      },
       "LatencyMs": 15863,
       "PipelineRefused": false
     },
@@ -1557,6 +1653,10 @@
       "CitationsTotal": 8,
       "CitationsValid": 8,
       "AnswerText": "These passages don't list tips as an item you can leave out of income. The general rule is that you must include all income you receive on your return unless the tax law says otherwise. What the passages describe for tax year 2025 is a new deduction for qualified tips, not an exclusion from income.\n\nAs a server, you're likely in a qualifying occupation. Qualified tips must come from customers, or through a tip-sharing arrangement if you're an employee, in an occupation that customarily and regularly received tips on or before December 31, 2024. \"Wait Staff\" is on that list.\n\nThe tips themselves must also qualify. They have to be cash tips that are paid voluntarily, not the subject of negotiation, and determined by the customer. Cash tips can be paid by cash, credit card, debit card, or a payment app. Non-cash items like meals or event tickets don't count. For example, a tip the customer chooses on a point-of-sale device with a no-tip option is a qualified tip.\n\nThere are limits on the deduction. You can't deduct more than $25,000 of qualified tips. The deduction is also reduced if your MAGI is above $150,000 (single) or $300,000 (married filing jointly). To estimate how this affects what you owe, try the Scenario calculator.",
+      "Judge": {
+        "Verdict": "partial",
+        "Reason": "The candidate correctly says tips are included in income (not excluded) and describes the 2025 qualified tips deduction with accurate details, but it never plainly says \"yes, tips are taxable\" or that they're reported with wages, so the main answer is only implied."
+      },
       "LatencyMs": 14284,
       "PipelineRefused": false
     },
@@ -1602,6 +1702,10 @@
       "CitationsTotal": 6,
       "CitationsValid": 6,
       "AnswerText": "Yes, income from selling hobby items can be taxable. Pub 17 says that if you sell items you collect as a hobby, your gain is taxable as a capital gain. Its example is someone who sold a painting on an online auction website for more than they paid for it, and that gain is reported as a capital gain on Schedule D (Form 1040).\n\nNote that these passages describe selling items from a collection, such as a painting you bought earlier. They don't specifically cover how to report income from selling artwork you create yourself as a hobby. Check the IRS resources on hobby income, or ask a tax professional, to confirm how your sales should be reported.\n\nYou can't deduct your costs. Hobby expenses are miscellaneous itemized deductions, which can no longer be deducted. A hobby isn't treated as a business because it isn't carried on to make a profit.\n\nYou also can't use hobby losses to reduce your other income, such as wages from a campus job. If you sell an item from your collection for less than you paid, you can't deduct that loss either.",
+      "Judge": {
+        "Verdict": "partial",
+        "Reason": "The candidate correctly says hobby expenses aren't deductible and hobby losses can't offset other income, but it frames the income as a capital gain on Schedule D rather than hobby income on Schedule 1 line 8j, and it hedges on how to report art the seller created."
+      },
       "LatencyMs": 11462,
       "PipelineRefused": false
     },
@@ -1647,6 +1751,10 @@
       "CitationsTotal": 10,
       "CitationsValid": 10,
       "AnswerText": "Yes. Beginning in 2025, there is a new \"no tax on tips\" deduction. It's one of four new deductions created by recent legislation, and you can claim it whether you take the standard deduction or itemize on Schedule A (Form 1040). Details are in the instructions for Schedule 1-A.\n\nThe most you can deduct is $25,000 of qualified tips, regardless of your filing status. If you're married filing jointly and both spouses have qualified tips, the $25,000 limit applies to your combined tips. It is not a per-spouse limit.\n\nYour deduction is reduced if your modified adjusted gross income (MAGI) is more than $150,000 ($300,000 if married filing jointly). To be eligible, you and/or your spouse who received the tips must have a valid SSN. If you're married, you must file a joint return.\n\nOnly qualified tips count. These are tips received from customers or through a tip-sharing arrangement in an occupation that customarily and regularly received tips on or before December 31, 2024. The tips must be cash tips, paid voluntarily, not negotiated, and determined by the customer. \"Cash tips\" include cash, check, credit or debit card, and payment apps denominated in cash. Non-cash items like meals or event tickets don't count.\n\nIf you're self-employed, your tips from your trade or business count toward the deduction only to the extent you had net income from that business. To see how the deduction affects your own taxes, try the Scenario calculator.",
+      "Judge": {
+        "Verdict": "correct",
+        "Reason": "The candidate confirms the new 2025 tips deduction, the $25,000 cap, the $150,000/$300,000 MAGI phase-out thresholds, the valid SSN requirement, and Schedule 1-A, with extra accurate detail and no contradiction of the reference."
+      },
       "LatencyMs": 10850,
       "PipelineRefused": false
     },
@@ -1692,6 +1800,10 @@
       "CitationsTotal": 7,
       "CitationsValid": 7,
       "AnswerText": "It depends mainly on how long you have been in the U.S. as a student. Your status is decided by the substantial presence test, and the answer matters. Resident aliens are taxed on their worldwide income, like U.S. citizens. Nonresident aliens are generally taxed only on their U.S. source income.\n\nAs an F-1 student, you are usually an \"exempt individual.\" This does not mean you are exempt from U.S. tax. It means you do not count the days you were in the U.S. as a student during your first 5 years when applying the substantial presence test. In practice, F-1 students in their first 5 calendar years generally do not count toward resident alien status through their days of presence.\n\nTo be an exempt student, you must substantially comply with your visa requirements. That means you must not engage in activities prohibited by U.S. immigration laws that could cost you your visa status.\n\nAfter 5 years, the rule changes. You will not be an exempt student in 2025 if you have been exempt as a teacher, trainee, or student for any part of more than 5 calendar years, unless you meet two conditions. First, you must show you do not intend to reside permanently in the U.S. Second, you must have substantially complied with your visa. If you are not exempt, your days start counting, and you could become a resident alien even though you are still on an F-1 visa.\n\nIf you qualify to exclude your days of presence as a student, you must file Form 8843 with the IRS.",
+      "Judge": {
+        "Verdict": "correct",
+        "Reason": "The candidate explains that F-1 students are exempt individuals whose days don't count toward the substantial presence test, and that the exemption ends after more than 5 calendar years unless they show no intent to reside permanently and visa compliance, matching the reference; it hedges on the headline answer but does not contradict it."
+      },
       "LatencyMs": 14926,
       "PipelineRefused": false
     },
@@ -1737,6 +1849,10 @@
       "CitationsTotal": 8,
       "CitationsValid": 8,
       "AnswerText": "The substantial presence test is one way to determine whether you are treated as a U.S. resident for tax purposes. You meet it for 2025 if you were physically present in the United States on at least 31 days during 2025 AND at least 183 days during the 3-year period of 2025, 2024, and 2023. For the 183-day count, you use all the days you were present in 2025, 1/3 of the days you were present in 2024, and 1/6 of the days you were present in 2023.\n\nExample: If you were present 120 days in each of 2025, 2024, and 2023, you count 120 days for 2025, 40 days for 2024 (1/3 of 120), and 20 days for 2023 (1/6 of 120). That totals 180 days, which is short of 183, so you would not be a resident under the test for 2025.\n\nGenerally, any day you are physically present in the country at any time during the day counts. For this test, \"United States\" includes the 50 states, D.C., and U.S. territorial waters, but not U.S. territories or U.S. airspace.\n\nSome days are not counted. These include days you regularly commute to work from Canada or Mexico, days in transit between two foreign places for less than 24 hours, days as a crew member of a foreign vessel, days you can't leave because of a medical condition that arose while you were in the United States, certain NATO visa days, and days you are an \"exempt individual.\" The \"exempt individual\" category is especially relevant to many international students, but these passages don't explain who qualifies. Pub 519 discusses the specific rules for each category separately.\n\nIf you meet the test in your first year of residency, your residency starting date is generally the first day you were present in the United States that year. You are a nonresident alien for the part of the year before that date. You may be able to disregard up to 10 days of presence when setting your starting date if you had a closer connection to, and your tax home in, a foreign country. However, those days still count toward meeting the test itself.",
+      "Judge": {
+        "Verdict": "correct",
+        "Reason": "The candidate states the 31-day and 183-day weighted thresholds (all of 2025, 1/3 of 2024, 1/6 of 2023) and says exempt individual days don't count, matching the reference, and its extra detail is accurate with a correct example."
+      },
       "LatencyMs": 10074,
       "PipelineRefused": false
     },
@@ -1782,6 +1898,10 @@
       "CitationsTotal": 7,
       "CitationsValid": 7,
       "AnswerText": "Based on these passages, Form 8843 is a form you file with the IRS when you exclude days of presence in the United States because you belong to certain exempt categories. One of those categories is being temporarily in the U.S. as a student on an F, J, M, or Q visa. The passages don't describe the form's contents in detail. They focus on who must file it and when.\n\nYou need to file it if you qualify as an exempt individual as a student. That means you are temporarily in the U.S. on an F, J, M, or Q visa and you substantially comply with your visa's requirements. Substantial compliance means you haven't engaged in activities that are prohibited by U.S. immigration laws and could cost you your visa status. Immediate family members of exempt students are also included.\n\nThere is a time limit. You generally won't be an exempt student in 2025 if you have been exempt as a teacher, trainee, or student for any part of more than 5 calendar years. The exception is if you meet both of two requirements: you establish that you don't intend to reside permanently in the U.S., and you have substantially complied with your visa's requirements.\n\nHow to file: if you file a 2025 income tax return, attach Form 8843 to it. If you don't have to file a return, mail Form 8843 by itself to the Department of the Treasury, Internal Revenue Service Center, Austin, TX 73301-0215. Either way, it's due by the due date for filing Form 1040-NR, which Pub 519 discusses in chapter 7.",
+      "Judge": {
+        "Verdict": "correct",
+        "Reason": "The candidate says Form 8843 is filed when excluding days of presence as an exempt student (F, J, M, Q), and that it is due by the Form 1040-NR due date, matching the reference; the extra details on substantial compliance, the 5-year limit and mailing are accurate."
+      },
       "LatencyMs": 14835,
       "PipelineRefused": false
     },
@@ -1827,6 +1947,10 @@
       "CitationsTotal": 7,
       "CitationsValid": 7,
       "AnswerText": "A nonresident alien who is required to file a U.S. income tax return should use Form 1040-NR, the U.S. Nonresident Alien Income Tax Return.\n\nThere are a few special situations. If you are a nonresident alien married to a U.S. citizen or resident, you can choose to be treated as a resident and file a joint return on Form 1040 or 1040-SR instead. If you don't make that choice, you file Form 1040-NR.\n\nIf you were both a nonresident and a resident during the same year (dual status), the form depends on your status at year end. If you are not a U.S. resident on the last day of the tax year, you file Form 1040-NR. If you become a resident and are a U.S. resident on the last day of the year, you file Form 1040 or 1040-SR. Note that dual-status taxpayers cannot e-file for tax year 2025.",
+      "Judge": {
+        "Verdict": "correct",
+        "Reason": "The candidate states that a nonresident alien files Form 1040-NR, matching the reference, and the extra detail about electing resident treatment and dual-status filing is accurate and does not contradict it."
+      },
       "LatencyMs": 7075,
       "PipelineRefused": false
     },
@@ -1872,6 +1996,10 @@
       "CitationsTotal": 7,
       "CitationsValid": 7,
       "AnswerText": "Generally, no. As a nonresident alien, you cannot claim the standard deduction. This also applies if you are a dual-status taxpayer: you cannot claim the standard deduction allowed on Form 1040 or 1040-SR, though you can itemize any allowable deductions.\n\nThere is a special exception for students and business apprentices from India. If you are eligible for the benefits of Article 21(2) of the United States-India Income Tax Treaty, you can claim the standard deduction, as long as you do not claim itemized deductions. You use Worksheet 5-1 to figure it, and the 2025 standard deduction amount is $15,000. However, if you are married and your spouse files a return and itemizes deductions, you cannot take the standard deduction.\n\nIf the India exception does not apply to you, you may be able to claim itemized deductions instead. However, nonresident aliens can itemize only if they have income effectively connected with their U.S. trade or business. Certain charitable contributions and casualty and theft losses are an exception: you can deduct them even if they do not relate to your effectively connected income. Itemized deductions are claimed on Schedule A (Form 1040-NR).",
+      "Judge": {
+        "Verdict": "partial",
+        "Reason": "The candidate correctly says nonresident aliens generally cannot take the standard deduction, with the India Article 21(2) exception, but it adds a likely wrong 2025 amount of $15,000 (the 2025 single standard deduction is $15,750 after the OBBBA change), which is a minor error."
+      },
       "LatencyMs": 7099,
       "PipelineRefused": false
     },
@@ -1917,6 +2045,10 @@
       "CitationsTotal": 9,
       "CitationsValid": 9,
       "AnswerText": "Generally, no. As an F-1 student who is a nonresident alien, your on-campus job is considered work performed to carry out the purpose for which you were admitted to the United States, so it is not covered under the social security program. That means your employer should not withhold social security or Medicare tax from this pay.\n\n\"On-campus work\" means work performed on the school's premises. It also includes work at an off-campus location that is educationally affiliated with the school. Work under the terms of a scholarship, fellowship, or assistantship also counts. USCIS permits this work for F-1 students as long as it does not displace a U.S. resident.\n\nThe important exception is residency status for tax purposes. If you are considered a resident alien, social security and Medicare taxes will be withheld, even though you still hold F-1 status. Separately, any student who is enrolled and regularly attending classes may be exempt from these taxes on pay for work done for their own school.\n\nIf these taxes were withheld in error, first ask your employer for a refund. If you can't get a full refund from your employer, you can file a claim with the IRS on Form 843 and attach the required documents. For an F-1 student, these include a copy of your W-2, your visa, Form I-94, and a complete copy of your Form I-20.",
+      "Judge": {
+        "Verdict": "correct",
+        "Reason": "The candidate says generally no, with the exception for resident aliens and the student-employed-by-school exemption, matching the reference; the extra details on refunds and on-campus work are accurate and do not contradict it."
+      },
       "LatencyMs": 9216,
       "PipelineRefused": false
     },
@@ -1962,6 +2094,10 @@
       "CitationsTotal": 11,
       "CitationsValid": 11,
       "AnswerText": "Yes. Income of any kind that a U.S. tax treaty exempts from U.S. tax is excluded from your gross income. Treaty exemptions for scholarship, fellowship, and research grants are generally available to nonresident alien students. Note the difference: if a treaty only limits the tax on income rather than exempting it, that income is still included in gross income.\n\nMany treaties limit how many years you can claim the exemption. For students, the limit is usually 4–5 years, and once you reach it you can no longer claim the exemption. Check the specific treaty or Pub. 901 for the time limit that applies to your country.\n\nIf you later become a resident alien, you generally can no longer claim the treaty exemption. The exception is when the treaty's saving clause provides an exception for it and you still meet the treaty's requirements. For example, a Chinese student kept the Article 20 scholarship exemption after becoming a resident alien because of such an exception.\n\nSeparately from treaties, a scholarship may also be excludable under U.S. law. This applies only if you are a degree candidate at an eligible educational institution and you use the money for qualified education expenses. Also, a nonresident alien's grant that is not from U.S. sources is not subject to U.S. tax.\n\nReporting: if your scholarship was reported as taxable on a form such as Form 1042-S, report it on the appropriate line of your return. Then enter the amount for which you claim treaty benefits, in parentheses, on Schedule 1 (Form 1040), line 8z. Write \"Exempt income,\" the treaty country, and the treaty article that provides the exemption.",
+      "Judge": {
+        "Verdict": "correct",
+        "Reason": "The candidate says treaty exemptions for scholarships are generally available to nonresident students, notes that conditions vary by treaty (time limits, saving clause), and points to the specific treaty and Pub. 901, which matches the reference's 'possibly, depends on the treaty' without contradicting it."
+      },
       "LatencyMs": 10868,
       "PipelineRefused": false
     },
@@ -2093,6 +2229,10 @@
       "CitationsTotal": 2,
       "CitationsValid": 2,
       "AnswerText": "For tax year 2027, the standard deduction for a single filer is $16,600. The IRS calls this status \"Unmarried Individuals (other than Surviving Spouses and Heads of Households).\" For comparison, it is $33,200 for married couples filing jointly and surviving spouses, $24,925 for heads of households, and $16,600 for married individuals filing separately.\n\nMany college students should check whether a parent or someone else can claim them as a dependent. If so, a different rule applies. Your standard deduction cannot exceed the greater of $1,400 or your earned income plus $500. This means it may be lower than $16,600.",
+      "Judge": {
+        "Verdict": "correct",
+        "Reason": "The candidate states the same key figure as the reference ($16,600 for a single filer in 2027) and adds consistent extra detail, so it does not contradict the reference."
+      },
       "LatencyMs": 11007,
       "PipelineRefused": false
     },
@@ -2138,6 +2278,10 @@
       "CitationsTotal": 2,
       "CitationsValid": 2,
       "AnswerText": "For tax year 2026, the standard deduction for someone who can be claimed as a dependent by another taxpayer is limited. It cannot exceed the greater of $1,350 or the sum of $450 plus the individual's earned income. Because the rule uses whichever figure is greater, $1,350 works as the effective minimum. A dependent with little or no earned income can still use a $1,350 standard deduction.\n\nFor comparison, the regular 2026 standard deduction for unmarried individuals (other than surviving spouses and heads of households) is $16,100. If you have earned income, for example from a job, the $450-plus-earned-income figure may give you a larger amount than $1,350. To see how this applies to your own income, try the Scenario calculator.",
+      "Judge": {
+        "Verdict": "correct",
+        "Reason": "The candidate states the same rule as the reference (greater of $1,350 or $450 plus earned income) and correctly notes $1,350 is the effective minimum; the added $16,100 single standard deduction for 2026 is accurate and does not contradict the reference."
+      },
       "LatencyMs": 9907,
       "PipelineRefused": false
     },
@@ -2183,6 +2327,10 @@
       "CitationsTotal": 2,
       "CitationsValid": 2,
       "AnswerText": "For tax year 2026, the standard deduction for a single filer is $16,100. Single filers fall under the category \"Unmarried Individuals (other than Surviving Spouses and Heads of Households).\" In the passage's table, the amounts appear in the same order as the filing statuses: $32,200 for married filing jointly and surviving spouses, $24,150 for heads of households, $16,100 for unmarried individuals, and $16,100 for married filing separately.\n\nA different rule applies if someone else, such as a parent, can claim you as a dependent. In that case, your standard deduction can't exceed the greater of (1) $1,350 or (2) $450 plus your earned income. This limit applies even if you file as single.",
+      "Judge": {
+        "Verdict": "correct",
+        "Reason": "The candidate states the $16,100 single-filer standard deduction for 2026, matching the reference, and the extra details about other statuses and the dependent limit do not contradict it."
+      },
       "LatencyMs": 8977,
       "PipelineRefused": false
     },
@@ -2228,6 +2376,10 @@
       "CitationsTotal": 2,
       "CitationsValid": 2,
       "AnswerText": "For tax year 2027, if you can be claimed as a dependent by another taxpayer (for example, your parents), your standard deduction is limited. It cannot exceed the greater of (1) $1,400, or (2) the sum of $500 and your earned income. In practice, this means the floor is $1,400: even with little or no earned income, your standard deduction is at least $1,400. If $500 plus your earned income is more than $1,400, that larger amount applies instead.\n\nThere is also an upper limit. A dependent's standard deduction can't go above the regular amount for their filing status. For example, that amount is $16,600 for unmarried individuals (other than surviving spouses and heads of households). To see how this applies to your own earnings, try the Scenario calculator.",
+      "Judge": {
+        "Verdict": "correct",
+        "Reason": "The candidate states the same rule as the reference: the greater of $1,400 or $500 plus earned income, capped at the regular standard deduction. The $16,600 example for single filers is extra detail that does not contradict the reference."
+      },
       "LatencyMs": 6635,
       "PipelineRefused": false
     },
@@ -2317,6 +2469,10 @@
       "CitationsTotal": 2,
       "CitationsValid": 2,
       "AnswerText": "For tax year 2027, the maximum deduction for interest paid on qualified education loans is $2,500. This deduction begins to phase out once your modified adjusted gross income (MAGI) exceeds $90,000, or $180,000 if you file a joint return.\n\nThe deduction is completely phased out once your MAGI reaches $105,000 or more ($210,000 or more for joint returns). If your MAGI falls between these two amounts, you get a reduced deduction. To see what that means for your own return, try the Scenario calculator.",
+      "Judge": {
+        "Verdict": "correct",
+        "Reason": "The candidate matches the reference: $2,500 maximum, phase-out starting above $90,000 ($180,000 joint), and fully phased out at $105,000 ($210,000 joint), with no contradictions."
+      },
       "LatencyMs": 5770,
       "PipelineRefused": false
     }

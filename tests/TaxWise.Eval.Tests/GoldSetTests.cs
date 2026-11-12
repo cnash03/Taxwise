@@ -21,6 +21,14 @@ public class GoldSetTests
     }
 
     [Fact]
+    public void A_drafted_answer_is_not_judgeable_until_approved()
+    {
+        var item = new GoldItem("q01", "p", true, "Q?", ["p970"], [6], "Drafted.", GoldItem.Draft);
+        Assert.False(item.HasGoldAnswer);
+        Assert.True((item with { GoldStatus = GoldItem.Approved }).HasGoldAnswer);
+    }
+
+    [Fact]
     public void Rejects_duplicates_and_in_scope_items_without_docs()
     {
         const string line = """{"id":"q01","persona":"p","inScope":true,"question":"Q?","expectedDocs":["p970"],"expectedPages":[]}""";
