@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Polly;
 using Qdrant.Client;
 using TaxWise.Rag.Answering;
+using TaxWise.Rag.Calculator;
 using TaxWise.Rag.Forms;
 using TaxWise.Rag.VectorStore;
 using TaxWise.Rag.Voyage;
@@ -33,7 +34,7 @@ public static class RagServiceCollectionExtensions
 
     /// <summary>
     /// Adds the cited Q&amp;A pipeline on top of <see cref="AddTaxWiseRag"/>: retriever, Claude answerer,
-    /// <see cref="AskService"/>, and the "Explain my form" explainer and <see cref="FormExplainService"/>. The Anthropic key is read from <c>ANTHROPIC_API_KEY</c> (env, user-secrets or
+    /// <see cref="AskService"/>, the "Explain my form" explainer and <see cref="FormExplainService"/>, and the calculator explainer and <see cref="CalculatorService"/>. The Anthropic key is read from <c>ANTHROPIC_API_KEY</c> (env, user-secrets or
     /// App Service settings) when the client is first needed, so hosts without a key still start. Without a key the
     /// SDK falls back to the <c>ant auth login</c> profile in <c>~/.config/anthropic</c>, which is how local dev runs.
     /// </summary>
@@ -56,6 +57,8 @@ public static class RagServiceCollectionExtensions
         services.AddSingleton<FormLibrary>();
         services.AddSingleton<IFormExplainer, ClaudeFormExplainer>();
         services.AddSingleton<FormExplainService>();
+        services.AddSingleton<ICalcExplainer, ClaudeCalcExplainer>();
+        services.AddSingleton<CalculatorService>();
         return services;
     }
 

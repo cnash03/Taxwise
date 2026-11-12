@@ -19,6 +19,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Every row of the 2025 Tax Table, extracted from the 2025 Form 1040 instructions PDF (TaxTable2025Tests). -->
+    <None Include="Calculator\Data\*.csv" CopyToOutputDirectory="PreserveNewest" LinkBase="Calculator\Data" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\src\TaxWise.Core\TaxWise.Core.csproj" />
   </ItemGroup>
 

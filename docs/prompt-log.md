@@ -281,3 +281,58 @@ Entries are append-only. The overall summary is in [AI_USAGE.md](AI_USAGE.md).
 - **Human change:** none.
 - **AI limits seen:** the omission above.
 - **Tag:** success
+
+### 2026-11-12 · Ad hoc · Claude Code (claude-opus-5-5) · @cnash03 · session `9a1333b2`
+- **Role:** ad hoc: finished Phase 4 after `ce6c7853` ran out mid-commit, then started `DECISIONS.md`.
+- **Prompt:** "where did i leave off and can i commit the changes in phase 4"
+  - Follow-ups: "start DECISIONS.md with those decisions", "commit these and then ill merge the pr".
+- **Generated:**
+  - Ran `/ai-report` for `ce6c7853` and `7ec55ad7`. Committed Phase 4 (`f906aac`) and opened PR #6 into `main`, carrying Phase 3 with it.
+  - `DECISIONS.md` with 8 decisions, each with alternatives, reasons and a session id (`f6a741d`). Session-log commit `6ffe822`.
+- **Human decisions:** 3 checkpoints.
+  - Finish with `/ai-report`, then commit and PR (recommended).
+  - Phase 4 tagged **partial**. We said we hadn't checked the `goesTo` values yet and hadn't changed anything by hand.
+  - Add DECISIONS.md to PR #6 (recommended). **Also add the six older decisions**, against the agent's "Not now" recommendation.
+- **Verified by:** `dotnet build` and `dotnet test` before committing; a grep of the diff for API keys; `gh pr view` for mergeability.
+- **Worked?** Yes. PR #6 was merged.
+- **Human change:** none.
+- **AI limits seen:**
+  - It tagged `7ec55ad7` **success** without asking us, and said so in its reply.
+  - DECISIONS.md #8 (code DD): the logs only record our choice, not why, so the agent wrote the reasons afterwards and labelled them that way. For #6 (Qdrant client) it wrote that no closer comparison was recorded rather than inventing one.
+  - Its Phase 4 commit message calls the `goesTo` values "human-checked" before anyone had checked them. It flagged this in the PR rather than rewriting the pushed commit.
+- **Tag:** success
+
+### 2026-11-12 · Phase 5 · Claude Code (claude-opus-5-5) · @cnash03 · session `71ffadc8`
+- **Role:** execution agent, Phase 5 (scenario calculator), on `phase-5-calculator` branched from `main` after PR #6 merged. Logged by `/ai-report` while the session was still running, so the entry could go in with the PR.
+- **Prompt:** "start phase 5"
+  - Follow-ups: "i can not toggle the years on explain my form", "ok stop 20678 and launch the app", "run /ai-report and open the PR".
+- **Generated:**
+  - `TaxWise.Core/Calculator`: `ITaxYearRules`, `TaxYear2025/2026/2027.cs` (every constant cites its IRS section and page), a reflection-based `TaxYearRegistry` (a new year is just a new file), `TaxCalculator` (Tax Table method below $100,000, worksheet formula above), and `CalcNarrative` for the canned fallback text.
+  - `DollarAmountValidator` (Core/Guardrails); `CalculatorService`, `CalcPrompt`, `ClaudeCalcExplainer`, `calc.system.md` and `calc.schema.json` in Rag.
+  - `POST /api/calculator` and `POST /api/calculator/compare`, which returns numbers only, with no Claude call.
+  - The App's Calculator page: step table, "How the tax was figured", "Why this number" with citations, Estimate badge, Not included line, and the Compare years table. Also a visible tax-year banner on Explain my form.
+  - Tests written before the implementation: every row of the 2025 Tax Table, all 20 Tax Computation Worksheet rows, 14 golden scenarios with PDF page numbers, and all 48 Rev. Proc. breakpoints. Plus inflation, dependent-floor, monotonic and guardrail tests, service and prompt tests, and endpoint tests: 138 calculator tests, 289 in total.
+  - README section; DECISIONS.md #9–11.
+- **Human decisions:** 7 checkpoints.
+  - Plan approved as written.
+  - Slide 11 mockup: use the Tax Table method and change the demo numbers ($1,235, not $1,231.50) (recommended).
+  - Golden data: the agent extracts it from the IRS PDF and we verify it (recommended).
+  - **Compare years: we chose "Build it"**; the agent recommended skipping it to stay on schedule.
+  - Wrap-up: **we chose to launch the app first**, not the recommended `/ai-report` and PR.
+  - Locked tax year on Explain my form: keep it locked and show why (recommended), after we reported we couldn't change the year.
+  - Phase 5 tagged **success**; the agent suggested partial.
+- **Verified by:**
+  - The agent extracted the text of i1040gi--2025, Rev. Proc. 2025-32 and Rev. Proc. 2026-35 with PdfPig. It parsed all 2,062 Tax Table rows (no gaps; the IRS's own $25,300 MFJ = $2,562 example matches) and checked every BUILD_PLAN constant against the Rev. Proc. text. All matched.
+  - `dotnet test`: 289/289. The calculator matched every Tax Table row on its first run.
+  - Live run against Qdrant, Voyage and Claude (Sonnet 5.5 dev): 6 scenarios across all three years, dependent and ≥$100k cases, plus compare. The guardrail rejected amounts on 2 first attempts. One retry passed; the other fell back to the canned text (see limits). After the fix, every scenario returned a cited explanation. The agent hand-checked the $150k MFJ figure: 118,500 × 22% − 10,172 = 15,898.
+  - We clicked through the new page in the app.
+- **Worked?** Yes. Our hand-check of the constants and golden rows is still needed before merge (BUILD_PLAN §12 item 4).
+- **Human change:** none.
+- **AI limits seen:**
+  - **The guardrail was too strict at first.** The known-amounts list left out the $100,000 Tax Table cutoff, so a correct MFJ explanation failed twice and fell back to the canned text. Only the live run showed it; the unit tests passed. It was fixed by adding the cutoff, plus a test.
+  - **A Phase 1 chunking artifact surfaced:** in Rev. Proc. 2025-32 the table headings come before the data in the PDF's text order, so a chunk labelled "Heads of Households" holds the MFJ rates. A 2026 single-filer explanation correctly said its passages didn't show the single rates. Flagged for a later phase, not fixed.
+  - It couldn't render the slide 11 mockup (no poppler), so it built the layout from BUILD_PLAN's description.
+  - Its first XML comment in a `.csproj` contained `--` and broke the build.
+  - **Launching the app:** Claude Code's safety check blocked it from stopping our running API until we said to. By then that process had already exited and a current build was running. Its first launch just brought back an old copy of the app from 10:26 that was still open, so it closed that copy and opened the new build.
+  - It decided by itself that results ≥$100k for 2026/2027 aren't marked as estimates, because the formula is exact Rev. Proc. text. It noted this in the code and tests.
+- **Tag:** success

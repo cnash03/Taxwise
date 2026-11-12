@@ -1,9 +1,367 @@
 @page "/calculator"
+@implements IDisposable
+@inject TaxWiseApiClient Api
+@inject UserSettings Settings
+@inject ILauncher Launcher
 
-<header class="page-header">
-    <h1>Scenario calculator</h1>
-</header>
+<div class="forms-page calc-page">
+    <section class="forms-main">
+        <header class="chat-header">
+            <div class="chat-heading">
+                <h1 class="chat-title">Scenario calculator</h1>
+                <div class="chat-subtitle">Estimate your federal refund or amount owed from one W-2. Every number is computed by code from IRS tables.</div>
+            </div>
+            <div class="chat-controls">
+                <TaxYearPicker Feature="TaxYearFeature.Calculator" Value="_taxYear" ValueChanged="OnYearChanged" />
+                <label class="toggle">
+                    <input type="checkbox" role="switch" checked="@_plainLanguage" @onchange="TogglePlainLanguage" />
+                    <span class="toggle-track" aria-hidden="true"></span>
+                    <span>Plain-language mode</span>
+                </label>
+                <label class="toggle">
+                    <input type="checkbox" role="switch" checked="@_compare" @onchange="ToggleCompareAsync" />
+                    <span class="toggle-track" aria-hidden="true"></span>
+                    <span>Compare years</span>
+                </label>
+            </div>
+        </header>
 
-<section class="empty-state">
-    <p>Estimate your refund or amount owed. Coming in Phase 5.</p>
-</section>
+        <div class="forms-body">
+            <form class="form-card calc-form" @onsubmit="CalculateAsync">
+                <div class="form-card-head">
+                    <h2>Your W-2</h2>
+                    <span class="form-card-sub">Tax year @_taxYear</span>
+                </div>
+
+                <label class="field">
+                    <span class="field-label">Wages (W-2 box 1)</span>
+                    <span class="money-input"><span>$</span><input type="number" min="0" step="0.01" @bind="_wages" required /></span>
+                </label>
+                <label class="field">
+                    <span class="field-label">Federal income tax withheld (W-2 box 2)</span>
+                    <span class="money-input"><span>$</span><input type="number" min="0" step="0.01" @bind="_withholding" required /></span>
+                </label>
+                <label class="field">
+                    <span class="field-label">Filing status</span>
+                    <select @bind="_status">
+                        @foreach (var status in Enum.GetValues<FilingStatus>())
+                        {
+                            <option value="@status">@CalcLabels.FilingStatus(status)</option>
+                        }
+                    </select>
+                </label>
+                <label class="check">
+                    <input type="checkbox" @bind="_dependent" />
+                    <span>Someone (like a parent) can claim me as a dependent</span>
+                </label>
+
+                <button type="submit" class="btn btn-primary" disabled="@_loading">@(_loading ? "Calculating…" : "Calculate")</button>
+                <p class="form-hint">The sample W-2 on "Explain my form" has $28,000 in wages and $1,500 withheld. Your wages also count as your earned income for the dependent standard deduction.</p>
+            </form>
+
+            <div class="explain-column">
+                @if (_loading)
+                {
+                    <article class="answer-card loading" aria-busy="true">
+                        <div class="skeleton"></div>
+                        <div class="skeleton"></div>
+                        <div class="skeleton short"></div>
+                    </article>
+                }
+                else if (_error is not null)
+                {
+                    <article class="answer-card error" role="alert">
+                        <div class="error-title">@(_errorUnreachable ? "TaxWise API unavailable" : "Something went wrong")</div>
+                        <p>@_error</p>
+                        <button class="btn" @onclick="CalculateAsync">Try again</button>
+                    </article>
+                }
+                else if (_result is { } r)
+                {
+                    <article class="answer-card calc-result">
+                        <div class="badges">
+                            <span class="badge">Tax year @r.TaxYear · @CalcLabels.FilingStatus(r.FilingStatus)@(r.CanBeClaimedAsDependent ? " · dependent" : null)</span>
+                            @if (r.IsEstimate)
+                            {
+                                <span class="badge estimate" title="@r.EstimateNote">Estimate</span>
+                            }
+                        </div>
+                        <div class="big-result @(r.IsRefund ? "refund" : "owed")">
+                            <span class="big-amount">@CalcLabels.Money(r.RefundOrOwed)</span>
+                            <span class="big-label">@(r.IsRefund ? "estimated refund" : "estimated amount owed")</span>
+                        </div>
+                        @if (r.EstimateNote is not null)
+                        {
+                            <p class="estimate-note">@r.EstimateNote. The tax uses the IRS method for building the table, applied to the published @r.TaxYear rates.</p>
+                        }
+
+                        <table class="steps">
+                            <tbody>
+                                @foreach (var (step, i) in r.Steps.Select((s, i) => (s, i)))
+                                {
+                                    <tr class="@(i == r.Steps.Count - 1 ? "total" : null)">
+                                        <td>
+                                            <div>@step.Label</div>
+                                            <div class="step-source">@step.SourceRef</div>
+                                        </td>
+                                        <td class="amount">@CalcLabels.Money(step.Amount)</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+
+                        <details class="breakdown">
+                            <summary>How the tax was figured</summary>
+                            @if (r.Breakdown.Method == TaxBreakdown.TaxTableMethod)
+                            {
+                                <p>Your taxable income falls in the @CalcLabels.Money(r.Breakdown.RowAtLeast!.Value)–@CalcLabels.Money(r.Breakdown.RowLessThan!.Value) row of the tax table.
+                                   The IRS figures each row's tax on its midpoint, @CalcLabels.Money(r.Breakdown.TaxedAmount), and rounds to the nearest dollar:</p>
+                            }
+                            else
+                            {
+                                <p>At $100,000 and up the IRS uses the rates directly (Tax Computation Worksheet):</p>
+                            }
+                            <ul>
+                                @foreach (var p in r.Breakdown.Portions)
+                                {
+                                    <li>@CalcLabels.Rate(p.Rate) × @CalcLabels.Money(p.Amount) = @CalcLabels.Money(p.Tax)</li>
+                                }
+                            </ul>
+                        </details>
+
+                        <p class="not-included">@r.NotIncluded</p>
+                    </article>
+
+                    <article class="answer-card why @(r.ExplanationKind == CalcResponse.FallbackKind ? "refusal" : null)">
+                        <div class="goes-to-label">Why this number</div>
+                        @if (_plainLanguage && r.ExplanationKind == CalcResponse.AnswerKind)
+                        {
+                            <div class="mode-tag">Plain language</div>
+                        }
+                        <p class="box-text">@r.Explanation</p>
+                        @if (r.ExplanationKind == CalcResponse.FallbackKind)
+                        {
+                            <p class="panel-note">This summary comes straight from the numbers above. A cited explanation wasn't available this time.</p>
+                        }
+                        @if (r.Citations.Count > 0)
+                        {
+                            <div class="chips">
+                                @foreach (var c in r.Citations)
+                                {
+                                    var source = r.Sources.FirstOrDefault(s => s.Number == c.Number);
+                                    if (source is null) continue;
+                                    <button class="chip @(c == _citation ? "selected" : null)" title="@source.Section"
+                                            aria-pressed="@(c == _citation)" @onclick="() => _citation = c">
+                                        @SourceLabels.Chip(source)
+                                    </button>
+                                }
+                            </div>
+                        }
+                        <footer class="disclaimer">@r.Disclaimer</footer>
+                    </article>
+                }
+                else
+                {
+                    <article class="answer-card">
+                        <div class="goes-to-label">How it works</div>
+                        <p class="box-text">Enter your W-2 numbers and press Calculate. TaxWise subtracts the standard deduction, looks up the tax
+                           the way the IRS Tax Table does, and compares it with what was withheld.</p>
+                    </article>
+                }
+
+                @if (_compare)
+                {
+                    <article class="answer-card compare">
+                        <div class="goes-to-label">Same W-2 in each tax year</div>
+                        @if (_compareResult is { } cmp)
+                        {
+                            <table class="steps compare-table">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        @foreach (var y in cmp.Years)
+                                        {
+                                            <th class="amount @(y.TaxYear == _result?.TaxYear ? "current" : null)">
+                                                @y.TaxYear@if (y.IsEstimate){<span class="estimate-star" title="@CalcLabels.EstimateNote(y.TaxYear)">*</span>}
+                                            </th>
+                                        }
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>Standard deduction</td>@foreach (var y in cmp.Years){<td class="amount">@CalcLabels.Money(y.StandardDeduction)</td>}</tr>
+                                    <tr><td>Taxable income</td>@foreach (var y in cmp.Years){<td class="amount">@CalcLabels.Money(y.TaxableIncome)</td>}</tr>
+                                    <tr><td>Tax</td>@foreach (var y in cmp.Years){<td class="amount">@CalcLabels.Money(y.Tax)</td>}</tr>
+                                    <tr class="total">
+                                        <td>Refund (owed)</td>
+                                        @foreach (var y in cmp.Years){<td class="amount">@(y.IsRefund ? CalcLabels.Money(y.RefundOrOwed) : $"({CalcLabels.Money(y.RefundOrOwed)})")</td>}
+                                    </tr>
+                                </tbody>
+                            </table>
+                            @if (cmp.Years.Any(y => y.IsEstimate))
+                            {
+                                <p class="form-hint">* Estimate: the official Tax Table for that year isn't published yet.</p>
+                            }
+                        }
+                        else if (_compareError is not null)
+                        {
+                            <p class="inline-error" role="alert">@_compareError</p>
+                        }
+                        else
+                        {
+                            <p class="form-hint">Press Calculate to compare 2025, 2026 and 2027.</p>
+                        }
+                    </article>
+                }
+
+                @if (_openError is not null)
+                {
+                    <div class="inline-error" role="alert">@_openError</div>
+                }
+            </div>
+        </div>
+    </section>
+
+    <SourcePanel Source="SelectedSource" Highlight="@_citation?.Highlight" OnOpenPdf="OpenPdfAsync" />
+</div>
+
+@code {
+    private readonly CancellationTokenSource _pageCts = new();
+    private CancellationTokenSource? _requestCts;
+    private int _taxYear;
+    private decimal _wages = 28_000m;
+    private decimal _withholding = 1_500m;
+    private FilingStatus _status = FilingStatus.Single;
+    private bool _dependent;
+    private bool _plainLanguage;
+    private bool _compare;
+    private bool _loading;
+    private CalcResponse? _result;
+    private CalcRequest? _resultRequest; // the inputs behind _result, so "Compare years" matches what's on screen
+    private string? _error;
+    private bool _errorUnreachable;
+    private CompareYearsResponse? _compareResult;
+    private string? _compareError;
+    private CitationRef? _citation;
+    private string? _openError;
+
+    private SourcePassage? SelectedSource =>
+        _citation is null ? null : _result?.Sources.FirstOrDefault(s => s.Number == _citation.Number);
+
+    protected override void OnInitialized()
+    {
+        _taxYear = Settings.GetTaxYear(TaxYearFeature.Calculator);
+        _plainLanguage = Settings.PlainLanguage;
+    }
+
+    private CalcRequest Request => new(_taxYear, _wages, _withholding, _status, _dependent, _plainLanguage);
+
+    private async Task CalculateAsync()
+    {
+        CancelRequest();
+        var cts = CancellationTokenSource.CreateLinkedTokenSource(_pageCts.Token);
+        _requestCts = cts;
+
+        var request = Request;
+        _loading = true;
+        _error = null;
+        _citation = null;
+        _compareResult = null;
+        _compareError = null;
+        StateHasChanged();
+
+        var compare = _compare ? CompareAsync(request, cts.Token) : Task.CompletedTask;
+        try
+        {
+            var response = await Api.CalculateAsync(request, cts.Token);
+            if (cts != _requestCts) return; // a newer request won
+            _result = response;
+            _resultRequest = request;
+            _citation = response.Citations.FirstOrDefault();
+        }
+        catch (ApiException e)
+        {
+            if (cts != _requestCts) return;
+            _result = null;
+            _resultRequest = null;
+            _error = e.Message;
+            _errorUnreachable = e.ApiUnreachable;
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+        _loading = false;
+        await compare;
+    }
+
+    private async Task CompareAsync(CalcRequest request, CancellationToken ct)
+    {
+        try
+        {
+            _compareResult = await Api.CompareYearsAsync(request, ct);
+        }
+        catch (ApiException e)
+        {
+            _compareError = e.Message;
+        }
+        catch (OperationCanceledException)
+        {
+        }
+    }
+
+    private void OnYearChanged(int year)
+    {
+        _taxYear = year;
+        // The result on screen belongs to the old year; keep it until the student recalculates, but drop the citation panel.
+        _citation = null;
+    }
+
+    private void TogglePlainLanguage(ChangeEventArgs e)
+    {
+        _plainLanguage = e.Value is true;
+        Settings.PlainLanguage = _plainLanguage;
+    }
+
+    private async Task ToggleCompareAsync(ChangeEventArgs e)
+    {
+        _compare = e.Value is true;
+        _compareError = null;
+        if (_compare && _resultRequest is not null)
+            await CompareAsync(_resultRequest, _pageCts.Token);
+    }
+
+    private void CancelRequest()
+    {
+        _requestCts?.Cancel();
+        _requestCts?.Dispose();
+        _requestCts = null;
+        _loading = false;
+    }
+
+    private async Task OpenPdfAsync(SourcePassage source)
+    {
+        if (!Uri.TryCreate($"{source.PdfUrl}#page={source.Page}", UriKind.Absolute, out var uri))
+        {
+            _openError = "This source has no PDF link.";
+            return;
+        }
+        _openError = null;
+        try
+        {
+            if (!await Launcher.OpenAsync(uri))
+                _openError = "Couldn't open that link on this computer.";
+        }
+        catch (Exception e) when (e is InvalidOperationException or PlatformNotSupportedException)
+        {
+            _openError = "Couldn't open that link on this computer.";
+        }
+    }
+
+    public void Dispose()
+    {
+        _requestCts?.Cancel();
+        _requestCts?.Dispose();
+        _pageCts.Cancel();
+        _pageCts.Dispose();
+    }
+}

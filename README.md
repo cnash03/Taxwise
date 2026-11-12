@@ -63,6 +63,16 @@ The **Explain my form** page walks through a sample W-2 and 1098-T, one box at a
 - `GET /api/forms/{w2|1098t}` returns a sample. Set `Forms:Directory` when the API runs outside the repo.
 - The page stays on tax year 2025 until the IRS releases the 2026 form instructions. **Upload mine** is shown but disabled (stretch goal).
 
+## Scenario calculator
+
+The **Scenario calculator** page estimates a federal refund or amount owed from one W-2 (wages, withholding, filing status, dependent or not):
+
+- All the math is in `TaxWise.Core/Calculator` (pure, `decimal` only). Each tax year is one file (`TaxYear2025.cs`, `TaxYear2026.cs`, `TaxYear2027.cs`). Every constant cites its IRS source in a comment. To add a year, add a file.
+- Taxable income under $100,000 uses the **Tax Table method**: the brackets are applied to the midpoint of the $50 row and the result is rounded to the dollar, the way the IRS builds the table. At $100,000 and up it uses the Tax Computation Worksheet formula. TY2025 is checked against every row of the official 2025 Tax Table ([`tests/TaxWise.Core.Tests/Calculator/Data/tax-table-2025.csv`](tests/TaxWise.Core.Tests/Calculator/Data/tax-table-2025.csv)). The 2026 and 2027 tables aren't published yet, so those results are labelled **Estimate**.
+- `POST /api/calculator` returns the step table plus a short explanation from Claude, cited to the year's IRS passages. Claude only gets the finished numbers. The **dollar guardrail** rejects any explanation with a dollar amount that isn't in the calculation. A rejected explanation is retried once; if the retry fails too, the page shows a canned explanation built from the numbers.
+- **Compare years** (header toggle) calls `POST /api/calculator/compare`, which runs the same inputs for 2025, 2026 and 2027 and returns numbers only, with no Claude call.
+- Not included: credits, the 2025–2028 tip and overtime deductions, other income and itemized deductions. The page says so under every result.
+
 ## Ingest the IRS documents
 
 The sources are listed in [`data/sources/manifest.json`](data/sources/manifest.json). The PDFs download to `data/sources/pdf/` (gitignored).

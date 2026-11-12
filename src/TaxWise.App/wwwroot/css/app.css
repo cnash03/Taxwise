@@ -785,6 +785,118 @@ h1:focus { outline: none; }
 .next-up p { margin: 4px 0 12px; color: var(--text-muted); font-size: 0.9rem; }
 .next-title { margin-top: 6px; font-weight: 600; }
 
+/* ---------- Scenario calculator (slide 11) ---------- */
+
+.calc-form { gap: 14px; }
+
+.field { display: grid; gap: 5px; }
+
+.field-label {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.field select,
+.money-input {
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    font: inherit;
+    color: var(--text);
+}
+
+.money-input {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.money-input:focus-within { border-color: var(--accent); }
+.money-input span { color: var(--text-muted); }
+
+.money-input input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: none;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.98rem;
+    color: var(--text);
+}
+
+.check {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 0.88rem;
+}
+
+.check input { margin-top: 3px; accent-color: var(--accent); }
+
+.badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+
+.badge {
+    padding: 2px 9px;
+    border-radius: 999px;
+    background: #eef1f1;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge.estimate { background: var(--chip-bg); color: var(--chip-text); }
+
+.big-result { display: flex; align-items: baseline; flex-wrap: wrap; gap: 10px; margin-bottom: 6px; }
+.big-amount { font-size: 2.2rem; font-weight: 700; letter-spacing: -0.01em; }
+.big-result.refund .big-amount { color: var(--accent); }
+.big-result.owed .big-amount { color: #b5462f; }
+.big-label { color: var(--text-muted); font-size: 0.95rem; }
+
+.estimate-note { margin: 0 0 8px; color: var(--chip-text); font-size: 0.8rem; }
+
+.steps {
+    width: 100%;
+    margin: 8px 0 6px;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.steps td,
+.steps th {
+    padding: 8px 4px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    text-align: left;
+}
+
+.steps th { color: var(--text-muted); font-size: 0.78rem; font-weight: 600; }
+.steps .amount { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; text-align: right; white-space: nowrap; }
+.steps tr.total td { border-bottom: none; font-weight: 700; }
+.step-source { margin-top: 2px; color: var(--text-muted); font-size: 0.72rem; }
+
+.compare-table th.current { color: var(--accent); }
+.estimate-star { color: var(--chip-text); }
+
+.breakdown { margin: 4px 0 10px; font-size: 0.85rem; }
+.breakdown summary { color: var(--accent); font-weight: 500; cursor: pointer; }
+.breakdown p { margin: 8px 0 4px; color: var(--text-muted); }
+.breakdown ul { margin: 0; padding-left: 20px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+.not-included {
+    margin: 0 0 6px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: #f1f4f4;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+}
+
+.why .mode-tag { margin-top: 8px; }
+.why .box-text { margin-top: 6px; }
+
 /* ---------- Blazor error UI ---------- */
 
 #blazor-error-ui {
