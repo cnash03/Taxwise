@@ -123,3 +123,15 @@ Design decisions for TaxWise, newest last. Each one records what we chose, what 
 **Alternatives considered:** Only the step table amounts, as BUILD_PLAN first said.
 
 **Why:** Live testing showed Claude correctly naming the $100,000 cutoff and the row bounds from the passages. Rejecting those would push correct explanations onto the canned text. Every amount on the list is still produced by code.
+
+## 12. Build the optional "Compare years" toggle in Phase 5
+
+**Phase 5 · 2026-11-12 · session `71ffadc8`, [PR #7](https://github.com/cnash03/Taxwise/pull/7)**
+
+**Decision:** The calculator has a **Compare years** toggle that runs the same W-2 for 2025, 2026 and 2027 side by side. It calls `POST /api/calculator/compare`, which returns numbers only and makes no Claude call.
+
+**Alternatives considered:** Skip it to stay on schedule. BUILD_PLAN §7.2 marks it optional, and the agent recommended skipping it.
+
+**Why:** We wanted it for the demo. The session log records our choice but not our reasons, so the reasons below were written down afterwards:
+- It shows directly that the standard deduction and brackets go up each year, which is the point of supporting three tax years.
+- It was cheap to add: the calculator is pure code, so comparing years costs no model calls and needs no new guardrail.
