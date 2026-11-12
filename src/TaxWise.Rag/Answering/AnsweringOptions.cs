@@ -20,6 +20,6 @@ public sealed class RetrievalOptions
 
     public int VectorTopK { get; set; } = 8;
     public int RerankTopK { get; set; } = 4;
-    /// <summary>Starting guess; calibrated on the gold set in Phase 7.</summary>
-    public double MinRerankScore { get; set; } = 0.35;
+    /// <summary>Calibrated on the gold set in Phase 7 (eval/results/2026-11-12-taxwise.md).</summary>
+    public double MinRerankScore { get; set; } = 0.5;
 }

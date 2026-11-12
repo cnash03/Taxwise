@@ -149,3 +149,36 @@ Design decisions for TaxWise, newest last. Each one records what we chose, what 
 
 **Why:** The "Quiz me on …" button already used the cited section, which reads better in the quiz header and merges related chats. The quiz should test what the student actually read in their answers, so every cited chunk counts. The Pub 970 criterion assumed the demo answer would cite only Pub 970.
 
+
+## 14. Set `MinRerankScore` to 0.50, chosen from one run scored at every threshold
+
+**Phase 7 · 2026-11-12 · session `dacce272`**
+
+**Decision:** The rerank threshold goes from the 0.35 starting guess to **0.50** (`src/TaxWise.Api/appsettings.json` and the `RetrievalOptions` default). The eval runs each gold question **once with the threshold off**, so Claude answers even when the top score is low. It saves the top score, then scores every threshold in {0.2, 0.3, 0.35, 0.4, 0.5} offline from those saved scores. When thresholds tie on out-of-scope refusals and false refusals, the higher one wins if it refuses more out-of-scope questions *before* Claude is called.
+
+**Alternatives considered:**
+- Re-run the gold set once per threshold, which costs 5× the API calls for the same numbers.
+- Break ties toward the lowest threshold.
+- Keep 0.35.
+
+**Why:**
+- Every threshold refused 12/12 out-of-scope and year-trap questions, because Claude returns `insufficient_sources` for the ones that get through. Every threshold also wrongly refused 1/40 in-scope questions (y05, which Claude marked insufficient).
+- The thresholds differ only in who does the refusing: 0.35 stops 2/12 before Claude, 0.50 stops 9/12. That saves Claude calls and doesn't depend on the model choosing to refuse.
+- The lowest in-scope top score was 0.70. We also probed every Explain-my-form box query and calculator query, which use the same threshold: the lowest was 0.675, so neither feature refuses at 0.50.
+
+**Caveat:** Some out-of-scope questions sit just under the line (0.486–0.490), and o07 (Canadian taxes) scored 0.507. 0.50 is the top of the planned grid. The data would support a value around 0.6, but we kept the planned grid.
+
+## 15. Gold-set page labels were corrected after the first run
+
+**Phase 7 · 2026-11-12 · session `dacce272`**
+
+**Decision:** After the first run, three expected-page labels in `eval/gold.jsonl` were widened:
+- q05: Pub 501 p5 "Who Should File"
+- q06: Pub 17 p12 "When Do I Have To File?"
+- q15: Pub 17 p30 Age Test
+
+hit@4 went from 87.5% to 95%. `--rejudge` now rescores hit@4 against the current gold set, so a label fix doesn't need a re-run. The two remaining misses (q01, q25) are real retrieval misses and were left as they are.
+
+**Alternatives considered:** Leave the labels as first drafted.
+
+**Why:** For those three questions the retrieved page states the answer outright. The agent had searched for one phrase and missed a second place where the same rule appears. Counting them as misses would understate retrieval. Only labels where the retrieved text holds the answer were changed.
