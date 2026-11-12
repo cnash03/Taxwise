@@ -14,7 +14,7 @@ public sealed class AskService(IRetriever retriever, IAnswerer answerer, ILogger
 {
     public async Task<AskResponse> AskAsync(AskRequest request, CancellationToken ct = default)
     {
-        var retrieval = await retriever.RetrieveAsync(request.Question, request.TaxYear, ct);
+        var retrieval = await retriever.RetrieveAsync(request.Question, request.TaxYear, ct: ct);
         if (!retrieval.MeetsThreshold)
         {
             logger.LogInformation(

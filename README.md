@@ -54,6 +54,15 @@ The **Ask a question** page sends `POST /api/ask` and shows cited answers:
 - The **Tax year** picker defaults to 2025 for chat. Years without their full IRS guides show a banner naming the Rev. Proc. the answers rely on.
 - **Quiz me on …** passes the chat's cited chunk IDs to the quizzes page (Phase 6).
 
+## Explain my form
+
+The **Explain my form** page walks through a sample W-2 and 1098-T, one box at a time:
+
+- The sample boxes, their values and where each one goes (`goesTo`) are in [`data/forms/`](data/forms). A person checks each `goesTo` against the TY2025 instructions. The model explains the mapping but never decides it, and the API always returns `goesTo` from the data.
+- Clicking a box sends `POST /api/forms/explain` (`{ form, boxId, plainLanguage }`). The API searches only that box's `sourceDocs` with its `retrievalQuery`, refuses below the rerank threshold without calling Claude, and runs the same citation validator as chat. Explanations are cached in memory per form, box and mode.
+- `GET /api/forms/{w2|1098t}` returns a sample. Set `Forms:Directory` when the API runs outside the repo.
+- The page stays on tax year 2025 until the IRS releases the 2026 form instructions. **Upload mine** is shown but disabled (stretch goal).
+
 ## Ingest the IRS documents
 
 The sources are listed in [`data/sources/manifest.json`](data/sources/manifest.json). The PDFs download to `data/sources/pdf/` (gitignored).

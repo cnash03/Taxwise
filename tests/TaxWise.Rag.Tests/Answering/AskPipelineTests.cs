@@ -27,7 +27,7 @@ public sealed class AskPipelineTests
         var result = await MakeRetriever(voyage, store).RetrieveAsync("q", 2025);
 
         Assert.Equal([VoyageInputType.Query], voyage.EmbedCalls);
-        Assert.Equal((2025, 8), Assert.Single(store.Searches));
+        Assert.Equal((2025, 8, null), Assert.Single(store.Searches));
         Assert.Equal(8, result.Searched);
         Assert.Equal([chunks[1].Id, chunks[3].Id, chunks[5].Id, chunks[7].Id], result.Passages.Select(p => p.Chunk.Id));
         Assert.True(result.MeetsThreshold);

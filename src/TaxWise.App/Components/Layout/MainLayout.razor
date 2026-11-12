@@ -1,4 +1,5 @@
 @inherits LayoutComponentBase
+@inject NavigationManager Nav
 
 <div class="shell">
     <aside class="sidebar">
@@ -6,6 +7,26 @@
     </aside>
 
     <main class="main">
-        @Body
+        <PageErrorBoundary @ref="_boundary">
+            <ChildContent>
+                @Body
+            </ChildContent>
+            <ErrorContent Context="e">
+                <article class="answer-card error page-error" role="alert">
+                    <div class="error-title">Something went wrong on this page</div>
+                    <p>@e.GetType().Name: @e.Message</p>
+                    <button class="btn" @onclick="Recover">Try again</button>
+                </article>
+            </ErrorContent>
+        </PageErrorBoundary>
     </main>
 </div>
+
+@code {
+    private PageErrorBoundary? _boundary;
+
+    // A new page gets a fresh start instead of the previous page's error.
+    protected override void OnParametersSet() => _boundary?.Recover();
+
+    private void Recover() => _boundary?.Recover();
+}

@@ -20,13 +20,24 @@ public static partial class AnswerPrompt
     public static string SystemPrompt(int taxYear, bool plainLanguage) =>
         SystemTemplate
             .Replace("{TaxYear}", taxYear.ToString(System.Globalization.CultureInfo.InvariantCulture))
-            .Replace("{WritingStyle}", plainLanguage ? PlainStyle : DefaultStyle)
+            .Replace("{WritingStyle}", WritingStyle(plainLanguage))
             .TrimEnd();
+
+    /// <summary>The default or plain-language style paragraph (BUILD_PLAN §5.2); the passages and facts stay the same.</summary>
+    internal static string WritingStyle(bool plainLanguage) => plainLanguage ? PlainStyle : DefaultStyle;
 
     /// <summary>The passages as P1..Pn blocks, then the question.</summary>
     public static string UserMessage(string question, IReadOnlyList<Chunk> passages)
     {
         var sb = new StringBuilder();
+        AppendPassages(sb, passages);
+        sb.Append("<question>").Append(Body(question.Trim())).Append("</question>");
+        return sb.ToString();
+    }
+
+    /// <summary>One <c>&lt;passage id="Pn" source="…"&gt;</c> block per chunk, in order.</summary>
+    internal static void AppendPassages(StringBuilder sb, IReadOnlyList<Chunk> passages)
+    {
         for (var i = 0; i < passages.Count; i++)
         {
             var c = passages[i];
@@ -34,8 +45,6 @@ public static partial class AnswerPrompt
               .Append(Body(c.Text))
               .Append("\n</passage>\n\n");
         }
-        sb.Append("<question>").Append(Body(question.Trim())).Append("</question>");
-        return sb.ToString();
     }
 
     /// <summary>"Pub 970 · Ch. 1 · p. 7 · TY 2025".</summary>
@@ -57,10 +66,10 @@ public static partial class AnswerPrompt
     }
 
     // Passage text goes in verbatim (Claude must quote it exactly); only a literal closing tag is defused.
-    private static string Body(string s) => s.Replace("</passage>", "</ passage>").Replace("</question>", "</ question>");
-    private static string Attr(string s) => s.Replace("\"", "'");
+    internal static string Body(string s) => s.Replace("</passage>", "</ passage>").Replace("</question>", "</ question>");
+    internal static string Attr(string s) => s.Replace("\"", "'");
 
-    private static string Resource(string name)
+    internal static string Resource(string name)
     {
         using var stream = typeof(AnswerPrompt).Assembly.GetManifestResourceStream($"TaxWise.Rag.Prompts.{name}")
                            ?? throw new InvalidOperationException($"Missing embedded prompt {name}.");

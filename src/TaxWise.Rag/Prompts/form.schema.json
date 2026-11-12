@@ -1,0 +1,21 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["status", "explanation", "citations"],
+  "properties": {
+    "status": { "enum": ["answered", "insufficient_sources"] },
+    "explanation": { "type": "string" },
+    "citations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["passage", "quote"],
+        "properties": {
+          "passage": { "enum": ["P1", "P2", "P3", "P4"] },
+          "quote":   { "type": "string", "description": "Exact sentence copied from that passage that supports the explanation" }
+        }
+      }
+    }
+  }
+}

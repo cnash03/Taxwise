@@ -37,12 +37,12 @@ internal sealed class FakeVoyage(params double[] rerankScores) : IVoyageClient
 
 internal sealed class FakeStore(IReadOnlyList<Chunk> hits) : IChunkStore
 {
-    public List<(int TaxYear, int Limit)> Searches { get; } = [];
+    public List<(int TaxYear, int Limit, IReadOnlyCollection<string>? DocIds)> Searches { get; } = [];
 
     public Task<IReadOnlyList<ScoredChunk>> SearchAsync(float[] vector, int taxYear, int limit,
         IReadOnlyCollection<string>? docIds = null, CancellationToken ct = default)
     {
-        Searches.Add((taxYear, limit));
+        Searches.Add((taxYear, limit, docIds));
         return Task.FromResult<IReadOnlyList<ScoredChunk>>(hits.Take(limit).Select(c => new ScoredChunk(c, 0.5)).ToList());
     }
 
@@ -69,5 +69,6 @@ internal sealed class FakeAnswerer(DraftAnswer? draft, bool refuse = false) : IA
 
 internal sealed class FakeRetriever(RetrievalResult result) : IRetriever
 {
-    public Task<RetrievalResult> RetrieveAsync(string question, int taxYear, CancellationToken ct = default) => Task.FromResult(result);
+    public Task<RetrievalResult> RetrieveAsync(string question, int taxYear, IReadOnlyCollection<string>? docIds = null,
+        CancellationToken ct = default) => Task.FromResult(result);
 }

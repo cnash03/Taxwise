@@ -12,7 +12,7 @@ public sealed class ApiException(string message, bool apiUnreachable) : Exceptio
 	public bool ApiUnreachable { get; } = apiUnreachable;
 }
 
-/// <summary>Calls <c>POST /api/ask</c> and <c>GET /api/knowledge-base</c>. API keys live only in the API (BUILD_PLAN §1).</summary>
+/// <summary>Calls the TaxWise API (ask, knowledge base, forms). API keys live only in the API (BUILD_PLAN §1).</summary>
 public sealed class TaxWiseApiClient(HttpClient http)
 {
 	public async Task<AskResponse> AskAsync(AskRequest request, CancellationToken cancellationToken)
@@ -27,18 +27,32 @@ public sealed class TaxWiseApiClient(HttpClient http)
 		return await ReadAsync<KnowledgeBaseResponse>(response, cancellationToken);
 	}
 
+	public async Task<FormSample> GetFormAsync(string formId, CancellationToken cancellationToken)
+	{
+		using var response = await SendAsync(() => http.GetAsync(ApiRoutes.Form(formId), cancellationToken), cancellationToken);
+		return await ReadAsync<FormSample>(response, cancellationToken);
+	}
+
+	public async Task<ExplainFormResponse> ExplainFormAsync(ExplainFormRequest request, CancellationToken cancellationToken)
+	{
+		using var response = await SendAsync(() => http.PostAsJsonAsync(ApiRoutes.ExplainForm, request, cancellationToken), cancellationToken);
+		return await ReadAsync<ExplainFormResponse>(response, cancellationToken);
+	}
+
 	private static async Task<HttpResponseMessage> SendAsync(Func<Task<HttpResponseMessage>> send, CancellationToken cancellationToken)
 	{
 		try
 		{
 			return await send();
 		}
-		catch (HttpRequestException)
+		catch (HttpRequestException e)
 		{
+			DebugLog.Write("send failed", e);
 			throw new ApiException("Can't reach the TaxWise API. Make sure it's running, then try again.", apiUnreachable: true);
 		}
-		catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested)
+		catch (TaskCanceledException e) when (!cancellationToken.IsCancellationRequested)
 		{
+			DebugLog.Write("send timed out", e);
 			throw new ApiException("The TaxWise API took too long to answer. Please try again.", apiUnreachable: true);
 		}
 	}
@@ -46,14 +60,19 @@ public sealed class TaxWiseApiClient(HttpClient http)
 	private static async Task<T> ReadAsync<T>(HttpResponseMessage response, CancellationToken cancellationToken)
 	{
 		if (!response.IsSuccessStatusCode)
-			throw new ApiException(await ProblemDetailAsync(response, cancellationToken), apiUnreachable: false);
+		{
+			var message = await ProblemDetailAsync(response, cancellationToken);
+			DebugLog.Write($"{(int)response.StatusCode} from {response.RequestMessage?.RequestUri}: {message}");
+			throw new ApiException(message, apiUnreachable: false);
+		}
 		try
 		{
 			return await response.Content.ReadFromJsonAsync<T>(cancellationToken)
 				?? throw new ApiException("The TaxWise API sent an empty response.", apiUnreachable: false);
 		}
-		catch (JsonException)
+		catch (JsonException e)
 		{
+			DebugLog.Write($"unreadable {typeof(T).Name} from {response.RequestMessage?.RequestUri}", e);
 			throw new ApiException("The TaxWise API sent a response the app couldn't read.", apiUnreachable: false);
 		}
 	}

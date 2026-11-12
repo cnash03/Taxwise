@@ -1,9 +1,292 @@
 @page "/forms"
+@implements IDisposable
+@inject TaxWiseApiClient Api
+@inject UserSettings Settings
+@inject ILauncher Launcher
 
-<header class="page-header">
-    <h1>Explain my form</h1>
-</header>
+<div class="forms-page">
+    <section class="forms-main">
+        <header class="chat-header">
+            <div class="chat-heading">
+                <h1 class="chat-title">Explain my form</h1>
+                <div class="chat-subtitle">Tap a box to see what it means and where it goes, with IRS citations.</div>
+            </div>
+            <div class="chat-controls">
+                <TaxYearPicker Feature="TaxYearFeature.Forms" Value="FormTaxYear" Disabled="true" Tooltip="@YearLockedTooltip" />
+                <label class="toggle">
+                    <input type="checkbox" role="switch" checked="@_plainLanguage" @onchange="TogglePlainLanguageAsync" />
+                    <span class="toggle-track" aria-hidden="true"></span>
+                    <span>Plain-language mode</span>
+                </label>
+                <div class="tabs" role="tablist" aria-label="Form">
+                    @foreach (var (id, name) in Tabs)
+                    {
+                        <button class="tab @(id == _formId ? "active" : null)" role="tab" aria-selected="@(id == _formId)"
+                                @onclick="() => SelectFormAsync(id)">Sample @name</button>
+                    }
+                    @* Disabled buttons don't show tooltips in every WebView, so the wrapper carries it. *@
+                    <span class="tab-wrap" title="Coming soon: uploading your own form is a stretch goal.">
+                        <button class="tab" role="tab" aria-selected="false" aria-disabled="true" disabled>Upload mine</button>
+                    </span>
+                </div>
+            </div>
+        </header>
 
-<section class="empty-state">
-    <p>Box-by-box explanations of a sample W-2 and 1098-T are coming in Phase 4.</p>
-</section>
+        <div class="forms-body">
+            <article class="form-card">
+                @if (_form is { } form)
+                {
+                    <div class="form-card-head">
+                        <h2>Form @form.Form</h2>
+                        <span class="form-card-sub">@form.Title · sample · TY @form.TaxYear</span>
+                    </div>
+                    <div class="form-issuer">
+                        <div class="form-box-label">@form.IssuerLabel</div>
+                        <div class="form-box-value">@form.Issuer</div>
+                    </div>
+                    <div class="form-grid">
+                        @foreach (var box in form.Boxes)
+                        {
+                            <button class="form-box @(box == _box ? "selected" : null)" aria-pressed="@(box == _box)"
+                                    title="@box.Label" @onclick="() => SelectBoxAsync(box)">
+                                <span class="form-box-label">@box.Id · @box.Label</span>
+                                <span class="form-box-value">@box.Value</span>
+                            </button>
+                        }
+                    </div>
+                    <p class="form-hint">Tap any box to see what it means. These are sample values, not your data.</p>
+                }
+                else if (_formError is not null)
+                {
+                    <div class="answer-card error" role="alert">
+                        <div class="error-title">@(_formErrorUnreachable ? "TaxWise API unavailable" : "Something went wrong")</div>
+                        <p>@_formError</p>
+                        <button class="btn" @onclick="() => SelectFormAsync(_formId)">Try again</button>
+                    </div>
+                }
+                else
+                {
+                    <div class="skeleton"></div>
+                    <div class="skeleton"></div>
+                    <div class="skeleton short"></div>
+                }
+            </article>
+
+            <div class="explain-column">
+                @if (_box is not null)
+                {
+                    <BoxExplanation Box="_box"
+                                    Response="_response"
+                                    Loading="_loading"
+                                    Error="@_error"
+                                    ApiUnreachable="_errorUnreachable"
+                                    PlainLanguage="_plainLanguage"
+                                    Selected="_citation"
+                                    OnCite="SelectCitation"
+                                    OnOpenLink="OpenLinkAsync"
+                                    OnRetry="() => SelectBoxAsync(_box)" />
+                }
+
+                @if (_form is not null)
+                {
+                    <article class="answer-card next-up">
+                        <div class="goes-to-label">Next up</div>
+                        @if (NextBox is { } next)
+                        {
+                            <div class="next-title">Box @next.Id · @next.Label</div>
+                            <p>@next.Summary</p>
+                            <button class="btn btn-primary" disabled="@_loading" @onclick="() => SelectBoxAsync(next)">
+                                @(_box is null ? "Start with the first box" : "Walk me through the next box")
+                            </button>
+                        }
+                        else if (OtherForm is var (otherId, otherName))
+                        {
+                            <div class="next-title">That's every box on this form.</div>
+                            <p>Want to go through the sample @otherName next?</p>
+                            <button class="btn btn-primary" @onclick="() => SelectFormAsync(otherId)">Open the sample @otherName</button>
+                        }
+                    </article>
+                }
+
+                @if (_openError is not null)
+                {
+                    <div class="inline-error" role="alert">@_openError</div>
+                }
+            </div>
+        </div>
+    </section>
+
+    <SourcePanel Source="SelectedSource" Highlight="@_citation?.Highlight" OnOpenPdf="OpenPdfAsync" />
+</div>
+
+@code {
+    private static readonly (string Id, string Name)[] Tabs = [("w2", "W-2"), ("1098t", "1098-T")];
+
+    /// <summary>BUILD_PLAN §1a: line numbers can change, so forms stay on TY2025 until the 2026 instructions are out.</summary>
+    private const int FormTaxYear = 2025;
+    private const string YearLockedTooltip =
+        "Explain my form uses tax year 2025 until the IRS releases the 2026 Form W-2, 1098-T and 1040 instructions, because box and line numbers can change.";
+
+    private readonly CancellationTokenSource _pageCts = new();
+    private readonly Dictionary<string, FormSample> _forms = [];
+    private CancellationTokenSource? _requestCts;
+    private string _formId = Tabs[0].Id;
+    private FormSample? _form;
+    private string? _formError;
+    private bool _formErrorUnreachable;
+    private FormBox? _box;
+    private ExplainFormResponse? _response;
+    private bool _loading;
+    private string? _error;
+    private bool _errorUnreachable;
+    private CitationRef? _citation;
+    private bool _plainLanguage;
+    private string? _openError;
+
+    private FormBox? NextBox
+    {
+        get
+        {
+            if (_form is null) return null;
+            var i = _box is null ? -1 : _form.Boxes.ToList().IndexOf(_box);
+            return i + 1 < _form.Boxes.Count ? _form.Boxes[i + 1] : null;
+        }
+    }
+
+    private (string Id, string Name)? OtherForm =>
+        Tabs.Where(t => t.Id != _formId).Select(t => ((string, string)?)t).FirstOrDefault();
+
+    private SourcePassage? SelectedSource =>
+        _citation is null ? null : _response?.Sources.FirstOrDefault(s => s.Number == _citation.Number);
+
+    protected override async Task OnInitializedAsync()
+    {
+        _plainLanguage = Settings.PlainLanguage;
+        await SelectFormAsync(_formId);
+    }
+
+    private async Task SelectFormAsync(string formId)
+    {
+        CancelRequest();
+        _formId = formId;
+        _form = null;
+        _formError = null;
+        ClearBox();
+
+        if (_forms.TryGetValue(formId, out var cached))
+        {
+            _form = cached;
+            return;
+        }
+        try
+        {
+            var form = await Api.GetFormAsync(formId, _pageCts.Token);
+            _forms[formId] = form;
+            if (_formId == formId) _form = form;
+        }
+        catch (ApiException e)
+        {
+            _formError = e.Message;
+            _formErrorUnreachable = e.ApiUnreachable;
+        }
+        catch (OperationCanceledException)
+        {
+        }
+    }
+
+    private async Task SelectBoxAsync(FormBox box)
+    {
+        if (_form is null) return;
+        CancelRequest();
+        var cts = CancellationTokenSource.CreateLinkedTokenSource(_pageCts.Token);
+        _requestCts = cts;
+
+        _box = box;
+        _response = null;
+        _citation = null;
+        _error = null;
+        _loading = true;
+        StateHasChanged();
+
+        try
+        {
+            var response = await Api.ExplainFormAsync(new ExplainFormRequest(_form.FormId, box.Id, _plainLanguage), cts.Token);
+            if (cts != _requestCts) return; // a newer click won
+            _response = response;
+            _citation = response.Citations.FirstOrDefault();
+        }
+        catch (ApiException e)
+        {
+            if (cts != _requestCts) return;
+            _error = e.Message;
+            _errorUnreachable = e.ApiUnreachable;
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+        _loading = false;
+    }
+
+    private async Task TogglePlainLanguageAsync(ChangeEventArgs e)
+    {
+        _plainLanguage = e.Value is true;
+        Settings.PlainLanguage = _plainLanguage;
+        // Same box, rewritten in the other style; the API caches each mode separately.
+        if (_box is not null) await SelectBoxAsync(_box);
+    }
+
+    private void SelectCitation(CitationRef citation) => _citation = citation;
+
+    private void ClearBox()
+    {
+        _box = null;
+        _response = null;
+        _citation = null;
+        _error = null;
+        _loading = false;
+    }
+
+    private void CancelRequest()
+    {
+        _requestCts?.Cancel();
+        _requestCts?.Dispose();
+        _requestCts = null;
+        _loading = false;
+    }
+
+    private async Task OpenPdfAsync(SourcePassage source)
+    {
+        if (!Uri.TryCreate($"{source.PdfUrl}#page={source.Page}", UriKind.Absolute, out var uri))
+        {
+            _openError = "This source has no PDF link.";
+            return;
+        }
+        await OpenAsync(uri);
+    }
+
+    private Task OpenLinkAsync(string url) =>
+        Uri.TryCreate(url, UriKind.Absolute, out var uri) ? OpenAsync(uri) : Task.CompletedTask;
+
+    private async Task OpenAsync(Uri uri)
+    {
+        _openError = null;
+        try
+        {
+            if (!await Launcher.OpenAsync(uri))
+                _openError = "Couldn't open that link on this computer.";
+        }
+        catch (Exception e) when (e is InvalidOperationException or PlatformNotSupportedException)
+        {
+            _openError = "Couldn't open that link on this computer.";
+        }
+    }
+
+    public void Dispose()
+    {
+        _requestCts?.Cancel();
+        _requestCts?.Dispose();
+        _pageCts.Cancel();
+        _pageCts.Dispose();
+    }
+}
