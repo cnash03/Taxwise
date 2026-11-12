@@ -336,3 +336,75 @@ Entries are append-only. The overall summary is in [AI_USAGE.md](AI_USAGE.md).
   - **Launching the app:** Claude Code's safety check blocked it from stopping our running API until we said to. By then that process had already exited and a current build was running. Its first launch just brought back an old copy of the app from 10:26 that was still open, so it closed that copy and opened the new build.
   - It decided by itself that results ≥$100k for 2026/2027 aren't marked as estimates, because the formula is exact Rev. Proc. text. It noted this in the code and tests.
 - **Tag:** success
+
+### 2026-11-12 · Phase 6 · Claude Code (claude-opus-5-5) · @cnash03 · session `73153c57`
+- **Role:** execution agent, Phase 6 (learning quizzes), on `phase-6-quizzes`.
+- **Prompt:** "start phase 6"
+  - Follow-ups: "screen's unlocked, finish the click-through", "all good, commit and open the PR".
+- **Generated:** `POST /api/quiz` (`QuizService`, `ClaudeQuizWriter`, `quiz.system.md`, `quiz.schema.json`). It makes one Claude call per passage, at most 5 at a time.
+  - `QuizItemValidator` in Core/Guardrails checks for 4 distinct options, an in-range answer, and a quote that appears in the passage. A failing question is regenerated once, then dropped.
+  - App: `QuizHistory` (cited chunks per topic, saved in `AppDataDirectory`), and the quiz page with topic list, A–D questions, feedback card with citation, and score screen.
+  - Tests: validator, service (fill-up to 5, regenerate once, the 5-call limit) and endpoint. 28 files changed in [`f8e80fa`](https://github.com/cnash03/Taxwise/commit/f8e80fa); README section; DECISIONS #13. [PR #8](https://github.com/cnash03/Taxwise/pull/8).
+- **Human decisions:** 4 checkpoints.
+  - Plan approved.
+  - Quiz topic = the cited section, not the conversation title the plan named (recommended).
+  - The nav menu shows the list of saved topics (recommended).
+  - **The Pub 970 acceptance check:** the agent recommended limiting quizzes to the topic's own document, which would meet the check as written. **We chose "Keep all cited chunks"**, so the demo quiz has 2 of 5 Pub 970 questions (DECISIONS #13).
+  - **Near-duplicate questions** (two passages share one sentence): the agent recommended dropping duplicate quotes. **We chose to leave them.**
+  - UI check: the agent restarted the API on 5080 and drove the app (recommended). **For the last screens we chose to click through ourselves.**
+- **Verified by:**
+  - `dotnet test`: 318/318.
+  - Live run: the scholarship demo question, then a quiz from it. 5 valid questions in about 5.5 s; every quote matched on the first try.
+  - The agent drove the app through the empty state and the saved topic. We clicked through the feedback, citation, score and topic-list screens.
+- **Worked?** Yes. The API meets its checks except "each question cites a Pub 970 chunk", which we waived on purpose.
+- **Human change:** none.
+- **AI limits seen:**
+  - The plan's acceptance check assumed the demo answer cites only Pub 970; the agent found it also cites Pub 519 and Pub 17, and asked us.
+  - The click-through stopped when the screen locked, and the agent waited instead of guessing.
+  - Claude Code's safety check blocked `git push` because the branch carried the raw AI log, so we pushed and opened the PR ourselves.
+  - The agent stopped our running API and app to test, and listed every change it had made to our setup (including resetting the tax-year preference).
+- **Tag:** success
+
+### 2026-11-12 · Phase 7 · Claude Code (claude-opus-5-5) · @cnash03 · session `dacce272`
+- **Role:** execution agent *and* evaluation run for Phase 7 (evaluation), on `phase-7-eval`. Logged by `/ai-report` while the session was still running.
+- **Prompt:** "start phase 7"
+  - Follow-ups (which changed direction): "draft the gold answers for me to review", "approve them all and run the rejudge", "yes commit and run /ai-report".
+- **Generated:**
+  - [`eval/gold.jsonl`](../eval/gold.jsonl): 52 questions, made up of 34 persona questions, 6 TY2026/2027 questions, 2 year-traps and 10 out-of-scope. Each has expected docs and pages, found by searching the 1,377 stored chunks.
+  - The runner, `eval/TaxWise.Eval`:
+    - `--mode taxwise|baseline` runs each question once with the threshold off, then sweeps `MinRerankScore` offline.
+    - `--rejudge` re-runs only the judge.
+    - The judge is `claude-sonnet-5-5` with structured `{verdict, reason}` output. The baseline is the same Opus model with no retrieval.
+  - Tests: new `TaxWise.Eval.Tests` project (23 tests).
+  - Results: `eval/results/2026-11-12-{taxwise,baseline}.{md,json}`.
+  - `MinRerankScore` 0.35 → 0.50; README Evaluation section; DECISIONS #14–15.
+  - Commits: [`469f3fc`](https://github.com/cnash03/Taxwise/commit/469f3fc), [`b25b9fe`](https://github.com/cnash03/Taxwise/commit/b25b9fe).
+- **Human decisions:** 6 checkpoints.
+  - Plan approved.
+  - **Gold answers:** the agent recommended "I draft, you approve". **We first chose to write them ourselves, then asked the agent to draft them, and approved all 40 at once without editing any.**
+  - **Full run:** the agent recommended only a smoke run here, with the full run in a separate evaluation session as BUILD_PLAN says. **We chose the full run in this session**, so the builder also ran the eval.
+  - **Wrap-up:** the agent recommended commit plus a draft PR. **We chose commit only.**
+  - Keep the threshold at 0.50 rather than widening the sweep grid (recommended).
+  - Outcome tags: Phase 6 success, Phase 7 partial.
+- **Verified by:**
+  - `dotnet test TaxWise.CI.slnf`: 340/340 at the first commit. The eval tests had 23/23 after the approval-only change.
+  - A 3-question smoke run, then the full runs (104 answers plus judge calls).
+  - A probe script measured the rerank scores of every Explain-my-form box query and every calculator query (minimum 0.675), so the 0.50 threshold doesn't break those features.
+  - Every draft gold answer was checked against the stored IRS text, including 6 claims the agent had first written from memory. q11 and q14 gained the exact phase-out ranges.
+- **Worked?** Partly. The harness works and the guardrail results are strong:
+  - hit@4 95%; citation validity 262/262; out-of-scope questions refused 12/12 (baseline 1/12); TY2027 questions 3/3 correct (baseline 0/3).
+  - **But TaxWise scored 80% correct against the plain chatbot's 90%** on the 40 in-scope questions.
+  - The 10 judge spot-checks are still unticked.
+- **Human change:** none. Gold answers were approved as drafted.
+- **AI limits seen:**
+  - **The agent's gold labels were too narrow.** hit@4 was 87.5% until it read the misses and found 3 where the retrieved page held the answer. It widened those labels *after seeing results* and said so (DECISIONS #15).
+  - **The agent changed the threshold tie-break after the smoke run** to prefer blocking before Claude is called. It's disclosed in DECISIONS #14, but the rule was set while looking at the data.
+  - **Judge disagreements:**
+    - q24 was marked "incorrect" because the agent's gold answer named no year, while TaxWise correctly followed Pub 17's 2026 wording.
+    - q12's reason contradicts its own "partial" verdict.
+    - The agent flagged both for the human spot-check instead of changing them.
+  - **A stale source:** the 2025 Pub 519 (p58) still prints a $15,000 standard deduction, and TaxWise quoted it faithfully. That's a knowledge-base problem the eval surfaced.
+  - **Phase 5's chunking flag came back:** the only wrongly refused in-scope question (y05, the 2026 10% bracket) is the Rev. Proc. rate-table heading problem flagged in `71ffadc8`.
+  - The first probe script failed: .NET file-based apps disable reflection JSON by default.
+  - **Gold answers were AI-drafted and approved in bulk.** BUILD_PLAN §12 item 5 wanted a human to write or approve *each* one.
+- **Tag:** partial
