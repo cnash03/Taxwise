@@ -341,7 +341,7 @@ Build the UI to match the slide 7 mockup (`Pages/Ask.razor`):
 
 ## 6. Phase 4: Explain my form (target Nov 19)
 
-Build the UI to match the slide 9 mockup. Tabs: **Sample W-2 · Sample 1098-T · Upload mine**. "Upload mine" is shown but disabled with a "Coming soon" tooltip, because uploads are a stretch goal.
+Build the UI to match the slide 9 mockup. Tabs: **Sample W-2 · Sample 1098-T · Upload mine**. "Upload mine" was first shown disabled; after Phase 8 it parses an uploaded PDF onto the reviewed sample boxes (`POST /api/forms/upload`, PdfPig text extraction plus Claude structured extraction, no OCR; DECISIONS.md #17).
 
 **Data** (`data/forms/w2-sample.json`, `1098t-sample.json`, written by the agent and **reviewed by a human**):
 ```jsonc
@@ -546,7 +546,7 @@ Run **head-to-head comparisons** (the same prompt given to Claude Code and to Co
 
 ## 11. Out of scope (stretch, only if a human asks)
 
-- Parsing uploaded W-2 and 1098-T PDFs (PdfPig text extraction plus Claude structured extraction; scans need OCR).
+- OCR for scanned or photographed W-2 and 1098-T uploads. (Parsing PDFs with a text layer was built after Phase 8; see §6.)
 - Colorado state tax coverage (a second collection, or `jurisdiction` payload filtering).
 - A side-by-side view comparing TaxWise with a plain chatbot (Phase 7's baseline mode already gives the data).
 - Voice input.

@@ -25,10 +25,8 @@
                         <button class="tab @(id == _formId ? "active" : null)" role="tab" aria-selected="@(id == _formId)"
                                 @onclick="() => SelectFormAsync(id)">Sample @name</button>
                     }
-                    @* Disabled buttons don't show tooltips in every WebView, so the wrapper carries it. *@
-                    <span class="tab-wrap" title="Coming soon: uploading your own form is a stretch goal.">
-                        <button class="tab" role="tab" aria-selected="false" aria-disabled="true" disabled>Upload mine</button>
-                    </span>
+                    <button class="tab @(IsUpload ? "active" : null)" role="tab" aria-selected="@IsUpload"
+                            @onclick="SelectUpload">Upload mine</button>
                 </div>
             </div>
         </header>
@@ -42,7 +40,7 @@
                 {
                     <div class="form-card-head">
                         <h2>Form @form.Form</h2>
-                        <span class="form-card-sub">@form.Title · sample · TY @form.TaxYear</span>
+                        <span class="form-card-sub">@form.Title · @(IsUpload ? "your form" : "sample") · TY @form.TaxYear</span>
                     </div>
                     <div class="form-issuer">
                         <div class="form-box-label">@form.IssuerLabel</div>
@@ -58,7 +56,48 @@
                             </button>
                         }
                     </div>
-                    <p class="form-hint">Tap any box to see what it means. These are sample values, not your data.</p>
+                    @if (IsUpload)
+                    {
+                        <p class="form-hint">
+                            Tap any box to see what it means. Only the boxes TaxWise can explain are shown, so check each
+                            value against your form.
+                        </p>
+                        <button class="link-btn upload-again" @onclick="ChooseAnotherFile">Upload a different form</button>
+                    }
+                    else
+                    {
+                        <p class="form-hint">Tap any box to see what it means. These are sample values, not your data.</p>
+                    }
+                }
+                else if (IsUpload)
+                {
+                    <div class="form-card-head">
+                        <h2>Upload your form</h2>
+                        <span class="form-card-sub">W-2 or 1098-T · PDF · TY @FormTaxYear</span>
+                    </div>
+                    <label class="upload-drop @(_uploading ? "busy" : null)">
+                        <InputFile OnChange="UploadAsync" accept=".pdf,application/pdf" disabled="@_uploading" class="upload-input" />
+                        <span class="upload-title">@(_uploading ? "Reading your form…" : "Choose a PDF")</span>
+                        <span class="upload-sub">
+                            Up to @MaxUploadMb MB. Use the PDF from your employer's or school's website: scans and photos can't be read.
+                        </span>
+                    </label>
+                    @if (_uploading)
+                    {
+                        <div class="skeleton"></div>
+                        <div class="skeleton short"></div>
+                    }
+                    @if (_uploadError is not null)
+                    {
+                        <div class="answer-card error" role="alert">
+                            <div class="error-title">@(_uploadErrorUnreachable ? "TaxWise API unavailable" : "Couldn't read that form")</div>
+                            <p>@_uploadError</p>
+                        </div>
+                    }
+                    <p class="form-hint">
+                        Your PDF is read in memory and never saved. TaxWise copies only the boxes it can explain, never your
+                        Social Security number.
+                    </p>
                 }
                 else if (_formError is not null)
                 {
@@ -109,6 +148,11 @@
                             <p>Want to go through the sample @otherName next?</p>
                             <button class="btn btn-primary" @onclick="() => SelectFormAsync(otherId)">Open the sample @otherName</button>
                         }
+                        else
+                        {
+                            <div class="next-title">That's every box on your form.</div>
+                            <p>Tap any box to go over it again.</p>
+                        }
                     </article>
                 }
 
@@ -125,6 +169,10 @@
 
 @code {
     private static readonly (string Id, string Name)[] Tabs = [("w2", "W-2"), ("1098t", "1098-T")];
+
+    /// <summary>The "Upload mine" tab. The uploaded form keeps its sample's form ID ("w2"/"1098t") for explain calls.</summary>
+    private const string UploadTab = "upload";
+    private const long MaxUploadMb = FormUploadLimits.MaxBytes / (1024 * 1024);
 
     /// <summary>BUILD_PLAN §1a: line numbers can change, so forms stay on TY2025 until the 2026 instructions are out.</summary>
     private const int FormTaxYear = 2025;
@@ -148,6 +196,12 @@
     private CitationRef? _citation;
     private bool _plainLanguage;
     private string? _openError;
+    private FormSample? _uploaded;      // kept in memory only, for as long as the page is open
+    private bool _uploading;
+    private string? _uploadError;
+    private bool _uploadErrorUnreachable;
+
+    private bool IsUpload => _formId == UploadTab;
 
     private FormBox? NextBox
     {
@@ -159,8 +213,9 @@
         }
     }
 
-    private (string Id, string Name)? OtherForm =>
-        Tabs.Where(t => t.Id != _formId).Select(t => ((string, string)?)t).FirstOrDefault();
+    private (string Id, string Name)? OtherForm => IsUpload
+        ? null
+        : Tabs.Where(t => t.Id != _formId).Select(t => ((string, string)?)t).FirstOrDefault();
 
     private SourcePassage? SelectedSource =>
         _citation is null ? null : _response?.Sources.FirstOrDefault(s => s.Number == _citation.Number);
@@ -198,6 +253,73 @@
         catch (OperationCanceledException)
         {
         }
+    }
+
+    private void SelectUpload()
+    {
+        CancelRequest();
+        _formId = UploadTab;
+        _formError = null;
+        ClearBox();
+        _form = _uploaded;
+    }
+
+    private void ChooseAnotherFile()
+    {
+        CancelRequest();
+        ClearBox();
+        _uploaded = null;
+        _form = null;
+        _uploadError = null;
+    }
+
+    private async Task UploadAsync(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        _uploadError = null;
+        _uploadErrorUnreachable = false;
+        if (!file.Name.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase) && file.ContentType != FormUploadLimits.ContentType)
+        {
+            _uploadError = "Choose a PDF file.";
+            return;
+        }
+        if (file.Size > FormUploadLimits.MaxBytes)
+        {
+            _uploadError = $"That file is over {MaxUploadMb} MB. Choose the PDF of a single form.";
+            return;
+        }
+
+        _uploading = true;
+        StateHasChanged();
+        try
+        {
+            // Copied to memory first so the request has a length; nothing is written to disk.
+            using var buffer = new MemoryStream();
+            await using (var stream = file.OpenReadStream(FormUploadLimits.MaxBytes, _pageCts.Token))
+                await stream.CopyToAsync(buffer, _pageCts.Token);
+
+            var form = await Api.UploadFormAsync(buffer.ToArray(), _pageCts.Token);
+            _uploaded = form;
+            if (IsUpload)
+            {
+                ClearBox();
+                _form = form;
+            }
+        }
+        catch (ApiException ex)
+        {
+            _uploadError = ex.Message;
+            _uploadErrorUnreachable = ex.ApiUnreachable;
+        }
+        catch (IOException)
+        {
+            _uploadError = "Couldn't read that file. Please choose it again.";
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+        _uploading = false;
     }
 
     private async Task SelectBoxAsync(FormBox box)
