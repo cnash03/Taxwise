@@ -192,3 +192,44 @@ hit@4 went from 87.5% to 95%. `--rejudge` now rescores hit@4 against the current
 **Alternatives considered:** Upload `data/sources/pdf` with the deploy (a second copy of the IRS files to keep in sync).
 
 **Why:** BUILD_PLAN §8 names the redirect as the simpler option. Locally nothing changes, because the PDFs are downloaded there. One catch: the redirect goes to the manifest's current `url`. When the IRS posts the 2026 editions, the 2025 entries must be re-pointed to `irs-prior/` (BUILD_PLAN §12 item 4a), or the deployed links will open the wrong edition.
+
+## 17. "Upload mine" fills the reviewed sample instead of building a new form
+
+**After Phase 8 · 2026-11-17**
+
+**Decision:** `POST /api/forms/upload` takes a W-2 or 1098-T PDF (raw `application/pdf` body, up to 5 MB) and returns the same `FormSample` shape as `GET /api/forms/{id}`. PdfPig reads the text layer, and Claude, through the shared `ClaudeJsonClient`, returns `{ formType, taxYear, issuer, boxes[] }` with a JSON schema. Its values are copied onto the reviewed sample: the result keeps the sample's `formId`, labels, `goesTo` and retrieval queries, and keeps only the sample's boxes (W-2 box 12 with code DD only). Values are normalised to the sample's display format (`$1,234.00`, `Checked`), and values that don't fit are dropped. A PDF with no text layer, another form type or another tax year gets a 422 with a plain message. The PDF is read into memory and never written to disk, and the log line has counts and the form type only.
+
+**Alternatives considered:**
+- Let Claude return every box it finds with its own labels and `goesTo`.
+- Multipart upload with `IFormFile`.
+- OCR for scans.
+
+**Why:** `goesTo` is human-verified data that the model never decides (BUILD_PLAN §6). Reusing the sample boxes keeps that true for uploads, and it means box clicks go through `/api/forms/explain` and its cache unchanged. The explainer never sees box values, so an uploaded box 1 gets the same cited explanation as the sample's. ASP.NET buffers multipart files over 64 KB to a temp file, and a raw body avoids that. OCR would need another service for a case that downloading the employer's or school's PDF avoids. Claude is told not to copy the SSN, EIN or addresses, and the schema has no field for them. SSN-shaped text is masked anyway as a backstop.
+
+**Caveat:** Boxes outside the samples (such as W-2 boxes 10, 11, 13 and 14, other box 12 codes, and 1098-T box 10) aren't shown. Fillable PDFs whose values live only in form fields can come back with no boxes; the error tells the student to print the form to a new PDF first.
+
+## 18. The loading class sits on an inner div, not on `#app`
+
+**After Phase 8 · 2026-11-17 · session `3b05f178`**
+
+**Decision:** `index.html` renders the "Loading…" text as `<div id="app"><div class="app-loading">Loading…</div></div>`. Blazor replaces the children of `#app`, so the centering class goes away when the app renders. The shell CSS also gives `.main` `min-width: 0` and lets the header controls wrap, so no page can grow wider than the window.
+
+**Alternatives considered:**
+- Keep `class="app-loading"` on `#app` and give `.shell` `width: 100%` to override the centering.
+- Cap every page at one shared max-width.
+
+**Why:** Blazor keeps the classes on the element it renders into. With `app-loading` (`display: grid; place-items: center`) on `#app`, the whole shell was centered at its own content width, which differs per page: in-app measurement showed a 1964px web view holding a 1389px shell. Moving the class fixes the cause instead of overriding it, and the student asked for every page to fill the window, so a shared cap was the opposite of what was wanted. Two earlier CSS fixes that only treated the symptoms are in the prompt log.
+
+## 19. The Mac app may read files the student picks
+
+**After Phase 8 · 2026-11-17 · session `3b05f178`**
+
+**Decision:** `Platforms/MacCatalyst/Entitlements.plist` adds `com.apple.security.files.user-selected.read-only` next to the App Sandbox and network-client entitlements.
+
+**Alternatives considered:**
+- Turn the App Sandbox off for the desktop build.
+- `com.apple.security.files.user-selected.read-write`.
+
+**Why:** "Upload mine" (#17) uses Blazor's `InputFile`, which opens the system file picker. In the sandboxed app without this entitlement the picker never appeared and the app hung on the first click. Read-only access to files the student chooses is the narrowest permission that works. The sandbox stays on because the Mac App Store needs it, and the app never writes the PDF anywhere.
+
+**Caveat:** The build doesn't always re-sign the app when only the entitlements change. After editing them, delete the `.app` bundle and rebuild, then check with `codesign -d --entitlements - <app>`.

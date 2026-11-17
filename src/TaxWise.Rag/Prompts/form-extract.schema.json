@@ -1,0 +1,22 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["formType", "taxYear", "issuer", "boxes"],
+  "properties": {
+    "formType": { "enum": ["w2", "1098t", "other"] },
+    "taxYear":  { "type": "integer", "description": "Tax year printed on the form, or 0 if none" },
+    "issuer":   { "type": "string", "description": "Employer or school name only, or empty" },
+    "boxes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "value"],
+        "properties": {
+          "id":    { "type": "string", "description": "Box id exactly as listed in the instructions" },
+          "value": { "type": "string" }
+        }
+      }
+    }
+  }
+}

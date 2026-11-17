@@ -61,7 +61,31 @@ app.MapPost("/" + ApiRoutes.ExplainForm, async (ExplainFormRequest? request, For
     });
 });
 
-app.MapPost("/" + ApiRoutes.Calculator, async (CalcRequest? request, CalculatorService calculator,
+// The PDF is the raw request body, read into memory and never written to disk. (Multipart form files over 64 KB are
+// buffered to a temp file by ASP.NET, which is why this isn't an IFormFile.)
+app.MapPost("/" + ApiRoutes.UploadForm, async (HttpRequest request, FormUploadService upload,
+    ILogger<Program> logger, CancellationToken ct) =>
+{
+    if (!string.Equals(request.GetTypedHeaders().ContentType?.MediaType.Value, FormUploadLimits.ContentType, StringComparison.OrdinalIgnoreCase))
+        return Results.Problem("Upload your W-2 or 1098-T as a PDF.", statusCode: StatusCodes.Status415UnsupportedMediaType);
+    if (request.ContentLength > FormUploadLimits.MaxBytes || await ReadUpToAsync(request.Body, FormUploadLimits.MaxBytes, ct) is not { } pdf)
+        return Results.Problem($"PDFs can be at most {FormUploadLimits.MaxBytes / (1024 * 1024)} MB.",
+            statusCode: StatusCodes.Status413PayloadTooLarge);
+
+    return await Guarded(logger, async () =>
+    {
+        try
+        {
+            return Results.Ok(await upload.ParseAsync(pdf, ct));
+        }
+        catch (FormUploadException e)
+        {
+            return Results.Problem(e.Message, statusCode: StatusCodes.Status422UnprocessableEntity);
+        }
+    });
+});
+
+app.MapPost("/" + ApiRoutes.Calculator,async (CalcRequest? request, CalculatorService calculator,
     HttpContext http, ILogger<Program> logger, CancellationToken ct) =>
 {
     if (CalcProblem(request) is { } problem) return problem;
@@ -124,7 +148,8 @@ app.MapGet("/" + ApiRoutes.KnowledgeBase, (SourceLibrary library, IOptions<TaxYe
 
 app.Run();
 
-// Maps answerer and retrieval failures to safe ProblemDetails (429 / 502), shared by /api/ask, /api/forms/explain, /api/calculator and /api/quiz.
+// Maps answerer and retrieval failures to safe ProblemDetails (429 / 502), shared by /api/ask, /api/forms/explain,
+// /api/forms/upload, /api/calculator and /api/quiz.
 static async Task<IResult> Guarded(ILogger logger, Func<Task<IResult>> run)
 {
     try
@@ -157,6 +182,20 @@ static IResult? CalcProblem(CalcRequest? request)
         return Results.Problem($"Wages and withholding must be between $0 and ${CalcLimits.MaxAmount:N0}.",
             statusCode: StatusCodes.Status400BadRequest);
     return null;
+}
+
+// The whole body, or null when it's longer than maxBytes (Content-Length can be missing or wrong).
+static async Task<byte[]?> ReadUpToAsync(Stream body, long maxBytes, CancellationToken ct)
+{
+    using var buffer = new MemoryStream();
+    var chunk = new byte[81920];
+    int read;
+    while ((read = await body.ReadAsync(chunk, ct)) > 0)
+    {
+        if (buffer.Length + read > maxBytes) return null;
+        buffer.Write(chunk, 0, read);
+    }
+    return buffer.ToArray();
 }
 
 static List<SourcePassage> AbsoluteSources(HttpContext http, IEnumerable<SourcePassage> sources) =>

@@ -76,12 +76,13 @@ The **Ask a question** page sends `POST /api/ask` and shows cited answers:
 
 ## Explain my form
 
-The **Explain my form** page walks through a sample W-2 and 1098-T, one box at a time:
+The **Explain my form** page walks through a sample W-2 and 1098-T, or the student's own uploaded PDF, one box at a time:
 
 - The sample boxes, their values and where each one goes (`goesTo`) are in [`data/forms/`](data/forms). A person checks each `goesTo` against the TY2025 instructions. The model explains the mapping but never decides it, and the API always returns `goesTo` from the data.
 - Clicking a box sends `POST /api/forms/explain` (`{ form, boxId, plainLanguage }`). The API searches only that box's `sourceDocs` with its `retrievalQuery`, refuses below the rerank threshold without calling Claude, and runs the same citation validator as chat. Explanations are cached in memory per form, box and mode.
 - `GET /api/forms/{w2|1098t}` returns a sample. Set `Forms:Directory` when the API runs outside the repo.
-- The page stays on tax year 2025 until the IRS releases the 2026 form instructions. **Upload mine** is shown but disabled (stretch goal).
+- **Upload mine** sends a W-2 or 1098-T PDF (up to 5 MB) as the raw body of `POST /api/forms/upload` (`Content-Type: application/pdf`). The API reads the text layer with PdfPig, asks Claude for the box values with a JSON schema, and copies them onto the reviewed sample. Labels, `goesTo` and retrieval queries all come from the sample, and boxes the sample doesn't have are left out, so clicking a box uses `/api/forms/explain` unchanged. The PDF stays in memory and is never saved. Box values and PDF text are never logged, Claude is told not to copy the SSN, and SSN-shaped text is masked anyway. Scans and photos (no text layer) get a clear error, since there's no OCR. See [DECISIONS.md](DECISIONS.md) #17.
+- The page stays on tax year 2025 until the IRS releases the 2026 form instructions. Uploaded forms for other years are turned away for the same reason.
 
 ## Scenario calculator
 
@@ -173,7 +174,7 @@ Options: `--only <docId>`, `--year <2025|2026|2027>`, `--recreate` (drop the col
 - **Federal only, students only.** TaxWise covers W-2, scholarship, dependent, simple gig and international-student questions. It refuses state rules, crypto, business depreciation and anything else its IRS sources don't cover.
 - **TY2026 and TY2027 chat is thin.** Until the IRS posts the 2026 publications (Dec 2026 – Jan 2027), those years only have their Rev. Proc., and chat shows a banner. Adding them takes a manifest change and an ingestion run (BUILD_PLAN §12 item 4a), not code.
 - **Calculator scope.** One W-2, standard deduction only, no credits, no other income, no 2025–2028 tip and overtime deductions. TY2026 and TY2027 results are estimates because those Tax Tables aren't published.
-- **Explain my form** uses TY2025 sample forms only. Uploading your own W-2 or 1098-T is a stretch goal.
+- **Explain my form** covers TY2025 only, and only the boxes on the sample forms (W-2 box 12 with code DD only). Uploads need a PDF with a text layer: scans and photos aren't read (no OCR), and fillable PDFs whose values live only in form fields may come back empty until they're printed to a new PDF.
 - **Answer correctness** was 80% (judge-scored, one run of 52 questions). That's below the plain chatbot's 90% on in-scope questions, because TaxWise only says what its passages support. 6 of its 8 misses were partial answers. The trade-off is 100% valid citations and 100% out-of-scope refusals, against 8% for the chatbot.
 - **No sign-in or rate limiting** on the API. Anyone with the deployed URL can spend the project's Anthropic and Voyage credit, so the URL isn't published and the Azure resources are deleted after the course.
 - **The App isn't signed** for distribution, and its builds aren't part of CI.

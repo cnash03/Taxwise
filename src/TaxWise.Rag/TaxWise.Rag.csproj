@@ -8,6 +8,7 @@
     <PackageReference Include="Anthropic" Version="13.8.0" />
     <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.11.0" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.15" />
+    <PackageReference Include="PdfPig" Version="0.1.16" />
     <PackageReference Include="Qdrant.Client" Version="1.20.0" />
   </ItemGroup>
 

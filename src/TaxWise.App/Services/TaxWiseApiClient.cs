@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using TaxWise.Shared;
@@ -37,6 +38,15 @@ public sealed class TaxWiseApiClient(HttpClient http)
 	{
 		using var response = await SendAsync(() => http.PostAsJsonAsync(ApiRoutes.ExplainForm, request, cancellationToken), cancellationToken);
 		return await ReadAsync<ExplainFormResponse>(response, cancellationToken);
+	}
+
+	/// <summary>Sends the PDF as the raw body. The result has the sample's form ID, so box clicks use <see cref="ExplainFormAsync"/>.</summary>
+	public async Task<FormSample> UploadFormAsync(byte[] pdf, CancellationToken cancellationToken)
+	{
+		using var content = new ByteArrayContent(pdf);
+		content.Headers.ContentType = new MediaTypeHeaderValue(FormUploadLimits.ContentType);
+		using var response = await SendAsync(() => http.PostAsync(ApiRoutes.UploadForm, content, cancellationToken), cancellationToken);
+		return await ReadAsync<FormSample>(response, cancellationToken);
 	}
 
 	public async Task<CalcResponse> CalculateAsync(CalcRequest request, CancellationToken cancellationToken)

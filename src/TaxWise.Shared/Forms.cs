@@ -26,6 +26,16 @@ public sealed record FormBox(
     string RetrievalQuery,
     IReadOnlyList<string> SourceDocs);
 
+/// <summary>
+/// <c>POST /api/forms/upload</c> takes one PDF as the raw body. It answers with a <see cref="FormSample"/> built on the
+/// reviewed sample, so box clicks go through <c>/api/forms/explain</c> unchanged.
+/// </summary>
+public static class FormUploadLimits
+{
+    public const string ContentType = "application/pdf";
+    public const long MaxBytes = 5 * 1024 * 1024;   // W-2 and 1098-T PDFs are usually under 500 KB
+}
+
 /// <summary>Body of <c>POST /api/forms/explain</c>.</summary>
 public sealed record ExplainFormRequest(string Form, string BoxId, bool PlainLanguage);
 
