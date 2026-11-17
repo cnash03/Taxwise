@@ -75,6 +75,9 @@
         <!-- Non-secret client settings (ApiBaseUrl). API keys never live in the App (BUILD_PLAN §1). -->
         <Content Remove="appsettings.json" />
         <EmbeddedResource Include="appsettings.json" />
+        <!-- Release builds for the demo point at the deployed API (docs/DEPLOY.md). -->
+        <Content Remove="appsettings.Release.json" />
+        <EmbeddedResource Include="appsettings.Release.json" Condition="'$(Configuration)' == 'Release' And Exists('appsettings.Release.json')" />
         <!-- Human-reviewed term definitions for plain-language mode (BUILD_PLAN §5.2). -->
         <EmbeddedResource Include="..\..\data\glossary.json" LogicalName="TaxWise.App.glossary.json" Link="glossary.json" />
     </ItemGroup>

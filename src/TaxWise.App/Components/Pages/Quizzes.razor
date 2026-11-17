@@ -140,6 +140,7 @@
                         <p class="box-text">@item.Explanation</p>
                         <div class="chips">
                             <button class="chip @(_showSource ? "selected" : null)" title="@item.Source.Section" aria-pressed="@_showSource"
+                                    aria-label="@SourceLabels.ChipAriaLabel(item.Source)"
                                     @onclick="() => _showSource = true">
                                 @SourceLabels.Chip(item.Source)
                             </button>

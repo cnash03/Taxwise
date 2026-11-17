@@ -7,7 +7,8 @@ namespace TaxWise.Rag.Forms;
 
 /// <summary>
 /// "Forms" config section. <see cref="Directory"/> holds the <c>*-sample.json</c> files; it defaults to the repo's
-/// data/forms, and must be set when the API runs outside the repo (Azure).
+/// data/forms, and must be set when the API runs outside the repo (Azure). A relative path is resolved against the
+/// app's base directory.
 /// </summary>
 public sealed class FormOptions
 {
@@ -22,7 +23,9 @@ public sealed class FormLibrary
     private readonly Dictionary<string, FormSample> _byId;
 
     public FormLibrary(IOptions<FormOptions> options)
-        : this(string.IsNullOrWhiteSpace(options.Value.Directory) ? RepoPaths.Forms : options.Value.Directory)
+        : this(string.IsNullOrWhiteSpace(options.Value.Directory)
+            ? RepoPaths.Forms
+            : Path.GetFullPath(options.Value.Directory, AppContext.BaseDirectory))
     {
     }
 

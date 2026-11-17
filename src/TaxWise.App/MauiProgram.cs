@@ -17,8 +17,10 @@ public static class MauiProgram
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
 			});
 
-		using (var settings = Assembly.GetExecutingAssembly().GetManifestResourceStream("TaxWise.App.appsettings.json"))
+		// appsettings.Release.json is only embedded in Release builds and overrides ApiBaseUrl with the deployed API.
+		foreach (var name in new[] { "TaxWise.App.appsettings.json", "TaxWise.App.appsettings.Release.json" })
 		{
+			using var settings = Assembly.GetExecutingAssembly().GetManifestResourceStream(name);
 			if (settings is not null)
 				builder.Configuration.AddJsonStream(settings);
 		}

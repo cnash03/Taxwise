@@ -14,7 +14,8 @@
             <div class="chat-controls">
                 <TaxYearPicker Feature="TaxYearFeature.Forms" Value="FormTaxYear" Disabled="true" Tooltip="@YearLockedTooltip" />
                 <label class="toggle">
-                    <input type="checkbox" role="switch" checked="@_plainLanguage" @onchange="TogglePlainLanguageAsync" />
+                    <input type="checkbox" role="switch" checked="@_plainLanguage" @onchange="TogglePlainLanguageAsync"
+                           aria-label="Plain-language mode: simpler wording from the same IRS passages" />
                     <span class="toggle-track" aria-hidden="true"></span>
                     <span>Plain-language mode</span>
                 </label>

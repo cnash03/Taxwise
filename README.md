@@ -18,6 +18,26 @@ TaxWise is a desktop app that helps college students understand their U.S. feder
 
 Dependencies point one way: `Shared ← Core ← Rag ← {Api, Ingestion, Eval}`. `App` depends only on `Shared`.
 
+```mermaid
+flowchart LR
+    subgraph Desktop["Desktop App (.NET MAUI Blazor Hybrid)"]
+        UI["Chat · Explain my form · Calculator · Quizzes"]
+    end
+    subgraph Azure["TaxWise.Api (Azure App Service)"]
+        API["Minimal API + guardrails<br/>(citation validator, dollar guardrail, rerank threshold)"]
+        CALC["TaxCalculator<br/>(pure C#, IRS constants)"]
+    end
+    IRS["IRS PDFs<br/>(irs.gov)"] -->|"download · parse (PdfPig) · chunk"| ING["TaxWise.Ingestion"]
+    ING -->|"embed (voyage-3.5)"| VOY["Voyage AI<br/>embed + rerank-2.5"]
+    ING -->|upsert| QD[("Qdrant<br/>collection taxwise")]
+    UI -->|HTTPS, no keys| API
+    API -->|"query embed → top 8 → rerank → top 4"| VOY
+    API -->|filter on taxYear| QD
+    API -->|"passages + question"| CL["Claude claude-opus-5-5<br/>(Anthropic C# SDK)"]
+    API --> CALC
+    API -->|"302 to page PDF"| IRS
+```
+
 ## Setup (macOS)
 
 On Windows or Linux, or if you're new to the project, follow [docs/SETUP.md](docs/SETUP.md) instead.
@@ -140,6 +160,24 @@ Options: `--only <docId>`, `--year <2025|2026|2027>`, `--recreate` (drop the col
 - **Re-runs are idempotent.** Point ids derive from the chunk id, and each (document, year) is replaced as a whole, so re-running never duplicates or leaves stale chunks.
 - **Sanity check.** `data/sources/ingest-report.json` has chunk counts per document, average size, and the 10 shortest and longest chunks.
 - **Voyage rate limits.** A Voyage account without a payment method is capped at 3 requests and 10K tokens per minute, which can't fit even one embedding batch. Add a payment method in the Voyage dashboard; the free token allowance still applies.
+
+## Deploy and demo
+
+- [docs/DEPLOY.md](docs/DEPLOY.md): Qdrant Cloud ingestion, Azure App Service publish and settings, and the Release App builds for macOS and Windows (`appsettings.Release.json` points them at Azure).
+- [docs/demo-script.md](docs/demo-script.md): the 4-minute demo rehearsal checklist.
+- The deployed API ships the manifest and sample forms but not the PDFs. `GET /api/sources/{docId}/pdf` redirects to irs.gov when the file isn't on the server.
+- The sidebar footer lists the knowledge base from `GET /api/knowledge-base`. **About & disclaimer** links IRS Free File and VITA.
+
+## Known limitations
+
+- **Federal only, students only.** TaxWise covers W-2, scholarship, dependent, simple gig and international-student questions. It refuses state rules, crypto, business depreciation and anything else its IRS sources don't cover.
+- **TY2026 and TY2027 chat is thin.** Until the IRS posts the 2026 publications (Dec 2026 – Jan 2027), those years only have their Rev. Proc., and chat shows a banner. Adding them takes a manifest change and an ingestion run (BUILD_PLAN §12 item 4a), not code.
+- **Calculator scope.** One W-2, standard deduction only, no credits, no other income, no 2025–2028 tip and overtime deductions. TY2026 and TY2027 results are estimates because those Tax Tables aren't published.
+- **Explain my form** uses TY2025 sample forms only. Uploading your own W-2 or 1098-T is a stretch goal.
+- **Answer correctness** was 80% (judge-scored, one run of 52 questions). That's below the plain chatbot's 90% on in-scope questions, because TaxWise only says what its passages support. 6 of its 8 misses were partial answers. The trade-off is 100% valid citations and 100% out-of-scope refusals, against 8% for the chatbot.
+- **No sign-in or rate limiting** on the API. Anyone with the deployed URL can spend the project's Anthropic and Voyage credit, so the URL isn't published and the Azure resources are deleted after the course.
+- **The App isn't signed** for distribution, and its builds aren't part of CI.
+- **Educational tool, not tax advice.** Every answer, explanation and calculator result says so.
 
 ## Build and test
 

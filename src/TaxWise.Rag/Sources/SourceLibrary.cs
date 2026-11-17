@@ -4,7 +4,8 @@ namespace TaxWise.Rag.Sources;
 
 /// <summary>
 /// "Sources" config section. <see cref="Directory"/> holds manifest.json and pdf/; it defaults to the repo's
-/// data/sources, and must be set when the API runs outside the repo (Azure).
+/// data/sources, and must be set when the API runs outside the repo (Azure). A relative path is resolved against the
+/// app's base directory, so a published build can point at the data files copied next to it.
 /// </summary>
 public sealed class SourceOptions
 {
@@ -21,7 +22,9 @@ public sealed class SourceLibrary
 
     public SourceLibrary(IOptions<SourceOptions> options)
     {
-        var dir = string.IsNullOrWhiteSpace(options.Value.Directory) ? RepoPaths.Sources : options.Value.Directory;
+        var dir = string.IsNullOrWhiteSpace(options.Value.Directory)
+            ? RepoPaths.Sources
+            : Path.GetFullPath(options.Value.Directory, AppContext.BaseDirectory);
         var manifest = Manifest.Load(Path.Combine(dir, "manifest.json"));
         Documents = manifest.Documents;
         _byId = manifest.Documents.ToDictionary(d => d.DocId, StringComparer.OrdinalIgnoreCase);
@@ -37,4 +40,7 @@ public sealed class SourceLibrary
         var path = Path.Combine(_pdfDir, entry.FileName);
         return File.Exists(path) ? path : null;
     }
+
+    /// <summary>The IRS URL for a manifest doc ID, or null when the ID is unknown. Used when the PDF isn't stored locally.</summary>
+    public string? FindRemoteUrl(string docId) => _byId.TryGetValue(docId, out var entry) ? entry.Url : null;
 }

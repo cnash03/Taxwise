@@ -68,6 +68,7 @@ else if (Turn.Response is { } r)
                             if (source is null) continue;
                             <button class="chip @(IsSelected(c) ? "selected" : null)"
                                     title="@source.Section"
+                                    aria-label="@SourceLabels.ChipAriaLabel(source)"
                                     aria-pressed="@IsSelected(c)"
                                     @onclick="() => OnCite.InvokeAsync(new CitationSelection(Turn, c, source))">
                                 @SourceLabels.Chip(source)
