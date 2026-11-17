@@ -408,3 +408,39 @@ Entries are append-only. The overall summary is in [AI_USAGE.md](AI_USAGE.md).
   - The first probe script failed: .NET file-based apps disable reflection JSON by default.
   - **Gold answers were AI-drafted and approved in bulk.** BUILD_PLAN §12 item 5 wanted a human to write or approve *each* one.
 - **Tag:** partial
+
+### 2026-11-12 · Phase 8 · Claude Code (claude-opus-5-5) · @cnash03 · session `a69ad57c`
+- **Role:** execution agent for Phase 8 (deploy and polish). It started on `phase-7-eval` and built on a new `phase-8-deploy-polish` branch. The commit and PR came later, in session `cd2da81e`.
+- **Prompt:** "start phase 8 - the last one right"
+- **Generated:**
+  - **Deploy config:**
+    - `src/TaxWise.Api/appsettings.Production.json` (HTTPS to Qdrant Cloud, data paths for Azure).
+    - The API publish output now carries `data/sources/manifest.json` and the sample forms.
+    - `GET /api/sources/{docId}/pdf` redirects (302) to the manifest's irs.gov URL when the PDF isn't on the server.
+    - Release App builds embed an optional `appsettings.Release.json` with the deployed `ApiBaseUrl`.
+  - **Polish:**
+    - `AboutDialog.razor` (disclaimer, IRS Free File and VITA links, Esc to close, focus moves into it).
+    - The sidebar knowledge-base footer now reads `/api/knowledge-base`.
+    - Screen-reader labels on every citation chip (`SourceLabels.ChipAriaLabel`, plus a test) and on the toggles.
+    - Visible focus outlines on the dark sidebar.
+  - **Docs:** [`docs/DEPLOY.md`](DEPLOY.md), [`docs/demo-script.md`](demo-script.md) (a timed 4-minute checklist), a README mermaid architecture diagram, deploy section and known limitations, and DECISIONS #16 (the PDF redirect).
+  - Commit [`34bf8d1`](https://github.com/cnash03/Taxwise/commit/34bf8d1), PR #10 (merged as [`9114011`](https://github.com/cnash03/Taxwise/commit/9114011)).
+- **Human decisions:** 1 checkpoint (3 questions).
+  - Plan approved (recommended).
+  - Azure and Qdrant Cloud accounts: **not set up yet**, so the agent built everything that doesn't need them and stopped short of deploying.
+  - **Desktop builds:** the agent recommended Mac only. **We chose Mac and Windows.** DEPLOY.md has the Windows steps, but the build has to happen on a Windows machine and hasn't been done.
+- **Verified by:**
+  - Full solution build with 0 warnings; `dotnet test TaxWise.CI.slnf` 342/342.
+  - **Published the API and ran it in Production mode outside the repo:** health, knowledge base and forms worked, and the PDF link redirected to irs.gov. The first run failed, and the second run from inside the publish folder passed.
+  - **Built the App in Release with a dummy `appsettings.Release.json`** and searched the compiled DLLs: the override was in the Release build and not in the Debug build. It then deleted the test output.
+  - Checked the demo script's crypto step against the eval results, and the W-2 box 1 mapping.
+  - **Human click-through on 2026-11-17** (session `cd2da81e`) against the current API: everything worked.
+- **Worked?** Yes for everything that doesn't need cloud accounts. **Not yet deployed**, so the Phase 8 acceptance check (the deployed API answers the demo questions from a fresh machine, and the demo takes under 4 minutes) is still open.
+- **Human change:** none. We clicked through it and it all worked.
+- **AI limits seen:**
+  - **It couldn't read the design-doc PDF** (no `pdftotext` or `pypdf` on the machine), so it drew the README architecture diagram from the code instead of the design doc's diagram, and said so.
+  - **It first wrote a demo crypto question the eval hadn't tested** ("How are my crypto staking rewards taxed?"). It then checked the eval results and switched to the exact eval wording ("How do I stake crypto for yield?").
+  - **It wrote an unverified size claim** ("about 15 MB") into DECISIONS #16, then removed it.
+  - **It can't see the App,** so it asked us to check the new dialog and footer on screen.
+  - **The Mac App build needs `-p:ValidateXcodeVersion=false`,** because Xcode 27.2 is newer than the 27.1 that the MAUI SDK expects. This is in DEPLOY.md.
+- **Tag:** success
