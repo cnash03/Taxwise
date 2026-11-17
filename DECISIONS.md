@@ -182,3 +182,13 @@ hit@4 went from 87.5% to 95%. `--rejudge` now rescores hit@4 against the current
 **Alternatives considered:** Leave the labels as first drafted.
 
 **Why:** For those three questions the retrieved page states the answer outright. The agent had searched for one phrase and missed a second place where the same rule appears. Counting them as misses would understate retrieval. Only labels where the retrieved text holds the answer were changed.
+
+## 16. The deployed API redirects to irs.gov for source PDFs
+
+**Phase 8 · 2026-11-12 · session `a69ad57c`**
+
+**Decision:** The API publish output includes `data/sources/manifest.json` and `data/forms/*-sample.json`, but not the source PDFs. `GET /api/sources/{docId}/pdf` serves the local file when it exists. For any other manifest doc it sends a 302 to the doc's `url`, and unknown IDs still get a 404. `Sources:Directory` and `Forms:Directory` may be relative; a relative path is resolved against the app's base directory, which `appsettings.Production.json` relies on.
+
+**Alternatives considered:** Upload `data/sources/pdf` with the deploy (a second copy of the IRS files to keep in sync).
+
+**Why:** BUILD_PLAN §8 names the redirect as the simpler option. Locally nothing changes, because the PDFs are downloaded there. One catch: the redirect goes to the manifest's current `url`. When the IRS posts the 2026 editions, the 2025 entries must be re-pointed to `irs-prior/` (BUILD_PLAN §12 item 4a), or the deployed links will open the wrong edition.

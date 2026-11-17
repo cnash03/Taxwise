@@ -18,6 +18,11 @@ public sealed class SourceLabelsTests
         Assert.Equal("1 · Form 1040 Instructions (incl. Tax Table) · p. 40 · TY 2025",
             SourceLabels.Chip(Source("Form 1040 Instructions (incl. Tax Table)", null, 40)));
 
+    [Fact]
+    public void ChipAriaLabel_SpellsOutPageAndYear() =>
+        Assert.Equal("Citation 1: Pub 970, Ch. 1, page 6, tax year 2025. Show the passage.",
+            SourceLabels.ChipAriaLabel(Source("Pub 970, Tax Benefits for Education", "Chapter 1. Scholarships")));
+
     [Theory]
     [InlineData("Chapter 12. Other Itemized Deductions", "Ch. 12")]
     [InlineData("Filing Information", null)]

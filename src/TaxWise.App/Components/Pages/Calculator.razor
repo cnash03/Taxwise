@@ -14,12 +14,14 @@
             <div class="chat-controls">
                 <TaxYearPicker Feature="TaxYearFeature.Calculator" Value="_taxYear" ValueChanged="OnYearChanged" />
                 <label class="toggle">
-                    <input type="checkbox" role="switch" checked="@_plainLanguage" @onchange="TogglePlainLanguage" />
+                    <input type="checkbox" role="switch" checked="@_plainLanguage" @onchange="TogglePlainLanguage"
+                           aria-label="Plain-language mode: simpler wording from the same IRS passages" />
                     <span class="toggle-track" aria-hidden="true"></span>
                     <span>Plain-language mode</span>
                 </label>
                 <label class="toggle">
-                    <input type="checkbox" role="switch" checked="@_compare" @onchange="ToggleCompareAsync" />
+                    <input type="checkbox" role="switch" checked="@_compare" @onchange="ToggleCompareAsync"
+                           aria-label="Compare years: the same inputs for 2025, 2026 and 2027" />
                     <span class="toggle-track" aria-hidden="true"></span>
                     <span>Compare years</span>
                 </label>
@@ -151,6 +153,7 @@
                                     var source = r.Sources.FirstOrDefault(s => s.Number == c.Number);
                                     if (source is null) continue;
                                     <button class="chip @(c == _citation ? "selected" : null)" title="@source.Section"
+                                            aria-label="@SourceLabels.ChipAriaLabel(source)"
                                             aria-pressed="@(c == _citation)" @onclick="() => _citation = c">
                                         @SourceLabels.Chip(source)
                                     </button>

@@ -106,10 +106,13 @@ app.MapPost("/" + ApiRoutes.Quiz, async (QuizRequest? request, QuizService quiz,
 });
 
 app.MapGet("/api/sources/{docId}/pdf", (string docId, SourceLibrary library) =>
-    // Only manifest doc IDs resolve to a file, so the route can't be used to read anything else.
+    // Only manifest doc IDs resolve, so the route can't be used to read anything else. The deployed API ships
+    // without the PDFs and redirects to irs.gov instead (BUILD_PLAN §8, Phase 8).
     library.FindPdf(docId) is { } path
         ? Results.File(path, "application/pdf", enableRangeProcessing: true)
-        : Results.NotFound());
+        : library.FindRemoteUrl(docId) is { } url
+            ? Results.Redirect(url)
+            : Results.NotFound());
 
 app.MapGet("/" + ApiRoutes.KnowledgeBase, (SourceLibrary library, IOptions<TaxYearOptions> years, HttpContext http) =>
     new KnowledgeBaseResponse(

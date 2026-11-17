@@ -1,0 +1,108 @@
+@inject ILauncher Launcher
+
+@* About / disclaimer dialog (BUILD_PLAN §8, Phase 8). Opened from the knowledge-base footer. *@
+@if (Open)
+{
+    <div class="dialog-backdrop" @onclick="CloseAsync"></div>
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="about-title" @onkeydown="OnKeyDown">
+        <header class="dialog-head">
+            <h2 id="about-title">About TaxWise</h2>
+            <button class="btn" @ref="_close" aria-label="Close About TaxWise" @onclick="CloseAsync">Close</button>
+        </header>
+
+        <p>
+            TaxWise helps college students understand their U.S. federal taxes. Answers come only from official IRS
+            publications and cite the page they came from. The calculator's math is done by code from IRS tables, not by the AI.
+        </p>
+
+        <div class="dialog-disclaimer" role="note">
+            <strong>Educational tool, not professional tax advice.</strong>
+            TaxWise doesn't file returns, doesn't see your real documents, and can be wrong. Check anything important against
+            the cited IRS page or with a tax professional.
+        </div>
+
+        <h3>Free help filing</h3>
+        <ul class="dialog-links">
+            <li>
+                <button class="link-btn" @onclick="() => OpenAsync(FreeFileUrl)">IRS Free File ↗</button>
+                <span>Free guided tax software for most students, through the IRS.</span>
+            </li>
+            <li>
+                <button class="link-btn" @onclick="() => OpenAsync(VitaUrl)">VITA (Volunteer Income Tax Assistance) ↗</button>
+                <span>Free in-person tax prep from IRS-certified volunteers, often on campus.</span>
+            </li>
+        </ul>
+
+        <h3>Knowledge base</h3>
+        @if (KnowledgeBase is { } kb)
+        {
+            <ul class="dialog-links">
+                @foreach (var doc in kb.Documents)
+                {
+                    <li>
+                        <button class="link-btn" @onclick="() => OpenAsync(doc.PdfUrl)">@doc.Title ↗</button>
+                        <span>TY @string.Join(", ", doc.TaxYears.Order())</span>
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p class="panel-empty">The document list loads from the TaxWise API once it's reachable.</p>
+        }
+
+        @if (_openError is not null)
+        {
+            <div class="inline-error" role="alert">@_openError</div>
+        }
+    </div>
+}
+
+@code {
+    private const string FreeFileUrl = "https://www.irs.gov/filing/free-file-do-your-federal-taxes-for-free";
+    private const string VitaUrl = "https://www.irs.gov/individuals/free-tax-return-preparation-for-qualifying-taxpayers";
+
+    private ElementReference _close;
+    private bool _wasOpen;
+    private bool _focusPending;
+    private string? _openError;
+
+    [Parameter] public bool Open { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public KnowledgeBaseResponse? KnowledgeBase { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if (Open && !_wasOpen) _focusPending = true;
+        if (!Open) _openError = null;
+        _wasOpen = Open;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Move focus into the dialog so keyboard users land on it, not behind it.
+        if (_focusPending && Open)
+        {
+            _focusPending = false;
+            await _close.FocusAsync();
+        }
+    }
+
+    private Task OnKeyDown(KeyboardEventArgs e) => e.Key == "Escape" ? CloseAsync() : Task.CompletedTask;
+
+    private Task CloseAsync() => OnClose.InvokeAsync();
+
+    private async Task OpenAsync(string url)
+    {
+        _openError = null;
+        try
+        {
+            if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) || !await Launcher.OpenAsync(uri))
+                _openError = "Couldn't open that link on this computer.";
+        }
+        catch (Exception e) when (e is InvalidOperationException or PlatformNotSupportedException)
+        {
+            _openError = "Couldn't open that link on this computer.";
+        }
+    }
+}

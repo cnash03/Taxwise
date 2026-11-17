@@ -1,3 +1,6 @@
+@implements IDisposable
+@inject TaxWiseApiClient Api
+
 <div class="brand">
     <span class="brand-mark" aria-hidden="true">T</span>
     <span class="brand-name">TaxWise</span>
@@ -11,8 +14,68 @@
     <NavLink class="nav-item" href="quizzes">Learning quizzes</NavLink>
 </nav>
 
-@* Static for now; driven by GET /api/knowledge-base in Phase 8 (BUILD_PLAN §8). *@
+@* Driven by GET /api/knowledge-base (BUILD_PLAN §8). *@
 <footer class="kb-footer">
     <div class="kb-title">Knowledge base</div>
-    <div class="kb-detail">Official IRS publications · TY 2025</div>
+    @if (_knowledgeBase is { } kb)
+    {
+        <div class="kb-detail">@FullSummary(kb)</div>
+        @if (LimitedSummary(kb) is { } limited)
+        {
+            <div class="kb-detail kb-muted">@limited</div>
+        }
+    }
+    else
+    {
+        <div class="kb-detail kb-muted">Official IRS publications · loads when the API is up</div>
+    }
+    <button class="kb-about" aria-haspopup="dialog" @onclick="OpenAboutAsync">About &amp; disclaimer</button>
 </footer>
+
+<AboutDialog Open="_aboutOpen" OnClose="() => _aboutOpen = false" KnowledgeBase="_knowledgeBase" />
+
+@code {
+    private readonly CancellationTokenSource _cts = new();
+    private KnowledgeBaseResponse? _knowledgeBase;
+    private bool _aboutOpen;
+
+    protected override Task OnInitializedAsync() => LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        try
+        {
+            _knowledgeBase = await Api.GetKnowledgeBaseAsync(_cts.Token);
+        }
+        catch (Exception e) when (e is ApiException or OperationCanceledException)
+        {
+            // The footer falls back to static text; opening About tries again.
+        }
+    }
+
+    private async Task OpenAboutAsync()
+    {
+        _aboutOpen = true;
+        if (_knowledgeBase is null) await LoadAsync();
+    }
+
+    /// <summary>"6 IRS documents · full for TY 2025"</summary>
+    private static string FullSummary(KnowledgeBaseResponse kb)
+    {
+        var full = kb.Documents.Count(d => d.TaxYears.Any(kb.FullKnowledgeBaseYears.Contains));
+        return $"{full} IRS documents · full for TY {string.Join(", ", kb.FullKnowledgeBaseYears)}";
+    }
+
+    /// <summary>"TY 2026, 2027: Rev. Proc. only", or null when every year has its full publications.</summary>
+    private static string? LimitedSummary(KnowledgeBaseResponse kb)
+    {
+        var limited = kb.SupportedTaxYears.Except(kb.FullKnowledgeBaseYears).Order().ToList();
+        return limited.Count == 0 ? null : $"TY {string.Join(", ", limited)}: Rev. Proc. only";
+    }
+
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+    }
+}

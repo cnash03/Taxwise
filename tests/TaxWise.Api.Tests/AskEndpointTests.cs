@@ -107,15 +107,19 @@ public sealed class AskEndpointTests : IClassFixture<WebApplicationFactory<Progr
     }
 
     [Fact]
-    public async Task SourcePdf_StreamsKnownDoc_And404sOtherwise()
+    public async Task SourcePdf_StreamsDownloadedDoc_RedirectsMissingOne_And404sUnknown()
     {
-        using var client = _factory.CreateClient();
+        using var client = _factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
 
         var ok = await client.GetAsync("/api/sources/p970/pdf");
         Assert.Equal(HttpStatusCode.OK, ok.StatusCode);
         Assert.Equal("application/pdf", ok.Content.Headers.ContentType?.MediaType);
 
-        Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync("/api/sources/rp-25-32/pdf")).StatusCode); // in manifest, not downloaded
+        var redirect = await client.GetAsync("/api/sources/rp-25-32/pdf"); // in manifest, not downloaded
+        Assert.Equal(HttpStatusCode.Redirect, redirect.StatusCode);
+        Assert.Equal("https://example.test/rp.pdf", redirect.Headers.Location?.ToString());
+
+        Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync("/api/sources/nope/pdf")).StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync("/api/sources/..%2Fmanifest/pdf")).StatusCode);
     }
 

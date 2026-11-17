@@ -30,6 +30,16 @@ public static partial class SourceLabels
         return string.Join(" · ", parts);
     }
 
+    /// <summary>Screen-reader name for a citation chip, e.g. "Citation 1: Pub 970, Ch. 1, page 6, tax year 2025. Show the passage."</summary>
+    public static string ChipAriaLabel(SourcePassage s)
+    {
+        var parts = new List<string> { ShortTitle(s.DocTitle) };
+        if (ShortChapter(s.Chapter) is { } ch) parts.Add(ch);
+        parts.Add($"page {s.Page}");
+        parts.Add($"tax year {s.TaxYear}");
+        return $"Citation {s.Number}: {string.Join(", ", parts)}. Show the passage.";
+    }
+
     /// <summary>
     /// Splits a passage around its highlight sentence: (before, highlight, after). The API copies the highlight
     /// from the passage text, so it's an exact substring; when it is null or not found, everything is in "before".
