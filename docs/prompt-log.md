@@ -444,3 +444,55 @@ Entries are append-only. The overall summary is in [AI_USAGE.md](AI_USAGE.md).
   - **It can't see the App,** so it asked us to check the new dialog and footer on screen.
   - **The Mac App build needs `-p:ValidateXcodeVersion=false`,** because Xcode 27.2 is newer than the 27.1 that the MAUI SDK expects. This is in DEPLOY.md.
 - **Tag:** success
+
+### 2026-11-17 · Ad hoc · Claude Code (claude-opus-5-5) · @cnash03 · session `cd2da81e`
+- **Role:** ad hoc. Next-steps review, then committing, testing and merging the Phase 8 work built in `a69ad57c`. `stats.sh` listed this session as already logged only because the Phase 8 entry mentions its id; this is its own entry.
+- **Prompt:** "what are the next steps of this app", then "yes, start on step 1" (finish Phase 8 polish and open the PR), "launch the app so I can click through it", "everything works, mark the PR ready", "merge it", "run /ai-report".
+- **Generated:**
+  - A next-steps review: deploy steps, and open issues from Phase 7 (TaxWise 80% vs the chatbot's 90%, eval run on the dev model, no head-to-heads yet, gold answers approved without edits).
+  - Commit [`34bf8d1`](https://github.com/cnash03/Taxwise/commit/34bf8d1) and draft PR #10. It wrote no new polish code: every BUILD_PLAN §8 polish item was already in the code.
+  - PR #10 marked ready (click-through box ticked) and merged as [`9114011`](https://github.com/cnash03/Taxwise/commit/9114011). The Phase 8 log entry, committed as [`5e9cfed`](https://github.com/cnash03/Taxwise/commit/5e9cfed) and merged in PR #11.
+- **Human decisions:** the agent had kept PR #10 as a draft until deploy and acceptance were done. We clicked through the app, then told it to mark the PR ready and merge it, leaving deploy as a separate step.
+- **Verified by:** all 342 tests passed; the Mac App built with `-p:ValidateXcodeVersion=false`; `/health` and `/api/sources/p970/pdf` (200, served locally) on the current API; our click-through of the App ("everything works").
+- **Worked?** Yes. Phase 8 is merged; deploy and the acceptance check are still open.
+- **Human change:** none.
+- **AI limits seen:**
+  - **It didn't launch the App** before opening the PR, so it couldn't see its own changes on screen and asked us to click through.
+  - **A stale API from a Nov 12 session was holding port 5080.** Claude Code's safety check blocked the agent from stopping it, so the first click-through ran against old API code. We stopped it ourselves and the agent started the current API.
+- **Tag:** success
+
+### 2026-11-17 · Stretch · Claude Code (claude-opus-5-5) · @cnash03 · session `3b05f178`
+- **Role:** ad hoc after the plan: a UI bug fix (page widths) and the "Upload mine" stretch goal. We asked it to hand the upload work to a subagent.
+- **Prompt:** "we need to work on 2 things … the screens are not the same width (i want them to be the same width no matter the screen size) … also spin up an agent to do the upload my form feature". Follow-ups: "merge it so i can test both", "run it for me", "close everything and try again", "when i press upload my pdf box i am frozen", "the width still changes per page so fix that again", "commit this and then run ai log".
+- **Generated:**
+  - **Upload mine (subagent, own git worktree),** commit `898107a` on `upload-my-form`:
+    - `POST /api/forms/upload`: raw PDF body (5 MB max, held in memory, never written to disk), PdfPig text extraction, then Claude structured extraction through `ClaudeJsonClient`.
+    - The extracted values go onto the reviewed sample form, so labels and `goesTo` stay human-checked and the existing explain flow and cache work unchanged.
+    - SSN, EIN, names and addresses are never extracted, and SSN-shaped text is masked as a backstop. Logs hold counts only.
+    - Plain 422 messages for scans, damaged or password-protected PDFs, other forms, other tax years, and forms with no box values.
+    - "Upload mine" tab in `ExplainForm.razor`, `TaxWiseApiClient.UploadFormAsync`.
+    - `FormUploadTests.cs` and `FormUploadEndpointTests.cs`; README and BUILD_PLAN updated; DECISIONS #17.
+  - **Width fix and picker fix,** commit `7b40b9c`:
+    - `index.html`: the root cause. See AI limits.
+    - `app.css`: `.main { min-width: 0 }`, header controls wrap, the 760px caps on Ask and Quizzes removed, and the form grid stacks to one column when narrow.
+    - `Entitlements.plist`: `com.apple.security.files.user-selected.read-only`.
+- **Human decisions:**
+  - We asked for the upload work to go to a subagent. The main agent gave it an isolated worktree so it couldn't clash with the CSS fix running at the same time.
+  - The agent tested both changes by checking out `upload-my-form` with the width fix uncommitted, rather than merging into `main`. We went along with it.
+  - **Outcome tag: we chose partial.** Both work, but the width fix took three attempts and the upload feature froze the app the first time we used it.
+- **Verified by:**
+  - Subagent: `dotnet build` and `dotnet test TaxWise.CI.slnf` (Core 216, Rag 97, Api 40, Eval 23, no failures).
+  - Main agent: smoke-tested the live endpoint (415 for a wrong content type, 422 with a plain message for a broken PDF), and checked with `codesign` that the rebuilt app carried the new entitlement.
+  - Temporary in-app logging of the web view frame and the page's element widths found the real width bug.
+  - Our own click-through confirmed the widths, and **we uploaded a real form and the box values came out right.**
+- **Worked?** Yes, after three tries on the widths and one fix to the upload picker.
+- **Human change:** none by hand. We tested and reported each problem.
+- **AI limits seen:**
+  - **Two wrong width fixes.** The first only removed max-widths inside pages; the second made `.main` shrink and let header controls wrap. Both were reasonable CSS, but neither was the cause. We reported the widths still changed.
+  - **The cause was found by measuring, not guessing.** The agent added temporary logging: the web view and viewport were 1964px wide but `.shell` was 1389px. The "Loading…" message's centering class (`app-loading`) sat on `#app` itself. Blazor keeps the element's class when it renders, so every page stayed centered at its own content width. The fix moved the class onto an inner div.
+  - **The subagent's feature froze the app.** All its tests passed, but it never ran the App. The sandboxed Mac app lacked the entitlement to show a file picker, so clicking the upload box hung. We found it; the main agent added the entitlement.
+  - **The first rebuild didn't re-sign the app,** so the entitlement was still missing. The agent caught this with `codesign` and rebuilt from a deleted bundle.
+  - **`dotnet build -t:Run` launched a stale Nov 12 build** without compiling (the same trap as in `ce6c7853`). The agent found it by checking that the bundle's CSS lacked the new rules.
+  - **A full-screen screenshot captured another app** (our browser) because TaxWise had opened behind it. The agent deleted it without using it. This happened before in `ce6c7853`.
+  - **It can't drive the App:** macOS hadn't given the terminal accessibility permission, so it couldn't click through pages itself.
+- **Tag:** partial
