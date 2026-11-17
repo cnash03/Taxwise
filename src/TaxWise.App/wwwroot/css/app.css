@@ -66,6 +66,8 @@ h1:focus { outline: none; }
 
 .main {
     flex: 1;
+    /* Every page gets exactly the space left of the sidebar, never its content's width. */
+    min-width: 0;
     overflow-y: auto;
     padding: 28px 36px;
 }
@@ -318,9 +320,10 @@ h1:focus { outline: none; }
 
 .chat-controls {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 14px;
-    flex-shrink: 0;
+    justify-content: flex-end;
+    gap: 8px 14px;
 }
 
 .year-picker {
@@ -425,7 +428,6 @@ h1:focus { outline: none; }
 }
 
 .answer-row {
-    max-width: 760px;
     margin-bottom: 26px;
 }
 
@@ -718,8 +720,6 @@ h1:focus { outline: none; }
     min-width: 0;
 }
 
-.forms-main .chat-controls { flex-wrap: wrap; justify-content: flex-end; }
-
 .tabs {
     display: flex;
     gap: 2px;
@@ -747,7 +747,8 @@ h1:focus { outline: none; }
 .forms-body {
     display: grid;
     flex: 1;
-    grid-template-columns: minmax(300px, 1fr) minmax(280px, 1fr);
+    /* Two columns that fill the page, stacking when the window is narrow. */
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
     gap: 20px;
     align-items: start;
     overflow-y: auto;
@@ -1019,8 +1020,6 @@ h1:focus { outline: none; }
     overflow-y: auto;
     padding: 24px 28px;
 }
-
-.quiz-body > * { max-width: 760px; }
 
 .topic-list { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
 

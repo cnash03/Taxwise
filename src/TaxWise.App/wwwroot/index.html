@@ -11,7 +11,8 @@
 
 <body>
 
-    <div id="app" class="app-loading">Loading…</div>
+    <!-- The loading class sits on an inner div so it goes away when Blazor renders; on #app itself it centered every page. -->
+    <div id="app"><div class="app-loading">Loading…</div></div>
 
     <div id="blazor-error-ui" data-nosnippet>
         An unhandled error has occurred.
