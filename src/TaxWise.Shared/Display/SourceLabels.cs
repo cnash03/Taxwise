@@ -20,20 +20,31 @@ public static partial class SourceLabels
         return m.Success ? $"Ch. {m.Groups[1].Value}" : null;
     }
 
-    /// <summary>Citation chip text, e.g. "1 · Pub 970 · Ch. 1 · p. 6 · TY 2025". Every source carries its tax year (BUILD_PLAN §10).</summary>
+    /// <summary>
+    /// Citation chip text, e.g. "1 · Pub 970 · Ch. 1 · p. 6 · TY 2025", or "1 · Colorado DOR · DR 0104 Book · p. 4 · TY 2025".
+    /// Every source carries its tax year (BUILD_PLAN §10), and Colorado sources say who published them.
+    /// </summary>
     public static string Chip(SourcePassage s)
     {
-        var parts = new List<string> { s.Number.ToString(), ShortTitle(s.DocTitle) };
+        var parts = new List<string> { s.Number.ToString() };
+        if (Publisher(s) is { } publisher) parts.Add(publisher);
+        parts.Add(ShortTitle(s.DocTitle));
         if (ShortChapter(s.Chapter) is { } ch) parts.Add(ch);
         parts.Add($"p. {s.Page}");
         parts.Add($"TY {s.TaxYear}");
         return string.Join(" · ", parts);
     }
 
+    /// <summary>"Colorado DOR" for Colorado sources; null for IRS ones, whose chips stay as they were.</summary>
+    public static string? Publisher(SourcePassage s) =>
+        Jurisdictions.IsColorado(s.Jurisdiction) ? Jurisdictions.Publisher(s.Jurisdiction) : null;
+
     /// <summary>Screen-reader name for a citation chip, e.g. "Citation 1: Pub 970, Ch. 1, page 6, tax year 2025. Show the passage."</summary>
     public static string ChipAriaLabel(SourcePassage s)
     {
-        var parts = new List<string> { ShortTitle(s.DocTitle) };
+        var parts = new List<string>();
+        if (Publisher(s) is { } publisher) parts.Add(publisher);
+        parts.Add(ShortTitle(s.DocTitle));
         if (ShortChapter(s.Chapter) is { } ch) parts.Add(ch);
         parts.Add($"page {s.Page}");
         parts.Add($"tax year {s.TaxYear}");

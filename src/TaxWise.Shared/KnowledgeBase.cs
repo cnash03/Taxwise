@@ -6,5 +6,9 @@ public sealed record KnowledgeBaseResponse(
     IReadOnlyList<int> SupportedTaxYears,
     IReadOnlyList<int> FullKnowledgeBaseYears);
 
-/// <summary>One ingested IRS document. <see cref="TaxYears"/> lists every year it has chunks for.</summary>
-public sealed record KnowledgeBaseDocument(string DocId, string Title, string Kind, IReadOnlyList<int> TaxYears, string PdfUrl);
+/// <summary>
+/// One ingested document. <see cref="TaxYears"/> lists every year it has chunks for; <see cref="Jurisdiction"/> is
+/// "US" for IRS documents and "CO" for Colorado DOR ones.
+/// </summary>
+public sealed record KnowledgeBaseDocument(string DocId, string Title, string Kind, IReadOnlyList<int> TaxYears, string PdfUrl,
+    string Jurisdiction = Jurisdictions.Federal);

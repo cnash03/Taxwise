@@ -114,7 +114,7 @@ public sealed class BaselineEndpointTests : IClassFixture<WebApplicationFactory<
         public int Calls { get; private set; }
 
         public Task<RetrievalResult> RetrieveAsync(string question, int taxYear, IReadOnlyCollection<string>? docIds = null,
-            CancellationToken ct = default)
+            string jurisdiction = TaxWise.Shared.Jurisdictions.Federal, CancellationToken ct = default)
         {
             Calls++;
             throw new InvalidOperationException("The baseline must not retrieve.");

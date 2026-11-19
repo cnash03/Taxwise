@@ -1,7 +1,7 @@
 # Taxwise
 Full Stack LLMs semester long project
 
-TaxWise is a desktop app that helps college students understand their U.S. federal taxes, with answers cited to official IRS publications. The build plan is in [docs/BUILD_PLAN.md](docs/BUILD_PLAN.md).
+TaxWise is a desktop app that helps college students understand their U.S. federal taxes, with answers cited to official IRS publications. Chat can also answer Colorado individual income tax questions from official Colorado Department of Revenue documents. The build plan is in [docs/BUILD_PLAN.md](docs/BUILD_PLAN.md).
 
 ## Architecture
 
@@ -74,6 +74,7 @@ The **Ask a question** page sends `POST /api/ask` and shows cited answers:
 - The **Tax year** picker defaults to 2025 for chat. Years without their full IRS guides show a banner naming the Rev. Proc. the answers rely on.
 - **Quiz me on …** passes the chat's cited chunk IDs to the quizzes page (Phase 6).
 - **Compare with a plain chatbot** (header toggle, remembered) also sends each question to `POST /api/ask/baseline`: the same model with no retrieval, the chatbot the eval's `--mode baseline` measures. The two answers appear side by side, each with its own loading and error state. The plain chatbot's column is labelled *"Plain chatbot — no sources, may be wrong or out of date"* and has no citations. Each compared question counts twice against the per-IP limit. See [DECISIONS.md](DECISIONS.md) #21.
+- **Federal or Colorado.** The **Taxes** selector in the header (remembered) switches chat between federal questions (IRS publications) and Colorado individual income tax questions (Colorado Department of Revenue documents). Colorado answers go through the same rerank threshold, citation validator and disclaimer, and their chips read `1 · Colorado DOR · DR 0104 Book · p. 4 · TY 2025`. With Colorado chosen, the tax year is fixed to the year the DOR documents cover (2025), and the plain-chatbot comparison and **Quiz me** are off. The request is `POST /api/ask` with `"jurisdiction": "CO"`; leaving it out means federal (`"US"`), so older clients keep working. See [DECISIONS.md](DECISIONS.md) #23.
 - **Voice input:** press the microphone button next to the question box (or Tab to it and press Space) and speak your question. The words appear in the box as you talk. Listening stops after a 4-second pause or when you press the button again, and the box stays editable so you can fix the text before pressing **Ask**. Nothing is sent until you do. The first time, macOS asks to allow **Microphone** and **Speech Recognition** for TaxWise. If you said no, turn them back on in System Settings → Privacy & Security. Recognition runs on the computer (Apple's on-device recognizer on a Mac, Windows speech recognition on Windows): no audio or text leaves it, and the transcript is never logged. See [DECISIONS.md](DECISIONS.md) #22.
 
 ## Explain my form
@@ -147,7 +148,7 @@ Options: `--only q01,q08`, `--limit N` (both write a `-smoke` report), `--concur
 
 `MinRerankScore` is **0.50**: 9 of the 12 out-of-scope questions are refused without calling Claude (DECISIONS #14). For "2027 standard deduction" with 2025 selected, the plain chatbot said the 2027 amounts weren't published yet, though Rev. Proc. 2026-35 came out on Nov 5. TaxWise refused.
 
-## Ingest the IRS documents
+## Ingest the source documents
 
 The sources are listed in [`data/sources/manifest.json`](data/sources/manifest.json). The PDFs download to `data/sources/pdf/` (gitignored).
 
@@ -158,7 +159,8 @@ dotnet run --project src/TaxWise.Ingestion -- --spot-check           # embed wit
 
 Options: `--only <docId>`, `--year <2025|2026|2027>`, `--recreate` (drop the collection first), `--spot-check-only`, `--qdrant-host <h> --qdrant-api-key <k>` (Qdrant Cloud).
 
-- **Edition check.** Each run prints the tax year read from each PDF's cover (or, for a Rev. Proc., from its section heading). A mismatch stops the run before anything is embedded. `irs.gov/pub/irs-pdf/` always serves the newest edition, so when the IRS posts a new year, point the manifest at the `irs-prior/` copy. The W-2/W-3 and 1098-E/T instructions already point there.
+- **Edition check.** Each run prints the tax year read from each PDF's cover (or, for a Rev. Proc., from its section heading). A mismatch stops the run before anything is embedded. `irs.gov/pub/irs-pdf/` always serves the newest edition, so when the IRS posts a new year, point the manifest at the `irs-prior/` copy. The W-2/W-3 and 1098-E/T instructions already point there. A guide revised in place, with no tax year on its cover (the Colorado Individual Income Tax Guide), names its `edition` in the manifest ("Revised January 2026"), and the check looks for that text instead.
+- **Colorado documents.** Manifest entries with `"jurisdiction": "CO"` are Colorado DOR documents; their chunks get `jurisdiction: CO` in Qdrant. Entries without the field are federal, and so are points ingested before the field existed. `firstPage`/`lastPage` limit a PDF to its instruction pages (the DR 0104 Book's tax table and fill-in forms are skipped). To load or refresh only Colorado: `--only co-dr0104` and `--only co-guide`. **Deploy the API from this code before loading Colorado into Qdrant Cloud**: older API builds don't filter on jurisdiction and would cite Colorado documents in federal answers.
 - **Changed files.** The manifest stores each PDF's sha256. If a re-download doesn't match, the run stops so a human can check the new edition.
 - **Re-runs are idempotent.** Point ids derive from the chunk id, and each (document, year) is replaced as a whole, so re-running never duplicates or leaves stale chunks.
 - **Sanity check.** `data/sources/ingest-report.json` has chunk counts per document, average size, and the 10 shortest and longest chunks.
@@ -168,12 +170,13 @@ Options: `--only <docId>`, `--year <2025|2026|2027>`, `--recreate` (drop the col
 
 - [docs/DEPLOY.md](docs/DEPLOY.md): Qdrant Cloud ingestion, Azure App Service publish and settings, and the Release App builds for macOS and Windows (`appsettings.Release.json` points them at Azure). It also covers running your local App against the deployed API (§4), shipping API changes (§5) and getting Azure access (§6).
 - [docs/demo-script.md](docs/demo-script.md): the 4-minute demo rehearsal checklist.
-- The deployed API ships the manifest and sample forms but not the PDFs. `GET /api/sources/{docId}/pdf` redirects to irs.gov when the file isn't on the server.
+- The deployed API ships the manifest and sample forms but not the PDFs. `GET /api/sources/{docId}/pdf` redirects to the manifest URL (irs.gov or tax.colorado.gov) when the file isn't on the server.
 - The sidebar footer lists the knowledge base from `GET /api/knowledge-base`. **About & disclaimer** links IRS Free File and VITA.
 
 ## Known limitations
 
-- **Federal only, students only.** TaxWise covers W-2, scholarship, dependent, simple gig and international-student questions. It refuses state rules, crypto, business depreciation and anything else its IRS sources don't cover.
+- **Federal, plus Colorado chat, for students.** TaxWise covers W-2, scholarship, dependent, simple gig and international-student questions. It refuses other states' rules, crypto, business depreciation and anything else its sources don't cover.
+- **Colorado is chat only, for TY2025.** The Scenario calculator, Explain my form, quizzes and the plain-chatbot comparison are federal only. Colorado chat uses two DOR documents (the 2025 DR 0104 Book's filing instructions and the Individual Income Tax Guide revised January 2026), so it can't answer from the DOR's other topic sheets, and it never reads tax amounts off the Colorado tax table. The gold set has no Colorado questions yet, so Colorado answer quality hasn't been measured.
 - **TY2026 and TY2027 chat is thin.** Until the IRS posts the 2026 publications (Dec 2026 – Jan 2027), those years only have their Rev. Proc., and chat shows a banner. Adding them takes a manifest change and an ingestion run (BUILD_PLAN §12 item 4a), not code.
 - **Calculator scope.** One W-2, standard deduction only, no credits, no other income, no 2025–2028 tip and overtime deductions. TY2026 and TY2027 results are estimates because those Tax Tables aren't published.
 - **Explain my form** covers TY2025 only, and only the boxes on the sample forms (W-2 box 12 with code DD only). Uploads need a PDF with a text layer: scans and photos aren't read (no OCR), and fillable PDFs whose values live only in form fields may come back empty until they're printed to a new PDF.

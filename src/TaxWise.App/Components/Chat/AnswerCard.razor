@@ -2,7 +2,7 @@
 
 @if (Turn.Status == TurnStatus.Loading)
 {
-    <div class="status-line pending"><span class="dot"></span>Searching IRS publications for tax year @Turn.TaxYear…</div>
+    <div class="status-line pending"><span class="dot"></span>Searching @(Turn.IsColorado ? "Colorado DOR documents" : "IRS publications") for tax year @Turn.TaxYear…</div>
     <article class="answer-card loading" aria-busy="true">
         <div class="skeleton"></div>
         <div class="skeleton"></div>

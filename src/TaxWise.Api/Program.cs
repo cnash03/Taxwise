@@ -50,7 +50,7 @@ app.MapPost("/" + ApiRoutes.Ask, async (AskRequest? request, AskService ask, IOp
 
     return await Guarded(logger, async () =>
     {
-        var response = await ask.AskAsync(request!, ct);
+        var response = await ask.AskAsync(request! with { Jurisdiction = Jurisdictions.Normalize(request.Jurisdiction) }, ct);
         return Results.Ok(response with { Sources = AbsoluteSources(http, response.Sources) });
     });
 }).RequireRateLimiting(UsageLimitOptions.PolicyName);
@@ -61,8 +61,11 @@ app.MapPost("/" + ApiRoutes.AskBaseline, async (AskRequest? request, BaselineSer
     ILogger<Program> logger, CancellationToken ct) =>
 {
     if (AskProblem(request, years.Value) is { } problem) return problem;
+    // The baseline prompt (and the eval it mirrors) is about federal taxes only.
+    if (Jurisdictions.IsColorado(request!.Jurisdiction))
+        return Results.Problem("The plain-chatbot comparison covers federal questions only.", statusCode: StatusCodes.Status400BadRequest);
 
-    return await Guarded(logger, async () => Results.Ok(await baseline.AskAsync(request!, ct)));
+    return await Guarded(logger, async () => Results.Ok(await baseline.AskAsync(request, ct)));
 }).RequireRateLimiting(UsageLimitOptions.PolicyName);
 
 app.MapGet("/api/forms/{formId}", (string formId, FormLibrary forms) =>
@@ -155,7 +158,7 @@ app.MapPost("/" + ApiRoutes.Quiz, async (QuizRequest? request, QuizService quiz,
 
 app.MapGet("/api/sources/{docId}/pdf", (string docId, SourceLibrary library) =>
     // Only manifest doc IDs resolve, so the route can't be used to read anything else. The deployed API ships
-    // without the PDFs and redirects to irs.gov instead (BUILD_PLAN §8, Phase 8).
+    // without the PDFs and redirects to the manifest URL (irs.gov or tax.colorado.gov) instead (BUILD_PLAN §8, Phase 8).
     library.FindPdf(docId) is { } path
         ? Results.File(path, "application/pdf", enableRangeProcessing: true)
         : library.FindRemoteUrl(docId) is { } url
@@ -165,7 +168,8 @@ app.MapGet("/api/sources/{docId}/pdf", (string docId, SourceLibrary library) =>
 app.MapGet("/" + ApiRoutes.KnowledgeBase, (SourceLibrary library, IOptions<TaxYearOptions> years, HttpContext http) =>
     new KnowledgeBaseResponse(
         library.Documents
-            .Select(d => new KnowledgeBaseDocument(d.DocId, d.Title, d.Kind, d.TaxYears, Absolute(http, ApiRoutes.SourcePdf(d.DocId))))
+            .Select(d => new KnowledgeBaseDocument(d.DocId, d.Title, d.Kind, d.TaxYears, Absolute(http, ApiRoutes.SourcePdf(d.DocId)),
+                d.JurisdictionCode))
             .ToList(),
         years.Value.Supported,
         years.Value.FullKnowledgeBase));
@@ -204,6 +208,10 @@ static IResult? AskProblem(AskRequest? request, TaxYearOptions years)
         return Results.Problem($"Questions can be at most {AskLimits.MaxQuestionLength} characters.", statusCode: StatusCodes.Status400BadRequest);
     if (!years.Supported.Contains(request.TaxYear))
         return Results.Problem($"Tax year {request.TaxYear} isn't supported. Choose {string.Join(", ", years.Supported)}.",
+            statusCode: StatusCodes.Status400BadRequest);
+    // Missing or null means federal, so clients built before Colorado was added keep working (DECISIONS #23).
+    if (Jurisdictions.Normalize(request.Jurisdiction) is null)
+        return Results.Problem($"Jurisdiction '{request.Jurisdiction}' isn't supported. Choose {string.Join(" or ", Jurisdictions.All)}.",
             statusCode: StatusCodes.Status400BadRequest);
     return null;
 }

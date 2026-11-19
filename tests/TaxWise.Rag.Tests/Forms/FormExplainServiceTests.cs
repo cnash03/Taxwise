@@ -141,7 +141,7 @@ public sealed class FormExplainServiceTests
         public (string Query, int TaxYear, IReadOnlyCollection<string>? DocIds) Last { get; private set; }
 
         public Task<RetrievalResult> RetrieveAsync(string question, int taxYear, IReadOnlyCollection<string>? docIds = null,
-            CancellationToken ct = default)
+            string jurisdiction = TaxWise.Shared.Jurisdictions.Federal, CancellationToken ct = default)
         {
             Calls++;
             Last = (question, taxYear, docIds);

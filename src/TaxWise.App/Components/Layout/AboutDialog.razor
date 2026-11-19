@@ -13,6 +13,8 @@
         <p>
             TaxWise helps college students understand their U.S. federal taxes. Answers come only from official IRS
             publications and cite the page they came from. The calculator's math is done by code from IRS tables, not by the AI.
+            Chat can also answer Colorado individual income tax questions from Colorado Department of Revenue documents;
+            the calculator, Explain my form and quizzes stay federal.
         </p>
 
         <div class="dialog-disclaimer" role="note">
@@ -41,7 +43,7 @@
                 {
                     <li>
                         <button class="link-btn" @onclick="() => OpenAsync(doc.PdfUrl)">@doc.Title ↗</button>
-                        <span>TY @string.Join(", ", doc.TaxYears.Order())</span>
+                        <span>@(Jurisdictions.IsColorado(doc.Jurisdiction) ? "Colorado DOR · " : "")TY @string.Join(", ", doc.TaxYears.Order())</span>
                     </li>
                 }
             </ul>

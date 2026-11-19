@@ -28,7 +28,7 @@ public sealed class FormExplainService(IRetriever retriever, IFormExplainer expl
 
     private async Task<ExplainFormResponse> ExplainUncachedAsync(FormSample form, FormBox box, bool plainLanguage, CancellationToken ct)
     {
-        var retrieval = await retriever.RetrieveAsync(box.RetrievalQuery, form.TaxYear, box.SourceDocs, ct);
+        var retrieval = await retriever.RetrieveAsync(box.RetrievalQuery, form.TaxYear, box.SourceDocs, ct: ct);
         if (!retrieval.MeetsThreshold)
         {
             logger.LogInformation(

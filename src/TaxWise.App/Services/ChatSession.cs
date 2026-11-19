@@ -11,11 +11,14 @@ public enum TurnStatus
 }
 
 /// <summary>One question and what came back. The settings are captured when it was asked.</summary>
-public sealed class ChatTurn(string question, bool plainLanguage, int taxYear)
+public sealed class ChatTurn(string question, bool plainLanguage, int taxYear, string jurisdiction = Jurisdictions.Federal)
 {
 	public string Question { get; } = question;
 	public bool PlainLanguage { get; } = plainLanguage;
 	public int TaxYear { get; } = taxYear;
+	/// <summary>"US" (IRS sources) or "CO" (Colorado DOR sources).</summary>
+	public string Jurisdiction { get; } = jurisdiction;
+	public bool IsColorado => Jurisdictions.IsColorado(Jurisdiction);
 	public TurnStatus Status { get; set; } = TurnStatus.Loading;
 	public AskResponse? Response { get; set; }
 	public string? Error { get; set; }
@@ -29,12 +32,15 @@ public sealed class ChatTurn(string question, bool plainLanguage, int taxYear)
 
 	public bool IsRefusal => Response?.Kind == AskResponse.RefusalKind;
 
-	/// <summary>The section of the first cited passage, e.g. "Scholarships and Fellowship Grants"; null for refusals.</summary>
+	/// <summary>
+	/// The section of the first cited passage, e.g. "Scholarships and Fellowship Grants"; null for refusals. Also null
+	/// for Colorado answers: quizzes fill up from federal retrieval, so they stay federal-only.
+	/// </summary>
 	public string? QuizTopic
 	{
 		get
 		{
-			if (Status != TurnStatus.Done || IsRefusal || Response is not { } r) return null;
+			if (Status != TurnStatus.Done || IsRefusal || IsColorado || Response is not { } r) return null;
 			var first = r.Paragraphs.SelectMany(p => p.Citations).FirstOrDefault();
 			return first is null ? null : r.Sources.FirstOrDefault(s => s.Number == first.Number)?.Section;
 		}

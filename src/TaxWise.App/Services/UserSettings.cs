@@ -1,3 +1,5 @@
+using TaxWise.Shared;
+
 namespace TaxWise.App.Services;
 
 /// <summary>Choices remembered across launches with MAUI <see cref="IPreferences"/> (BUILD_PLAN §1a, §5 Phase 3).</summary>
@@ -20,6 +22,13 @@ public sealed class UserSettings(IPreferences preferences)
 	{
 		get => preferences.Get("compareWithChatbot", false);
 		set => preferences.Set("compareWithChatbot", value);
+	}
+
+	/// <summary>Whose rules chat answers about: "US" (federal, the default) or "CO" (Colorado).</summary>
+	public string ChatJurisdiction
+	{
+		get => Jurisdictions.Normalize(preferences.Get("chatJurisdiction", Jurisdictions.Federal)) ?? Jurisdictions.Federal;
+		set => preferences.Set("chatJurisdiction", Jurisdictions.Normalize(value) ?? Jurisdictions.Federal);
 	}
 
 	public int GetTaxYear(TaxYearFeature feature)

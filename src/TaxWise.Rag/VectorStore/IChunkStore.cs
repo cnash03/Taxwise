@@ -1,4 +1,5 @@
 using TaxWise.Core;
+using TaxWise.Shared;
 
 namespace TaxWise.Rag.VectorStore;
 
@@ -10,9 +11,12 @@ public interface IChunkStore
     /// <summary>Idempotent upsert: point ids are derived from <see cref="Chunk.Id"/>.</summary>
     Task UpsertAsync(IReadOnlyList<Chunk> chunks, IReadOnlyList<float[]> vectors, CancellationToken ct = default);
 
-    /// <summary>Nearest chunks for <paramref name="vector"/> in one tax year, optionally limited to some documents.</summary>
+    /// <summary>
+    /// Nearest chunks for <paramref name="vector"/> in one tax year and one jurisdiction ("US" or "CO"), optionally
+    /// limited to some documents.
+    /// </summary>
     Task<IReadOnlyList<ScoredChunk>> SearchAsync(float[] vector, int taxYear, int limit,
-        IReadOnlyCollection<string>? docIds = null, CancellationToken ct = default);
+        IReadOnlyCollection<string>? docIds = null, string jurisdiction = Jurisdictions.Federal, CancellationToken ct = default);
 
     /// <summary>The stored chunks with these IDs, in the order asked; IDs that aren't stored are skipped.</summary>
     Task<IReadOnlyList<Chunk>> GetAsync(IReadOnlyList<string> chunkIds, CancellationToken ct = default);

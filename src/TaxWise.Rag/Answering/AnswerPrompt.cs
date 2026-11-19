@@ -2,6 +2,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using TaxWise.Core;
+using TaxWise.Shared;
 
 namespace TaxWise.Rag.Answering;
 
@@ -16,12 +17,24 @@ public static partial class AnswerPrompt
     public static IReadOnlyDictionary<string, JsonElement> Schema { get; } =
         JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(Resource("answer.schema.json"))!;
 
-    /// <summary>Same text for every request with the same year and mode, so the prefix stays cacheable.</summary>
-    public static string SystemPrompt(int taxYear, bool plainLanguage) =>
-        SystemTemplate
+    /// <summary>
+    /// Same text for every request with the same year, mode and jurisdiction, so the prefix stays cacheable. The
+    /// federal text is unchanged from before Colorado was added; Colorado swaps in the DOR as the publisher and
+    /// doesn't point at the (federal-only) Scenario calculator.
+    /// </summary>
+    public static string SystemPrompt(int taxYear, bool plainLanguage, string jurisdiction = Jurisdictions.Federal)
+    {
+        var colorado = Jurisdictions.IsColorado(jurisdiction);
+        return SystemTemplate
+            .Replace("{TaxName}", colorado ? "Colorado state income" : "federal")
+            .Replace("{Publisher}", colorado ? "Colorado Department of Revenue" : "IRS")
+            .Replace("{CalculatorHint}", colorado
+                ? "relevant rule. The Scenario calculator covers federal tax only, so don't suggest it."
+                : "relevant rule and suggest the Scenario calculator.")
             .Replace("{TaxYear}", taxYear.ToString(System.Globalization.CultureInfo.InvariantCulture))
             .Replace("{WritingStyle}", WritingStyle(plainLanguage))
             .TrimEnd();
+    }
 
     /// <summary>The default or plain-language style paragraph (BUILD_PLAN §5.2); the passages and facts stay the same.</summary>
     internal static string WritingStyle(bool plainLanguage) => plainLanguage ? PlainStyle : DefaultStyle;
@@ -47,10 +60,12 @@ public static partial class AnswerPrompt
         }
     }
 
-    /// <summary>"Pub 970 · Ch. 1 · p. 7 · TY 2025".</summary>
+    /// <summary>"Pub 970 · Ch. 1 · p. 7 · TY 2025"; Colorado passages start with "Colorado DOR · ".</summary>
     public static string SourceLabel(Chunk c)
     {
-        var parts = new List<string> { Chunk.ShortTitle(c.DocTitle) };
+        var parts = new List<string>();
+        if (Jurisdictions.IsColorado(c.Jurisdiction)) parts.Add(Jurisdictions.Publisher(c.Jurisdiction));
+        parts.Add(Chunk.ShortTitle(c.DocTitle));
         if (ShortChapter(c.Chapter) is { } ch) parts.Add(ch);
         parts.Add($"p. {c.PageStart}");
         parts.Add($"TY {c.TaxYear}");

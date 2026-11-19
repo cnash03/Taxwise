@@ -2,6 +2,7 @@ using Microsoft.Extensions.Options;
 using TaxWise.Core;
 using TaxWise.Rag.VectorStore;
 using TaxWise.Rag.Voyage;
+using TaxWise.Shared;
 
 namespace TaxWise.Rag.Answering;
 
@@ -17,20 +18,23 @@ public sealed record RetrievalResult(int Searched, IReadOnlyList<RetrievedPassag
 public interface IRetriever
 {
     /// <param name="docIds">When set, only these manifest documents are searched (Explain my form, BUILD_PLAN §6).</param>
+    /// <param name="jurisdiction">"US" (federal, the default) or "CO" (Colorado); only that jurisdiction's chunks are searched.</param>
     Task<RetrievalResult> RetrieveAsync(string question, int taxYear, IReadOnlyCollection<string>? docIds = null,
-        CancellationToken ct = default);
+        string jurisdiction = Jurisdictions.Federal, CancellationToken ct = default);
 }
 
-/// <summary>Embed the question → Qdrant top K for the tax year → Voyage rerank → keep the top N (BUILD_PLAN §5.1).</summary>
+/// <summary>
+/// Embed the question → Qdrant top K for the tax year and jurisdiction → Voyage rerank → keep the top N (BUILD_PLAN §5.1).
+/// </summary>
 public sealed class Retriever(IVoyageClient voyage, IChunkStore store, IOptions<RetrievalOptions> options) : IRetriever
 {
     private readonly RetrievalOptions _options = options.Value;
 
     public async Task<RetrievalResult> RetrieveAsync(string question, int taxYear, IReadOnlyCollection<string>? docIds = null,
-        CancellationToken ct = default)
+        string jurisdiction = Jurisdictions.Federal, CancellationToken ct = default)
     {
         var vectors = await voyage.EmbedAsync([question], VoyageInputType.Query, ct);
-        var hits = await store.SearchAsync(vectors[0], taxYear, _options.VectorTopK, docIds, ct);
+        var hits = await store.SearchAsync(vectors[0], taxYear, _options.VectorTopK, docIds, jurisdiction, ct);
         if (hits.Count == 0) return new RetrievalResult(0, [], 0, false);
 
         // Rerank on the same breadcrumb + text that was embedded, so section names still count.

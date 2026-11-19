@@ -153,7 +153,7 @@ public sealed class CalculatorServiceTests
         public List<(string Query, int TaxYear, IReadOnlyCollection<string>? DocIds)> Calls { get; } = [];
 
         public Task<RetrievalResult> RetrieveAsync(string question, int taxYear, IReadOnlyCollection<string>? docIds = null,
-            CancellationToken ct = default)
+            string jurisdiction = TaxWise.Shared.Jurisdictions.Federal, CancellationToken ct = default)
         {
             lock (Calls) Calls.Add((question, taxYear, docIds));
             return Task.FromResult(respond(question));

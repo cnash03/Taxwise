@@ -103,8 +103,8 @@ public sealed class CalculatorService(IRetriever retriever, ICalcExplainer expla
                 : $"tax rate table for {CalcLabels.FilingStatus(r.FilingStatus).ToLowerInvariant()}: tax on taxable income";
 
         var searches = await Task.WhenAll(
-            retriever.RetrieveAsync(deductionQuery, r.TaxYear, docs, ct),
-            retriever.RetrieveAsync(taxQuery, r.TaxYear, docs, ct));
+            retriever.RetrieveAsync(deductionQuery, r.TaxYear, docs, ct: ct),
+            retriever.RetrieveAsync(taxQuery, r.TaxYear, docs, ct: ct));
 
         var lists = searches.Where(s => s.MeetsThreshold).Select(s => s.Passages.Take(PassagesPerQuery).ToList()).ToList();
         var passages = new List<Chunk>();

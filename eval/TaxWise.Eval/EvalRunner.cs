@@ -74,7 +74,7 @@ public sealed class EvalRunner(
 
             var chunks = retrieval.Passages.Select(p => p.Chunk).ToList();
             var texts = chunks.Select(c => c.Text).ToList();
-            var answer = await answerer.AnswerAsync(g.Question, chunks, g.TaxYear, plainLanguage: false, ct);
+            var answer = await answerer.AnswerAsync(g.Question, chunks, g.TaxYear, plainLanguage: false, ct: ct);
             if (answer.ModelRefused || answer.Draft is null)
                 return Result(g, retrieval.TopScore, retrieved, hit, Outcomes.ModelRefusal, 0, 0, null, sw);
 
