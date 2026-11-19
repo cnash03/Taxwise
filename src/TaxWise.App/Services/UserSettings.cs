@@ -15,6 +15,13 @@ public sealed class UserSettings(IPreferences preferences)
 		set => preferences.Set("plainLanguage", value);
 	}
 
+	/// <summary>Chat also asks the plain chatbot (same model, no retrieval) and shows both answers side by side.</summary>
+	public bool CompareWithChatbot
+	{
+		get => preferences.Get("compareWithChatbot", false);
+		set => preferences.Set("compareWithChatbot", value);
+	}
+
 	public int GetTaxYear(TaxYearFeature feature)
 	{
 		var year = preferences.Get(Key(feature), DefaultTaxYear(feature));

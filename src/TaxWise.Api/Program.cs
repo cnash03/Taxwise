@@ -46,19 +46,23 @@ app.MapGet("/health", () => new HealthResponse("ok", typeof(Program).Assembly.Ge
 app.MapPost("/" + ApiRoutes.Ask, async (AskRequest? request, AskService ask, IOptions<TaxYearOptions> years,
     HttpContext http, ILogger<Program> logger, CancellationToken ct) =>
 {
-    if (request is null || string.IsNullOrWhiteSpace(request.Question))
-        return Results.Problem("Ask a question.", statusCode: StatusCodes.Status400BadRequest);
-    if (request.Question.Length > AskLimits.MaxQuestionLength)
-        return Results.Problem($"Questions can be at most {AskLimits.MaxQuestionLength} characters.", statusCode: StatusCodes.Status400BadRequest);
-    if (!years.Value.Supported.Contains(request.TaxYear))
-        return Results.Problem($"Tax year {request.TaxYear} isn't supported. Choose {string.Join(", ", years.Value.Supported)}.",
-            statusCode: StatusCodes.Status400BadRequest);
+    if (AskProblem(request, years.Value) is { } problem) return problem;
 
     return await Guarded(logger, async () =>
     {
-        var response = await ask.AskAsync(request, ct);
+        var response = await ask.AskAsync(request!, ct);
         return Results.Ok(response with { Sources = AbsoluteSources(http, response.Sources) });
     });
+}).RequireRateLimiting(UsageLimitOptions.PolicyName);
+
+// The "Compare with a plain chatbot" side: same request, same model, no retrieval. It calls Claude, so it shares the
+// per-IP limit with /api/ask (a compared question uses two permits).
+app.MapPost("/" + ApiRoutes.AskBaseline, async (AskRequest? request, BaselineService baseline, IOptions<TaxYearOptions> years,
+    ILogger<Program> logger, CancellationToken ct) =>
+{
+    if (AskProblem(request, years.Value) is { } problem) return problem;
+
+    return await Guarded(logger, async () => Results.Ok(await baseline.AskAsync(request!, ct)));
 }).RequireRateLimiting(UsageLimitOptions.PolicyName);
 
 app.MapGet("/api/forms/{formId}", (string formId, FormLibrary forms) =>
@@ -168,8 +172,8 @@ app.MapGet("/" + ApiRoutes.KnowledgeBase, (SourceLibrary library, IOptions<TaxYe
 
 app.Run();
 
-// Maps answerer and retrieval failures to safe ProblemDetails (429 / 502), shared by /api/ask, /api/forms/explain,
-// /api/forms/upload, /api/calculator and /api/quiz.
+// Maps answerer and retrieval failures to safe ProblemDetails (429 / 502), shared by /api/ask, /api/ask/baseline,
+// /api/forms/explain, /api/forms/upload, /api/calculator and /api/quiz.
 static async Task<IResult> Guarded(ILogger logger, Func<Task<IResult>> run)
 {
     try
@@ -189,6 +193,19 @@ static async Task<IResult> Guarded(ILogger logger, Func<Task<IResult>> run)
         logger.LogError("Retrieval failed: {Type}: {Message}", e.GetType().Name, e.Message);
         return Results.Problem("The search service is unavailable. Please try again.", statusCode: StatusCodes.Status502BadGateway);
     }
+}
+
+// Shared input checks for /api/ask and /api/ask/baseline; null when the request is fine.
+static IResult? AskProblem(AskRequest? request, TaxYearOptions years)
+{
+    if (request is null || string.IsNullOrWhiteSpace(request.Question))
+        return Results.Problem("Ask a question.", statusCode: StatusCodes.Status400BadRequest);
+    if (request.Question.Length > AskLimits.MaxQuestionLength)
+        return Results.Problem($"Questions can be at most {AskLimits.MaxQuestionLength} characters.", statusCode: StatusCodes.Status400BadRequest);
+    if (!years.Supported.Contains(request.TaxYear))
+        return Results.Problem($"Tax year {request.TaxYear} isn't supported. Choose {string.Join(", ", years.Supported)}.",
+            statusCode: StatusCodes.Status400BadRequest);
+    return null;
 }
 
 // Shared input checks for the calculator endpoints; null when the request is fine.

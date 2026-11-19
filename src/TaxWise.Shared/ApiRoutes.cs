@@ -4,6 +4,8 @@ namespace TaxWise.Shared;
 public static class ApiRoutes
 {
     public const string Ask = "api/ask";
+    /// <summary>The same question to the same model with no retrieval, for the "Compare with a plain chatbot" view.</summary>
+    public const string AskBaseline = "api/ask/baseline";
     public const string KnowledgeBase = "api/knowledge-base";
     public const string ExplainForm = "api/forms/explain";
     /// <summary>The student's own W-2 or 1098-T, sent as the raw PDF body (<see cref="FormUploadLimits"/>).</summary>

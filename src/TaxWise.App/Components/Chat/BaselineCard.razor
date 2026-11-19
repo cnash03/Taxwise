@@ -1,0 +1,44 @@
+@* The plain-chatbot side of a compared turn: the same model with no IRS passages. No citations, no guardrails. *@
+
+@if (Baseline.Status == TurnStatus.Loading)
+{
+    <div class="status-line pending"><span class="dot"></span>Asking the plain chatbot (no sources)…</div>
+    <article class="answer-card loading" aria-busy="true" aria-label="Plain chatbot answer loading">
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+        <div class="skeleton short"></div>
+    </article>
+}
+else if (Baseline.Status == TurnStatus.Failed)
+{
+    <article class="answer-card error" role="alert">
+        <div class="error-title">@(Baseline.ApiUnreachable ? "TaxWise API unavailable" : "The plain chatbot didn't answer")</div>
+        <p>@Baseline.Error</p>
+        <button class="btn" disabled="@Busy" @onclick="() => OnRetry.InvokeAsync(Turn)"
+                aria-label="Ask the plain chatbot again">Try again</button>
+    </article>
+}
+else if (Baseline.Response is { } r)
+{
+    <div class="status-line"><span class="dot warn"></span>Searched no sources</div>
+    <article class="answer-card baseline @(Baseline.IsRefusal ? "refusal" : null)" aria-label="@r.Label">
+        <div class="baseline-tag">@r.Label</div>
+        @foreach (var p in Paragraphs(r.Text))
+        {
+            <p class="baseline-paragraph">@p</p>
+        }
+        <footer class="disclaimer">@r.Disclaimer</footer>
+    </article>
+}
+
+@code {
+    [Parameter, EditorRequired] public ChatTurn Turn { get; set; } = default!;
+    [Parameter] public bool Busy { get; set; }
+    [Parameter] public EventCallback<ChatTurn> OnRetry { get; set; }
+
+    private BaselineTurn Baseline => Turn.Baseline!;
+
+    // The model writes free text (sometimes with line breaks or Markdown); it's shown as plain paragraphs, never as HTML.
+    private static IEnumerable<string> Paragraphs(string text) =>
+        text.Replace("\r\n", "\n").Split("\n\n", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+}

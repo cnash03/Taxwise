@@ -16,7 +16,11 @@ public sealed class UsageLimitTests(WebApplicationFactory<Program> factory) : IC
     {
         b.UseSetting("UsageLimit:PermitLimit", permitLimit.ToString());
         // No passages, so /api/ask answers "not found" without calling Claude.
-        b.ConfigureTestServices(s => s.AddSingleton<IRetriever>(new EmptyRetriever()));
+        b.ConfigureTestServices(s =>
+        {
+            s.AddSingleton<IRetriever>(new EmptyRetriever());
+            s.AddSingleton<IBaselineAnswerer>(new FixedBaseline());
+        });
     });
 
     [Fact]
@@ -31,6 +35,32 @@ public sealed class UsageLimitTests(WebApplicationFactory<Program> factory) : IC
 
         Assert.Equal(HttpStatusCode.TooManyRequests, limited.StatusCode);
         Assert.Contains("question limit", await limited.Content.ReadAsStringAsync());
+    }
+
+    [Fact]
+    public async Task Baseline_Returns429_OnceTheLimitIsUsed()
+    {
+        using var client = Factory(permitLimit: 1).CreateClient();
+        var request = new AskRequest("How do I stake crypto for yield?", false, 2025);
+
+        Assert.Equal(HttpStatusCode.OK, (await client.PostAsJsonAsync("/api/ask/baseline", request)).StatusCode);
+        var limited = await client.PostAsJsonAsync("/api/ask/baseline", request);
+
+        Assert.Equal(HttpStatusCode.TooManyRequests, limited.StatusCode);
+        Assert.Contains("question limit", await limited.Content.ReadAsStringAsync());
+    }
+
+    [Fact]
+    public async Task ComparedQuestion_UsesTwoPermits_FromTheSameBudgetAsAsk()
+    {
+        using var client = Factory(permitLimit: 2).CreateClient();
+        var request = new AskRequest("Is my scholarship taxable?", false, 2025);
+
+        Assert.Equal(HttpStatusCode.OK, (await client.PostAsJsonAsync("/api/ask", request)).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await client.PostAsJsonAsync("/api/ask/baseline", request)).StatusCode);
+
+        Assert.Equal(HttpStatusCode.TooManyRequests, (await client.PostAsJsonAsync("/api/ask", request)).StatusCode);
+        Assert.Equal(HttpStatusCode.TooManyRequests, (await client.PostAsJsonAsync("/api/ask/baseline", request)).StatusCode);
     }
 
     [Fact]
@@ -50,6 +80,12 @@ public sealed class UsageLimitTests(WebApplicationFactory<Program> factory) : IC
 
         for (var i = 0; i < 5; i++)
             Assert.Equal(HttpStatusCode.OK, (await client.PostAsJsonAsync("/api/ask", request)).StatusCode);
+    }
+
+    private sealed class FixedBaseline : IBaselineAnswerer
+    {
+        public Task<BaselineResult> AnswerAsync(string question, int taxYear, CancellationToken ct = default) =>
+            Task.FromResult(new BaselineResult("An answer.", false, new ModelCallInfo("stub", 1, 1, 1, 0, "end_turn")));
     }
 
     private sealed class EmptyRetriever : IRetriever
