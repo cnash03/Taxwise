@@ -277,3 +277,22 @@ hit@4 went from 87.5% to 95%. `--rejudge` now rescores hit@4 against the current
 **Why:** On-device recognition needs no new keys, costs nothing, and no audio or transcript leaves the computer, which matters for an app that talks about students' money. A cloud service would mean a key in the API, a new endpoint and per-request cost, against BUILD_PLAN §1's rule that the App holds no keys. The toolkit already wraps both platforms' recognizers with permission handling, so writing our own would duplicate it. The transcript is never logged, and the debug log only records the error kind.
 
 **Caveat:** On a Mac the on-device English model must be installed (it comes with Dictation, System Settings → Keyboard); otherwise the button shows "Speech recognition isn't available". On Windows, System.Speech shows each phrase only once it's recognized, not word by word. The toolkit holds event handlers through weak references, so `VoiceInput` is a singleton with instance-method handlers. Neither platform could be tested with a real voice by the agent.
+
+## 23. Colorado chat uses a `jurisdiction` payload in the one `taxwise` collection
+
+**Stretch · 2026-11-18**
+
+**Decision:** Every chunk has a `jurisdiction` payload, `"US"` (IRS) or `"CO"` (Colorado Department of Revenue), with a keyword index; `EnsureCollectionAsync` adds the index to an existing collection on the next ingestion run. `AskRequest` has an optional `Jurisdiction` that defaults to federal, and the retriever filters on it next to `taxYear`. The federal filter matches `"US"` **or a missing field**, so the 1377 federal points ingested before this change keep working without a re-ingest. Colorado answers use the same pipeline and guardrails (rerank threshold, citation validator, tax year on every source, disclaimer), with "Colorado state income" and "Colorado Department of Revenue" in the system prompt and Colorado refusal text and links (Tax.Colorado.gov, Revenue Online, VITA). The federal prompt is byte-for-byte unchanged, and a test pins it. The manifest adds two DOR documents, both tagged TY2025:
+- `co-dr0104`: the 2025 DR 0104 Book (`Book104_2025.pdf`). Only the filing instructions, pp. 4–33, are chunked (new `firstPage`/`lastPage` fields). Pp. 34–36 are the tax table, which the model must not read amounts from (BUILD_PLAN §10), and pp. 37–88 are fill-in forms.
+- `co-guide`: the Colorado Individual Income Tax Guide, "Revised January 2026". The DOR revises it in place rather than per tax year, so there is no tax year on its cover. A new `edition` field makes the edition check look for that text on the first pages instead.
+
+The App's Ask page gets a **Taxes: Federal / Colorado** selector. With Colorado chosen, the year is fixed to the DOR documents' year, and chips and the source panel say "Colorado DOR". The calculator, Explain my form, quizzes and the plain-chatbot comparison (#21) stay federal. `/api/ask/baseline` turns Colorado away, and Colorado answers aren't saved as quiz topics.
+
+**Alternatives considered:**
+- A second Qdrant collection for Colorado.
+- Tag Colorado chunks by `docId` prefix only.
+- Ingest the whole DR 0104 Book, or add the DOR's "Part-Year Residents and Nonresidents" topic sheet (revised November 2026, with a TY2026 Form 1040-NR line table).
+
+**Why:** BUILD_PLAN §11 names both options. One collection keeps one ingestion path, one set of Qdrant settings and one Qdrant Cloud cluster, and a payload filter is the same mechanism already used for `taxYear` (§1a). Treating a missing field as federal means no paid re-embedding of the IRS documents. The forms and tax-table pages embedded poorly in the dry run (barcodes, rows of "00", lookup rows). The topic sheet was left out because its 1040-NR table is for TY2026; the DR 0104 Book and the guide already cover residency and Form 104PN for TY2025.
+
+**Caveat:** Main's code before this change filters on `taxYear` only. Until the deployed API runs this branch, Colorado chunks uploaded to the shared collection would show up in **federal** TY2025 answers. So: deploy the API first, then ingest Colorado into Qdrant Cloud. The guide's tax-year tag is a human call (§12 item 2): its January 2026 revision is the one in force for TY2025 returns, and its text names the years each rule applies to. No Colorado questions are in the gold set yet, because a human writes and approves gold answers (§12 item 5).

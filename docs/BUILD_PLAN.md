@@ -547,7 +547,7 @@ Run **head-to-head comparisons** (the same prompt given to Claude Code and to Co
 ## 11. Out of scope (stretch, only if a human asks)
 
 - OCR for scanned or photographed W-2 and 1098-T uploads. (Parsing PDFs with a text layer was built after Phase 8; see §6.)
-- Colorado state tax coverage (a second collection, or `jurisdiction` payload filtering).
+- Colorado state tax coverage (a second collection, or `jurisdiction` payload filtering). (Built after Phase 8 on request, with `jurisdiction` payload filtering in the one `taxwise` collection: chat answers Colorado individual income tax questions from two Colorado DOR documents for TY2025, behind a Federal / Colorado selector. The calculator, Explain my form and quizzes stay federal. See DECISIONS #23 and the README.)
 - A side-by-side view comparing TaxWise with a plain chatbot (Phase 7's baseline mode already gives the data). (Built after Phase 8: the Ask page's **Compare with a plain chatbot** toggle and `POST /api/ask/baseline`, which reuses the eval's baseline answerer; see DECISIONS #21.)
 - Voice input. (Built after Phase 8 on request: a mic button on the Ask page fills the question box using the OS's on-device speech recognizer. See DECISIONS #22 and the README.)
 

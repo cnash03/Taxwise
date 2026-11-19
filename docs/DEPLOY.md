@@ -166,6 +166,7 @@ On Windows PowerShell, replace the `zip` line with `Compress-Archive -Path publi
 - **Logs:** `az webapp log tail -g $RG -n $APP`. A 502 from `/api/ask` usually means a key is missing or wrong, and the log line says which.
 - **Roll back** by checking out the last good commit and publishing again.
 - **Re-ingest** (new IRS documents or chunking changes) by running the Ingestion command in §1 against Qdrant Cloud. You need the Qdrant host and key from the subscription owner. The API doesn't need a redeploy for that.
+- **Colorado documents** go in the same collection with a `jurisdiction` payload (DECISIONS #23). Deploy the API from code that has the jurisdiction filter **first**; an older API filters on tax year only and would cite Colorado documents in federal answers. Then load only the Colorado entries, without `--recreate`: `dotnet run --project src/TaxWise.Ingestion -- --download --only co-dr0104 --qdrant-host <cluster-host> --qdrant-api-key <qdrant-key>`, the same with `--only co-guide`, and finally `--spot-check-only` with the same Qdrant flags. The point count should rise by exactly 90 (47 + 43).
 - **App changes** don't need an API deploy. Rebuild the `.dmg` with `scripts/package-mac.sh` (§3) and share the new one.
 
 ## 6. Give a teammate access
