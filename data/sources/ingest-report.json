@@ -1,7 +1,7 @@
 {
   "generatedOn": "2026-11-18",
-  "totalChunks": 1377,
-  "averageTokens": 404.8,
+  "totalChunks": 1467,
+  "averageTokens": 407.5,
   "coverChecks": [
     {
       "docId": "p17",
@@ -56,6 +56,18 @@
       "manifestYear": 2027,
       "detected": "TY2027 ← Section 3. 2027 Adjusted Items",
       "status": "ok"
+    },
+    {
+      "docId": "co-dr0104",
+      "manifestYear": 2025,
+      "detected": "2025",
+      "status": "ok"
+    },
+    {
+      "docId": "co-guide",
+      "manifestYear": 2025,
+      "detected": "Revised January 2026",
+      "status": "ok (edition text found; a human confirms its tax year)"
     }
   ],
   "documents": [
@@ -128,6 +140,20 @@
       "chunks": 72,
       "averageTokens": 112,
       "pages": "4–31"
+    },
+    {
+      "docId": "co-dr0104",
+      "taxYear": 2025,
+      "chunks": 47,
+      "averageTokens": 446.3,
+      "pages": "4–33"
+    },
+    {
+      "docId": "co-guide",
+      "taxYear": 2025,
+      "chunks": 43,
+      "averageTokens": 451.3,
+      "pages": "1–34"
     }
   ],
   "shortest": [

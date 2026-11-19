@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TaxWise.Core.Chunking;
+using TaxWise.Shared;
 
 namespace TaxWise.Rag.Sources;
 
@@ -35,9 +36,31 @@ public sealed class ManifestEntry
     public required string Kind { get; set; }
     public string Sha256 { get; set; } = "";
     public List<RevProcSectionEntry>? RevProcSections { get; set; }
+    /// <summary>"US" (IRS) or "CO" (Colorado DOR). Left out on the IRS entries, which are federal.</summary>
+    public string? Jurisdiction { get; set; }
+    /// <summary>
+    /// For a guide the publisher revises in place instead of per tax year (e.g. "Revised January 2026"): the
+    /// edition check looks for this text on the first pages instead of reading a tax year off the cover.
+    /// </summary>
+    public string? Edition { get; set; }
+    /// <summary>
+    /// Optional physical page range to chunk (1-based, inclusive). Used for booklets whose back half is fill-in
+    /// forms and lookup tables: those pages embed poorly, and the model must not read tax amounts off a table row
+    /// (BUILD_PLAN §10). Page numbers in chunk IDs and <c>#page=N</c> links stay physical.
+    /// </summary>
+    public int? FirstPage { get; set; }
+    public int? LastPage { get; set; }
     public string? Note { get; set; }
 
+    /// <summary>True when <paramref name="page"/> is inside <see cref="FirstPage"/>..<see cref="LastPage"/> (open-ended when unset).</summary>
+    public bool IncludesPage(int page) => page >= (FirstPage ?? 1) && page <= (LastPage ?? int.MaxValue);
+
     [JsonIgnore] public bool IsRevProc => Kind == "rev-proc";
+
+    /// <summary><see cref="Jurisdiction"/> as a code; a missing one is federal, an unknown one is an error.</summary>
+    [JsonIgnore]
+    public string JurisdictionCode => Jurisdictions.Normalize(Jurisdiction)
+                                      ?? throw new InvalidOperationException($"{DocId}: unknown jurisdiction '{Jurisdiction}'.");
     [JsonIgnore] public string FileName => $"{DocId}.pdf";
 
     /// <summary>Every tax year this document produces chunks for.</summary>

@@ -1,13 +1,16 @@
+using TaxWise.Shared;
+
 namespace TaxWise.Core;
 
-/// <summary>One retrievable passage from an IRS document (BUILD_PLAN §4.2 step 5).</summary>
+/// <summary>One retrievable passage from an IRS or Colorado DOR document (BUILD_PLAN §4.2 step 5).</summary>
 public sealed record Chunk(
     string Id,            // deterministic: $"{docId}-ty{taxYear}-p{pageStart}-{ordinal:D3}"
     string DocId, string DocTitle, int TaxYear,
     string? Chapter, string Section,
     int PageStart, int PageEnd,
     string Text,          // without the breadcrumb prefix
-    IReadOnlyList<string>? Sections = null) // every section in a merged chunk, in order; null when it's just Section
+    IReadOnlyList<string>? Sections = null, // every section in a merged chunk, in order; null when it's just Section
+    string Jurisdiction = Jurisdictions.Federal) // "US" (IRS) or "CO" (Colorado DOR), from the manifest entry
 {
     /// <summary><see cref="Sections"/>, or just <see cref="Section"/> when the chunk covers one section.</summary>
     public IReadOnlyList<string> AllSections => Sections is { Count: > 0 } ? Sections : [Section];

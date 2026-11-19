@@ -1,5 +1,6 @@
 using TaxWise.Core;
 using TaxWise.Core.Guardrails;
+using TaxWise.Shared;
 
 namespace TaxWise.Rag.Answering;
 
@@ -15,8 +16,9 @@ public sealed record AnswererResult(DraftAnswer? Draft, bool ModelRefused, Model
 public interface IAnswerer
 {
     /// <param name="passages">Sent as P1..Pn in this order.</param>
+    /// <param name="jurisdiction">"US" or "CO": picks the IRS or Colorado DOR wording of the system prompt.</param>
     Task<AnswererResult> AnswerAsync(string question, IReadOnlyList<Chunk> passages, int taxYear, bool plainLanguage,
-        CancellationToken ct = default);
+        string jurisdiction = Jurisdictions.Federal, CancellationToken ct = default);
 }
 
 /// <summary>The model couldn't produce an answer. <see cref="Exception.Message"/> is safe to show users.</summary>

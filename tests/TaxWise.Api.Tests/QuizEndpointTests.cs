@@ -90,7 +90,7 @@ public sealed class QuizEndpointTests : IClassFixture<WebApplicationFactory<Prog
             Task.FromResult<IReadOnlyList<Chunk>>(Stored.Where(c => chunkIds.Contains(c.Id)).ToList());
 
         public Task<IReadOnlyList<ScoredChunk>> SearchAsync(float[] vector, int taxYear, int limit,
-            IReadOnlyCollection<string>? docIds = null, CancellationToken ct = default) => throw new NotSupportedException();
+            IReadOnlyCollection<string>? docIds = null, string jurisdiction = TaxWise.Shared.Jurisdictions.Federal, CancellationToken ct = default) => throw new NotSupportedException();
         public Task EnsureCollectionAsync(bool recreate, CancellationToken ct = default) => throw new NotSupportedException();
         public Task UpsertAsync(IReadOnlyList<Chunk> chunks, IReadOnlyList<float[]> vectors, CancellationToken ct = default) => throw new NotSupportedException();
         public Task DeleteAsync(string docId, int taxYear, CancellationToken ct = default) => throw new NotSupportedException();
@@ -100,7 +100,7 @@ public sealed class QuizEndpointTests : IClassFixture<WebApplicationFactory<Prog
     private sealed class EmptyRetriever : IRetriever
     {
         public Task<RetrievalResult> RetrieveAsync(string question, int taxYear, IReadOnlyCollection<string>? docIds = null,
-            CancellationToken ct = default) => Task.FromResult(new RetrievalResult(0, [], 0, false));
+            string jurisdiction = TaxWise.Shared.Jurisdictions.Federal, CancellationToken ct = default) => Task.FromResult(new RetrievalResult(0, [], 0, false));
     }
 
     private sealed class StubWriter : IQuizWriter

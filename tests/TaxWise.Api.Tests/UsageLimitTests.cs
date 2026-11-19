@@ -55,6 +55,6 @@ public sealed class UsageLimitTests(WebApplicationFactory<Program> factory) : IC
     private sealed class EmptyRetriever : IRetriever
     {
         public Task<RetrievalResult> RetrieveAsync(string question, int taxYear, IReadOnlyCollection<string>? docIds = null,
-        CancellationToken ct = default) => Task.FromResult(new RetrievalResult(0, [], 0, false));
+        string jurisdiction = TaxWise.Shared.Jurisdictions.Federal, CancellationToken ct = default) => Task.FromResult(new RetrievalResult(0, [], 0, false));
     }
 }

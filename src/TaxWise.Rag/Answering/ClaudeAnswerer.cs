@@ -1,5 +1,6 @@
 using TaxWise.Core;
 using TaxWise.Core.Guardrails;
+using TaxWise.Shared;
 
 namespace TaxWise.Rag.Answering;
 
@@ -7,10 +8,11 @@ namespace TaxWise.Rag.Answering;
 public sealed class ClaudeAnswerer(ClaudeJsonClient claude) : IAnswerer
 {
     public async Task<AnswererResult> AnswerAsync(string question, IReadOnlyList<Chunk> passages, int taxYear, bool plainLanguage,
-        CancellationToken ct = default)
+        string jurisdiction = Jurisdictions.Federal, CancellationToken ct = default)
     {
         var result = await claude.CallAsync(
-            AnswerPrompt.SystemPrompt(taxYear, plainLanguage), AnswerPrompt.UserMessage(question, passages), AnswerPrompt.Schema, ct);
+            AnswerPrompt.SystemPrompt(taxYear, plainLanguage, jurisdiction), AnswerPrompt.UserMessage(question, passages),
+            AnswerPrompt.Schema, ct);
         if (result.Refused)
             return new AnswererResult(null, true, result.Call);
 

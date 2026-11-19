@@ -3,13 +3,14 @@ using Microsoft.Extensions.Options;
 using Qdrant.Client;
 using Qdrant.Client.Grpc;
 using TaxWise.Core;
+using TaxWise.Shared;
 using static Qdrant.Client.Grpc.Conditions;
 
 namespace TaxWise.Rag.VectorStore;
 
 /// <summary>
-/// Qdrant-backed chunk store: one collection ("taxwise") for all tax years, cosine distance,
-/// payload indexes on docId and taxYear (BUILD_PLAN §1a, §4.2 step 7).
+/// Qdrant-backed chunk store: one collection ("taxwise") for all tax years and jurisdictions, cosine distance,
+/// payload indexes on docId, taxYear and jurisdiction (BUILD_PLAN §1a, §4.2 step 7, DECISIONS #23).
 /// </summary>
 public sealed class QdrantChunkStore(QdrantClient client, IOptions<QdrantOptions> options) : IChunkStore
 {
@@ -24,12 +25,18 @@ public sealed class QdrantChunkStore(QdrantClient client, IOptions<QdrantOptions
             await client.DeleteCollectionAsync(Collection, cancellationToken: ct);
             exists = false;
         }
-        if (exists) return;
+        if (!exists)
+        {
+            await client.CreateCollectionAsync(Collection,
+                new VectorParams { Size = _options.VectorSize, Distance = Distance.Cosine }, cancellationToken: ct);
+            await client.CreatePayloadIndexAsync(Collection, PayloadKeys.DocId, PayloadSchemaType.Keyword, cancellationToken: ct);
+            await client.CreatePayloadIndexAsync(Collection, PayloadKeys.TaxYear, PayloadSchemaType.Integer, cancellationToken: ct);
+        }
 
-        await client.CreateCollectionAsync(Collection,
-            new VectorParams { Size = _options.VectorSize, Distance = Distance.Cosine }, cancellationToken: ct);
-        await client.CreatePayloadIndexAsync(Collection, PayloadKeys.DocId, PayloadSchemaType.Keyword, cancellationToken: ct);
-        await client.CreatePayloadIndexAsync(Collection, PayloadKeys.TaxYear, PayloadSchemaType.Integer, cancellationToken: ct);
+        // Collections made before Colorado was added (local and Qdrant Cloud) get the jurisdiction index on the next run.
+        var info = await client.GetCollectionInfoAsync(Collection, ct);
+        if (!info.PayloadSchema.ContainsKey(PayloadKeys.Jurisdiction))
+            await client.CreatePayloadIndexAsync(Collection, PayloadKeys.Jurisdiction, PayloadSchemaType.Keyword, cancellationToken: ct);
     }
 
     public async Task UpsertAsync(IReadOnlyList<Chunk> chunks, IReadOnlyList<float[]> vectors, CancellationToken ct = default)
@@ -50,15 +57,28 @@ public sealed class QdrantChunkStore(QdrantClient client, IOptions<QdrantOptions
     }
 
     public async Task<IReadOnlyList<ScoredChunk>> SearchAsync(float[] vector, int taxYear, int limit,
-        IReadOnlyCollection<string>? docIds = null, CancellationToken ct = default)
+        IReadOnlyCollection<string>? docIds = null, string jurisdiction = Jurisdictions.Federal, CancellationToken ct = default)
     {
+        var hits = await client.QueryAsync(Collection, query: vector, filter: SearchFilter(taxYear, jurisdiction, docIds),
+            limit: (ulong)limit, payloadSelector: true, cancellationToken: ct);
+        return hits.Select(h => new ScoredChunk(ChunkPayload.FromPayload(h.Payload), h.Score)).ToList();
+    }
+
+    /// <summary>
+    /// taxYear AND jurisdiction (AND docId when given). Federal also matches points with no jurisdiction field, so a
+    /// collection ingested before Colorado keeps working without a re-ingest (DECISIONS #23).
+    /// </summary>
+    public static Filter SearchFilter(int taxYear, string jurisdiction, IReadOnlyCollection<string>? docIds = null)
+    {
+        var code = Jurisdictions.Normalize(jurisdiction)
+                   ?? throw new ArgumentException($"Unknown jurisdiction '{jurisdiction}'.", nameof(jurisdiction));
         var filter = new Filter { Must = { Match(PayloadKeys.TaxYear, taxYear) } };
+        filter.Must.Add(code == Jurisdictions.Federal
+            ? new Condition { Filter = new Filter { Should = { MatchKeyword(PayloadKeys.Jurisdiction, code), IsEmpty(PayloadKeys.Jurisdiction) } } }
+            : MatchKeyword(PayloadKeys.Jurisdiction, code));
         if (docIds is { Count: > 0 })
             filter.Must.Add(Match(PayloadKeys.DocId, docIds.ToList()));
-
-        var hits = await client.QueryAsync(Collection, query: vector, filter: filter, limit: (ulong)limit,
-            payloadSelector: true, cancellationToken: ct);
-        return hits.Select(h => new ScoredChunk(ChunkPayload.FromPayload(h.Payload), h.Score)).ToList();
+        return filter;
     }
 
     public async Task<IReadOnlyList<Chunk>> GetAsync(IReadOnlyList<string> chunkIds, CancellationToken ct = default)
@@ -90,6 +110,8 @@ public static class PayloadKeys
     public const string PageStart = "pageStart";
     public const string PageEnd = "pageEnd";
     public const string Text = "text";
+    /// <summary>"US" or "CO". Missing on points ingested before Colorado was added, which are federal.</summary>
+    public const string Jurisdiction = "jurisdiction";
 }
 
 /// <summary>Maps every <see cref="Chunk"/> field to and from a Qdrant payload.</summary>
@@ -107,6 +129,7 @@ public static class ChunkPayload
             [PayloadKeys.PageStart] = c.PageStart,
             [PayloadKeys.PageEnd] = c.PageEnd,
             [PayloadKeys.Text] = c.Text,
+            [PayloadKeys.Jurisdiction] = c.Jurisdiction,
         };
         if (c.Chapter is not null) payload[PayloadKeys.Chapter] = c.Chapter;
         if (c.Sections is not null) payload[PayloadKeys.Sections] = c.Sections.ToArray();
@@ -127,5 +150,8 @@ public static class ChunkPayload
         p[PayloadKeys.Text].StringValue,
         p.TryGetValue(PayloadKeys.Sections, out var sections) && sections.KindCase == Value.KindOneofCase.ListValue
             ? sections.ListValue.Values.Select(v => v.StringValue).ToList()
-            : null);
+            : null,
+        p.TryGetValue(PayloadKeys.Jurisdiction, out var jurisdiction) && jurisdiction.HasStringValue
+            ? jurisdiction.StringValue
+            : Jurisdictions.Federal);
 }

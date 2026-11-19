@@ -18,13 +18,17 @@ public static partial class PdfLayoutReader
     /// <summary>Footer band (page number, running chapter title, catalog number) as a share of page height.</summary>
     private const double FooterBand = 0.075;
 
-    public sealed record Result(IReadOnlyList<LayoutBlock> Blocks, IReadOnlyList<LayoutBlock> FirstPage, int PageCount);
+    /// <param name="FrontPages">Every block of the first <see cref="EditionDetector.PagesSearched"/> pages, footers
+    /// included, for the edition check: the Colorado guide prints "Revised January 2026" in its footer.</param>
+    public sealed record Result(IReadOnlyList<LayoutBlock> Blocks, IReadOnlyList<LayoutBlock> FirstPage, int PageCount,
+        IReadOnlyList<LayoutBlock> FrontPages);
 
     public static Result Read(string path)
     {
         using var document = PdfDocument.Open(path);
         var blocks = new List<LayoutBlock>();
         var firstPage = new List<LayoutBlock>();
+        var frontPages = new List<LayoutBlock>();
 
         foreach (var page in document.GetPages())
         {
@@ -35,13 +39,14 @@ public static partial class PdfLayoutReader
                 // Printer's proof banner ("Userid: CPM … MUST be removed before printing") sits above the page box.
                 if (block.BoundingBox.Bottom > page.Height) continue;
 
-                var split = SplitByStyle(page.Number, block);
+                var split = SplitByStyle(page.Number, block).ToList();
                 if (page.Number == 1) firstPage.AddRange(split);
+                if (page.Number <= EditionDetector.PagesSearched) frontPages.AddRange(split);
                 if (block.BoundingBox.Top < page.Height * FooterBand) continue;
                 blocks.AddRange(split);
             }
         }
-        return new Result(blocks, firstPage, document.NumberOfPages);
+        return new Result(blocks, firstPage, document.NumberOfPages, frontPages);
     }
 
     /// <summary>

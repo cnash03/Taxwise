@@ -15,7 +15,7 @@ public class EvalRunnerTests
     private sealed class FakeRetriever(double top, params Chunk[] chunks) : IRetriever
     {
         public Task<RetrievalResult> RetrieveAsync(string question, int taxYear, IReadOnlyCollection<string>? docIds = null,
-            CancellationToken ct = default) =>
+            string jurisdiction = TaxWise.Shared.Jurisdictions.Federal, CancellationToken ct = default) =>
             Task.FromResult(new RetrievalResult(8, chunks.Select(c => new RetrievedPassage(c, top)).ToList(), top, top >= 0.35));
     }
 
@@ -23,7 +23,7 @@ public class EvalRunnerTests
     {
         public int Calls;
         public Task<AnswererResult> AnswerAsync(string question, IReadOnlyList<Chunk> passages, int taxYear, bool plainLanguage,
-            CancellationToken ct = default)
+            string jurisdiction = TaxWise.Shared.Jurisdictions.Federal, CancellationToken ct = default)
         {
             Interlocked.Increment(ref Calls);
             return Task.FromResult(new AnswererResult(draft, false, Call));

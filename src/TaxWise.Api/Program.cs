@@ -53,10 +53,14 @@ app.MapPost("/" + ApiRoutes.Ask, async (AskRequest? request, AskService ask, IOp
     if (!years.Value.Supported.Contains(request.TaxYear))
         return Results.Problem($"Tax year {request.TaxYear} isn't supported. Choose {string.Join(", ", years.Value.Supported)}.",
             statusCode: StatusCodes.Status400BadRequest);
+    // Missing or null means federal, so clients built before Colorado was added keep working.
+    if (Jurisdictions.Normalize(request.Jurisdiction) is not { } jurisdiction)
+        return Results.Problem($"Jurisdiction '{request.Jurisdiction}' isn't supported. Choose {string.Join(" or ", Jurisdictions.All)}.",
+            statusCode: StatusCodes.Status400BadRequest);
 
     return await Guarded(logger, async () =>
     {
-        var response = await ask.AskAsync(request, ct);
+        var response = await ask.AskAsync(request with { Jurisdiction = jurisdiction }, ct);
         return Results.Ok(response with { Sources = AbsoluteSources(http, response.Sources) });
     });
 }).RequireRateLimiting(UsageLimitOptions.PolicyName);
@@ -151,7 +155,7 @@ app.MapPost("/" + ApiRoutes.Quiz, async (QuizRequest? request, QuizService quiz,
 
 app.MapGet("/api/sources/{docId}/pdf", (string docId, SourceLibrary library) =>
     // Only manifest doc IDs resolve, so the route can't be used to read anything else. The deployed API ships
-    // without the PDFs and redirects to irs.gov instead (BUILD_PLAN §8, Phase 8).
+    // without the PDFs and redirects to the manifest URL (irs.gov or tax.colorado.gov) instead (BUILD_PLAN §8, Phase 8).
     library.FindPdf(docId) is { } path
         ? Results.File(path, "application/pdf", enableRangeProcessing: true)
         : library.FindRemoteUrl(docId) is { } url
@@ -161,7 +165,8 @@ app.MapGet("/api/sources/{docId}/pdf", (string docId, SourceLibrary library) =>
 app.MapGet("/" + ApiRoutes.KnowledgeBase, (SourceLibrary library, IOptions<TaxYearOptions> years, HttpContext http) =>
     new KnowledgeBaseResponse(
         library.Documents
-            .Select(d => new KnowledgeBaseDocument(d.DocId, d.Title, d.Kind, d.TaxYears, Absolute(http, ApiRoutes.SourcePdf(d.DocId))))
+            .Select(d => new KnowledgeBaseDocument(d.DocId, d.Title, d.Kind, d.TaxYears, Absolute(http, ApiRoutes.SourcePdf(d.DocId)),
+                d.JurisdictionCode))
             .ToList(),
         years.Value.Supported,
         years.Value.FullKnowledgeBase));

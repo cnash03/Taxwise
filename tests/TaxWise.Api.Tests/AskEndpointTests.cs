@@ -139,7 +139,7 @@ public sealed class AskEndpointTests : IClassFixture<WebApplicationFactory<Progr
     private sealed class LambdaRetriever(Func<RetrievalResult> result) : IRetriever
     {
         public Task<RetrievalResult> RetrieveAsync(string question, int taxYear, IReadOnlyCollection<string>? docIds = null,
-        CancellationToken ct = default) => Task.FromResult(result());
+        string jurisdiction = TaxWise.Shared.Jurisdictions.Federal, CancellationToken ct = default) => Task.FromResult(result());
     }
 
     private sealed class StubAnswerer : IAnswerer
@@ -148,7 +148,7 @@ public sealed class AskEndpointTests : IClassFixture<WebApplicationFactory<Progr
         public AnswererFailure? Failure { get; set; }
         public int Calls { get; private set; }
 
-        public Task<AnswererResult> AnswerAsync(string question, IReadOnlyList<Chunk> passages, int taxYear, bool plainLanguage, CancellationToken ct = default)
+        public Task<AnswererResult> AnswerAsync(string question, IReadOnlyList<Chunk> passages, int taxYear, bool plainLanguage, string jurisdiction = TaxWise.Shared.Jurisdictions.Federal, CancellationToken ct = default)
         {
             Calls++;
             if (Failure is { } f) throw new AnswererException(f, "safe message");

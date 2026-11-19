@@ -164,7 +164,7 @@ public sealed class QuizServiceTests
         public (string Query, int TaxYear)? LastQuery { get; private set; }
 
         public Task<RetrievalResult> RetrieveAsync(string question, int taxYear, IReadOnlyCollection<string>? docIds = null,
-            CancellationToken ct = default)
+            string jurisdiction = TaxWise.Shared.Jurisdictions.Federal, CancellationToken ct = default)
         {
             Calls++;
             LastQuery = (question, taxYear);

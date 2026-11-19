@@ -85,18 +85,34 @@ public sealed class IngestionPipeline(
         return 0;
     }
 
-    private static IReadOnlyList<Chunk> Chunk(ManifestEntry entry, PdfLayoutReader.Result pdf) =>
-        entry.IsRevProc
-            ? RevProcChunker.Chunk(entry.ToSourceDocument(), pdf.Blocks,
+    // Only the manifest's page range (all pages unless set) is chunked. The chunkers don't know about jurisdictions;
+    // every chunk takes its manifest entry's ("US" unless it says "CO").
+    private static IReadOnlyList<Chunk> Chunk(ManifestEntry entry, PdfLayoutReader.Result pdf)
+    {
+        var blocks = pdf.Blocks.Where(b => entry.IncludesPage(b.Page)).ToList();
+        var chunks = entry.IsRevProc
+            ? RevProcChunker.Chunk(entry.ToSourceDocument(), blocks,
                 entry.RevProcSections!.Select(s => new RevProcSection(s.Number, s.TaxYear)).ToList())
-            : SectionChunker.Chunk(entry.ToSourceDocument(), pdf.Blocks);
+            : SectionChunker.Chunk(entry.ToSourceDocument(), blocks);
+        var jurisdiction = entry.JurisdictionCode;
+        return chunks.Select(c => c with { Jurisdiction = jurisdiction }).ToList();
+    }
 
     /// <summary>
     /// Publications: the year printed on the cover must equal the manifest year. Rev. Procs: each
     /// ingested section's heading ("SECTION 4. 2026 ADJUSTED ITEMS") must name the year it is tagged with.
+    /// Guides revised in place (no tax year on the cover, manifest <c>edition</c> set): the edition text must
+    /// appear on the first pages, and a human confirms which tax year it serves.
     /// </summary>
     private static CoverCheck CheckEdition(ManifestEntry entry, PdfLayoutReader.Result pdf, IReadOnlyList<Chunk> chunks)
     {
+        if (entry.Edition is { Length: > 0 } edition)
+        {
+            var found = EditionDetector.Contains(pdf.FrontPages, edition);
+            return new(entry.DocId, entry.TaxYear, found ? edition : "?",
+                found ? "ok (edition text found; a human confirms its tax year)" : $"MISMATCH: '{edition}' not on the first pages; check for a newer revision");
+        }
+
         if (entry.IsRevProc)
         {
             var headings = chunks.GroupBy(c => (c.TaxYear, c.Chapter)).Select(g => g.Key).ToList();
@@ -120,6 +136,9 @@ public sealed class IngestionPipeline(
                         || !entry.TaxYears.Contains(c.TaxYear) || string.IsNullOrWhiteSpace(c.Text))
             .Select(c => c.Id)
             .ToList();
+        problems.AddRange(chunks
+            .Where(c => c.Jurisdiction != entry.JurisdictionCode || !entry.IncludesPage(c.PageStart) || !entry.IncludesPage(c.PageEnd))
+            .Select(c => c.Id));
         if (problems.Count > 0)
             throw new InvalidOperationException($"{entry.DocId}: invalid chunks: {string.Join(", ", problems.Take(5))}");
         var duplicates = chunks.GroupBy(c => c.Id).Where(g => g.Count() > 1).Select(g => g.Key).ToList();
@@ -134,7 +153,7 @@ public sealed class IngestionPipeline(
         Console.WriteLine($"{"docId",-10} {"manifest",-9} {"detected",-10} status");
         foreach (var c in covers)
         {
-            var detected = c.Detected.Length > 10 ? "(sections)" : c.Detected;
+            var detected = c.Detected.Length > 10 ? "(below)" : c.Detected;
             Console.WriteLine($"{c.DocId,-10} {c.ManifestYear,-9} {detected,-10} {c.Status}");
             if (c.Detected.Length > 10) Console.WriteLine($"{"",-21} {c.Detected}");
         }

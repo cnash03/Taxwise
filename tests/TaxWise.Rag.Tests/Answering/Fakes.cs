@@ -40,7 +40,7 @@ internal sealed class FakeStore(IReadOnlyList<Chunk> hits) : IChunkStore
     public List<(int TaxYear, int Limit, IReadOnlyCollection<string>? DocIds)> Searches { get; } = [];
 
     public Task<IReadOnlyList<ScoredChunk>> SearchAsync(float[] vector, int taxYear, int limit,
-        IReadOnlyCollection<string>? docIds = null, CancellationToken ct = default)
+        IReadOnlyCollection<string>? docIds = null, string jurisdiction = TaxWise.Shared.Jurisdictions.Federal, CancellationToken ct = default)
     {
         Searches.Add((taxYear, limit, docIds));
         return Task.FromResult<IReadOnlyList<ScoredChunk>>(hits.Take(limit).Select(c => new ScoredChunk(c, 0.5)).ToList());
@@ -61,7 +61,7 @@ internal sealed class FakeAnswerer(DraftAnswer? draft, bool refuse = false) : IA
     public int Calls { get; private set; }
     public IReadOnlyList<Chunk>? LastPassages { get; private set; }
 
-    public Task<AnswererResult> AnswerAsync(string question, IReadOnlyList<Chunk> passages, int taxYear, bool plainLanguage, CancellationToken ct = default)
+    public Task<AnswererResult> AnswerAsync(string question, IReadOnlyList<Chunk> passages, int taxYear, bool plainLanguage, string jurisdiction = TaxWise.Shared.Jurisdictions.Federal, CancellationToken ct = default)
     {
         Calls++;
         LastPassages = passages;
@@ -73,5 +73,5 @@ internal sealed class FakeAnswerer(DraftAnswer? draft, bool refuse = false) : IA
 internal sealed class FakeRetriever(RetrievalResult result) : IRetriever
 {
     public Task<RetrievalResult> RetrieveAsync(string question, int taxYear, IReadOnlyCollection<string>? docIds = null,
-        CancellationToken ct = default) => Task.FromResult(result);
+        string jurisdiction = TaxWise.Shared.Jurisdictions.Federal, CancellationToken ct = default) => Task.FromResult(result);
 }

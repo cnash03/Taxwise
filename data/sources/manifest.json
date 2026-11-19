@@ -96,6 +96,29 @@
         }
       ],
       "note": "Unlike Rev. Proc. 2025-32, this one puts the adjusted items in §3 (standard deduction is §3.15)."
+    },
+    {
+      "docId": "co-dr0104",
+      "title": "DR 0104 Book, 2025 Colorado Individual Income Tax Filing Guide",
+      "url": "https://tax.colorado.gov/sites/default/files/documents/Book104_2025.pdf",
+      "taxYear": 2025,
+      "kind": "instructions",
+      "sha256": "69c80c89118eccd21dc18e564237539e647c623a361a7f0beebed99ef5b0c7f8",
+      "jurisdiction": "CO",
+      "firstPage": 4,
+      "lastPage": 33,
+      "note": "Colorado DOR's TY2025 booklet (cover dated 10/29/25). Linked from tax.colorado.gov/DR0104Booklet (checked 2026-11-18). Only the filing instructions (pp. 4–33) are ingested: pp. 34–36 are the tax table and pp. 37–88 are the fill-in forms. The DOR names each year's file, so the 2026 edition will be a new entry, not a new download at this URL."
+    },
+    {
+      "docId": "co-guide",
+      "title": "Income Tax Guide, Colorado Individual Income Tax Guide (Revised January 2026)",
+      "url": "https://tax.colorado.gov/sites/default/files/documents/Individual_Income_Tax_Guide_January_2026.pdf",
+      "taxYear": 2025,
+      "kind": "publication",
+      "sha256": "9a7c0c7b732b76299deb4b0e8ba9fe8b955ca2691c01a4e38dd2bf3a193daaa7",
+      "jurisdiction": "CO",
+      "edition": "Revised January 2026",
+      "note": "Linked from tax.colorado.gov/individual-income-tax-guide (checked 2026-11-18). Revised in place, not per tax year: the January 2026 revision is the one in force for TY2025 returns filed in spring 2026, so it is tagged 2025. Its text names the years each rule applies to (e.g. the rate table, 'for tax years 2026 and later')."
     }
   ]
 }

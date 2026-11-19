@@ -121,7 +121,7 @@ public sealed class FormsEndpointTests : IClassFixture<WebApplicationFactory<Pro
     private sealed class LambdaRetriever(Func<RetrievalResult> result) : IRetriever
     {
         public Task<RetrievalResult> RetrieveAsync(string question, int taxYear, IReadOnlyCollection<string>? docIds = null,
-            CancellationToken ct = default) => Task.FromResult(result());
+            string jurisdiction = TaxWise.Shared.Jurisdictions.Federal, CancellationToken ct = default) => Task.FromResult(result());
     }
 
     private sealed class StubExplainer : IFormExplainer
