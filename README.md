@@ -73,6 +73,7 @@ The **Ask a question** page sends `POST /api/ask` and shows cited answers:
 - **Plain-language mode** (header toggle, remembered between launches) asks Claude for simpler wording from the same passages. In that mode, tax terms get hover definitions from [`data/glossary.json`](data/glossary.json). Those definitions are written and reviewed by people, not generated. Set `reviewed: true` on each entry after checking it against its `chunkId`.
 - The **Tax year** picker defaults to 2025 for chat. Years without their full IRS guides show a banner naming the Rev. Proc. the answers rely on.
 - **Quiz me on …** passes the chat's cited chunk IDs to the quizzes page (Phase 6).
+- **Compare with a plain chatbot** (header toggle, remembered) also sends each question to `POST /api/ask/baseline`: the same model with no retrieval, the chatbot the eval's `--mode baseline` measures. The two answers appear side by side, each with its own loading and error state. The plain chatbot's column is labelled *"Plain chatbot — no sources, may be wrong or out of date"* and has no citations. Each compared question counts twice against the per-IP limit. See [DECISIONS.md](DECISIONS.md) #21.
 
 ## Explain my form
 
