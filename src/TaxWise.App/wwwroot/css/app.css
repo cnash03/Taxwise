@@ -615,6 +615,26 @@ h1:focus { outline: none; }
 
 .composer-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 
+/* Voice input: mic button and its status line */
+.mic-btn { display: inline-flex; align-items: center; justify-content: center; padding: 0 12px; color: var(--accent); }
+.mic-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.mic-btn.listening { border-color: var(--down); background: var(--down); color: #fff; animation: mic-pulse 1.2s ease-in-out infinite; }
+.mic-btn.listening:hover:not(:disabled) { border-color: var(--down); }
+@keyframes mic-pulse { 50% { box-shadow: 0 0 0 6px rgba(217, 83, 79, 0.25); } }
+
+.voice-status {
+    padding: 0 28px 12px;
+    background: var(--surface);
+    color: var(--accent);
+    font-size: 0.85rem;
+}
+
+.voice-status:empty { padding: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+    .mic-btn.listening { animation: none; }
+}
+
 .inline-error {
     padding: 0 28px 12px;
     background: var(--surface);

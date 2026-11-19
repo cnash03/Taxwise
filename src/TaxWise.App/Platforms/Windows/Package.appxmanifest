@@ -41,6 +41,8 @@
 
   <Capabilities>
     <rescap:Capability Name="runFullTrust" />
+    <!-- Voice input on the Ask page (DECISIONS #21). Only used if the App is ever built as an MSIX package. -->
+    <DeviceCapability Name="microphone" />
   </Capabilities>
 
 </Package>
