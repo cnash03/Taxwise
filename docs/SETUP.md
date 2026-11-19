@@ -100,6 +100,8 @@ dotnet build src/TaxWise.App -t:Run -f net10.0-maccatalyst
 
 A green dot in the App means it's connected to the API.
 
+**Only working on the App?** You can skip Docker, ingestion, the API and the keys. Point your App at the deployed API instead ([DEPLOY.md §4](DEPLOY.md#4-run-your-local-app-against-the-deployed-api)).
+
 ## 5. Claude Code and AI logging
 
 If you use Claude Code in this repo, the hooks in `.claude/settings.json` automatically log each session to `docs/ai-log/raw/<your-git-username>/`. To make that work:

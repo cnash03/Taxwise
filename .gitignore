@@ -21,5 +21,6 @@ publish/
 data/qdrant/
 data/sources/pdf/
 **/appsettings.Development.local.json
+src/TaxWise.App/appsettings.local.json
 *.env
 .env*
