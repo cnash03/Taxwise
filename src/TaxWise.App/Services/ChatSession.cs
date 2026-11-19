@@ -21,6 +21,12 @@ public sealed class ChatTurn(string question, bool plainLanguage, int taxYear)
 	public string? Error { get; set; }
 	public bool ApiUnreachable { get; set; }
 
+	/// <summary>The plain chatbot's answer to the same question; null when the comparison was off.</summary>
+	public BaselineTurn? Baseline { get; set; }
+
+	/// <summary>True while either side of the turn is still waiting for the API.</summary>
+	public bool IsLoading => Status == TurnStatus.Loading || Baseline?.Status == TurnStatus.Loading;
+
 	public bool IsRefusal => Response?.Kind == AskResponse.RefusalKind;
 
 	/// <summary>The section of the first cited passage, e.g. "Scholarships and Fellowship Grants"; null for refusals.</summary>
@@ -38,6 +44,17 @@ public sealed class ChatTurn(string question, bool plainLanguage, int taxYear)
 	public IReadOnlyList<string> CitedChunkIds => IsRefusal || Response is null
 		? []
 		: Response.Paragraphs.SelectMany(p => p.Citations).Select(c => c.ChunkId).Distinct().ToList();
+}
+
+/// <summary>The plain-chatbot side of a compared turn, with its own loading and error state.</summary>
+public sealed class BaselineTurn
+{
+	public TurnStatus Status { get; set; } = TurnStatus.Loading;
+	public BaselineResponse? Response { get; set; }
+	public string? Error { get; set; }
+	public bool ApiUnreachable { get; set; }
+
+	public bool IsRefusal => Response?.Kind == BaselineResponse.RefusalKind;
 }
 
 /// <summary>

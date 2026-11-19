@@ -24,6 +24,12 @@
                     <span class="toggle-track" aria-hidden="true"></span>
                     <span>Plain-language mode</span>
                 </label>
+                <label class="toggle">
+                    <input type="checkbox" role="switch" checked="@_compare" @onchange="ToggleCompare"
+                           aria-label="Compare with a plain chatbot: also ask the same model with no IRS sources and show both answers side by side" />
+                    <span class="toggle-track" aria-hidden="true"></span>
+                    <span>Compare with a plain chatbot</span>
+                </label>
                 @if (Chat.Turns.Count > 0)
                 {
                     <button class="btn" disabled="@Busy" @onclick="NewChat">New chat</button>
@@ -42,6 +48,10 @@
                 <div class="welcome">
                     <h2>Ask about your federal taxes</h2>
                     <p>TaxWise searches IRS publications for tax year @_taxYear and answers with numbered citations you can check.</p>
+                    @if (_compare)
+                    {
+                        <p>Compare is on: each question is also sent to the same model with no IRS sources, and both answers appear side by side.</p>
+                    }
                     <div class="follow-ups">
                         @foreach (var example in Examples)
                         {
@@ -56,16 +66,40 @@
                 <div class="user-row">
                     <div class="user-bubble">@turn.Question</div>
                 </div>
-                <div class="answer-row">
-                    <AnswerCard Turn="turn"
-                                Selected="_selected"
-                                Busy="Busy"
-                                OnCite="Select"
-                                OnFollowUp="AskAsync"
-                                OnQuiz="QuizMe"
-                                OnOpenLink="OpenLinkAsync"
-                                OnRetry="RetryAsync" />
-                </div>
+                @if (turn.Baseline is null)
+                {
+                    <div class="answer-row">
+                        <AnswerCard Turn="turn"
+                                    Selected="_selected"
+                                    Busy="Busy"
+                                    OnCite="Select"
+                                    OnFollowUp="AskAsync"
+                                    OnQuiz="QuizMe"
+                                    OnOpenLink="OpenLinkAsync"
+                                    OnRetry="RetryAsync" />
+                    </div>
+                }
+                else
+                {
+                    @* Side by side: TaxWise (retrieval, citations, guardrails) and the same model with no sources. *@
+                    <div class="answer-row compare-row" role="group" aria-label="TaxWise and a plain chatbot answering the same question">
+                        <section class="compare-col" aria-label="TaxWise answer, from IRS publications with citations">
+                            <h3 class="compare-heading">TaxWise <span>· IRS publications, cited</span></h3>
+                            <AnswerCard Turn="turn"
+                                        Selected="_selected"
+                                        Busy="Busy"
+                                        OnCite="Select"
+                                        OnFollowUp="AskAsync"
+                                        OnQuiz="QuizMe"
+                                        OnOpenLink="OpenLinkAsync"
+                                        OnRetry="RetryAsync" />
+                        </section>
+                        <section class="compare-col baseline-col" aria-label="Plain chatbot answer, same model with no sources">
+                            <h3 class="compare-heading">Plain chatbot <span>· same model, no sources</span></h3>
+                            <BaselineCard Turn="turn" Busy="Busy" OnRetry="RetryBaselineAsync" />
+                        </section>
+                    </div>
+                }
             }
         </div>
 
@@ -99,13 +133,14 @@
     private ElementReference _messages;
     private string _draft = "";
     private bool _plainLanguage;
+    private bool _compare;
     private int _taxYear;
     private CitationSelection? _selected;
     private KnowledgeBaseResponse? _knowledgeBase;
     private string? _openError;
     private bool _scrollPending;
 
-    private bool Busy => Chat.Turns.Any(t => t.Status == TurnStatus.Loading);
+    private bool Busy => Chat.Turns.Any(t => t.IsLoading);
 
     /// <summary>BUILD_PLAN §1a: years without their full publications get a banner naming the Rev. Proc. in use.</summary>
     private string? LimitedYearBanner
@@ -122,11 +157,14 @@
     protected override async Task OnInitializedAsync()
     {
         _plainLanguage = Settings.PlainLanguage;
+        _compare = Settings.CompareWithChatbot;
         _taxYear = Settings.GetTaxYear(TaxYearFeature.Chat);
 
         // A request still marked loading was cancelled when we left the page; let the student retry it.
         foreach (var turn in Chat.Turns.Where(t => t.Status == TurnStatus.Loading))
             Fail(turn, "Stopped because you left the page.", unreachable: false);
+        foreach (var baseline in Chat.Turns.Select(t => t.Baseline).OfType<BaselineTurn>().Where(b => b.Status == TurnStatus.Loading))
+            Fail(baseline, "Stopped because you left the page.", unreachable: false);
 
         try
         {
@@ -156,6 +194,12 @@
         Settings.PlainLanguage = _plainLanguage;
     }
 
+    private void ToggleCompare(ChangeEventArgs e)
+    {
+        _compare = e.Value is true;
+        Settings.CompareWithChatbot = _compare;
+    }
+
     private void NewChat()
     {
         Chat.Clear();
@@ -169,7 +213,7 @@
         question = question.Trim();
         if (question.Length == 0 || Busy) return;
         _draft = "";
-        var turn = new ChatTurn(question, _plainLanguage, _taxYear);
+        var turn = new ChatTurn(question, _plainLanguage, _taxYear) { Baseline = _compare ? new BaselineTurn() : null };
         Chat.Turns.Add(turn);
         await RunAsync(turn);
     }
@@ -177,15 +221,36 @@
     private async Task RetryAsync(ChatTurn failed)
     {
         if (Busy) return;
-        var turn = new ChatTurn(failed.Question, failed.PlainLanguage, failed.TaxYear);
+        // Only the failed side is asked again; a plain-chatbot answer already on screen is kept.
+        var turn = new ChatTurn(failed.Question, failed.PlainLanguage, failed.TaxYear)
+        {
+            Baseline = failed.Baseline is { Status: TurnStatus.Done } done ? done : failed.Baseline is null ? null : new BaselineTurn(),
+        };
         Chat.Turns[Chat.Turns.IndexOf(failed)] = turn;
         await RunAsync(turn);
     }
 
+    private async Task RetryBaselineAsync(ChatTurn turn)
+    {
+        if (Busy) return;
+        turn.Baseline = new BaselineTurn();
+        _scrollPending = true;
+        StateHasChanged();
+        await RunBaselineAsync(turn, turn.Baseline);
+    }
+
+    /// <summary>Asks TaxWise and, for a compared turn, the plain chatbot in parallel; each side fails on its own.</summary>
     private async Task RunAsync(ChatTurn turn)
     {
         _scrollPending = true;
         StateHasChanged();
+        var baseline = turn.Baseline is { Status: TurnStatus.Loading } b ? RunBaselineAsync(turn, b) : Task.CompletedTask;
+        await RunTaxWiseAsync(turn);
+        await baseline;
+    }
+
+    private async Task RunTaxWiseAsync(ChatTurn turn)
+    {
         try
         {
             turn.Response = await Api.AskAsync(new AskRequest(turn.Question, turn.PlainLanguage, turn.TaxYear), _cts.Token);
@@ -203,6 +268,35 @@
             return;
         }
         _scrollPending = true;
+        // Render now: in a compared turn the plain chatbot may still be loading.
+        StateHasChanged();
+    }
+
+    private async Task RunBaselineAsync(ChatTurn turn, BaselineTurn baseline)
+    {
+        try
+        {
+            // PlainLanguage is sent but unused: the chatbot keeps the eval's one-line prompt (DECISIONS #21).
+            baseline.Response = await Api.AskBaselineAsync(new AskRequest(turn.Question, turn.PlainLanguage, turn.TaxYear), _cts.Token);
+            baseline.Status = TurnStatus.Done;
+        }
+        catch (ApiException e)
+        {
+            Fail(baseline, e.Message, e.ApiUnreachable);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+        _scrollPending = true;
+        StateHasChanged();
+    }
+
+    private static void Fail(BaselineTurn baseline, string message, bool unreachable)
+    {
+        baseline.Status = TurnStatus.Failed;
+        baseline.Error = message;
+        baseline.ApiUnreachable = unreachable;
     }
 
     private static void Fail(ChatTurn turn, string message, bool unreachable)
