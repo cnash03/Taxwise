@@ -1,3 +1,4 @@
+using System.Threading.RateLimiting;
 using Microsoft.Extensions.Options;
 using TaxWise.Api;
 using TaxWise.Core.Calculator;
@@ -18,8 +19,27 @@ builder.Services.AddTaxWiseRag(builder.Configuration);
 builder.Services.AddTaxWiseAnswering(builder.Configuration);
 builder.Services.AddSingleton<SourceLibrary>();
 builder.Services.AddProblemDetails();
+builder.Services.Configure<UsageLimitOptions>(builder.Configuration.GetSection(UsageLimitOptions.SectionName));
+builder.Services.AddRateLimiter(o =>
+{
+    // Options are read per request (not from builder.Configuration) so test overrides apply. Behind Azure the client IP
+    // comes from X-Forwarded-For (ASPNETCORE_FORWARDEDHEADERS_ENABLED, docs/DEPLOY.md).
+    o.AddPolicy(UsageLimitOptions.PolicyName, http =>
+        http.RequestServices.GetRequiredService<IOptions<UsageLimitOptions>>().Value is { PermitLimit: > 0 } limit
+            ? RateLimitPartition.GetFixedWindowLimiter(http.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                _ => new FixedWindowRateLimiterOptions { PermitLimit = limit.PermitLimit, Window = TimeSpan.FromMinutes(limit.WindowMinutes) })
+            : RateLimitPartition.GetNoLimiter("off"));
+    o.OnRejected = (context, ct) =>
+    {
+        context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+        return new ValueTask(Results.Problem("You've reached the TaxWise question limit for now. Please try again later.",
+            statusCode: StatusCodes.Status429TooManyRequests).ExecuteAsync(context.HttpContext));
+    };
+});
 
 var app = builder.Build();
+
+app.UseRateLimiter();
 
 app.MapGet("/health", () => new HealthResponse("ok", typeof(Program).Assembly.GetName().Version?.ToString() ?? "0.0.0"));
 
@@ -39,7 +59,7 @@ app.MapPost("/" + ApiRoutes.Ask, async (AskRequest? request, AskService ask, IOp
         var response = await ask.AskAsync(request, ct);
         return Results.Ok(response with { Sources = AbsoluteSources(http, response.Sources) });
     });
-});
+}).RequireRateLimiting(UsageLimitOptions.PolicyName);
 
 app.MapGet("/api/forms/{formId}", (string formId, FormLibrary forms) =>
     forms.Find(formId) is { } form ? Results.Ok(form) : Results.NotFound());
@@ -59,7 +79,7 @@ app.MapPost("/" + ApiRoutes.ExplainForm, async (ExplainFormRequest? request, For
         var response = await explain.ExplainAsync(form, box, request.PlainLanguage, ct);
         return Results.Ok(response with { Sources = AbsoluteSources(http, response.Sources) });
     });
-});
+}).RequireRateLimiting(UsageLimitOptions.PolicyName);
 
 // The PDF is the raw request body, read into memory and never written to disk. (Multipart form files over 64 KB are
 // buffered to a temp file by ASP.NET, which is why this isn't an IFormFile.)
@@ -83,7 +103,7 @@ app.MapPost("/" + ApiRoutes.UploadForm, async (HttpRequest request, FormUploadSe
             return Results.Problem(e.Message, statusCode: StatusCodes.Status422UnprocessableEntity);
         }
     });
-});
+}).RequireRateLimiting(UsageLimitOptions.PolicyName);
 
 app.MapPost("/" + ApiRoutes.Calculator,async (CalcRequest? request, CalculatorService calculator,
     HttpContext http, ILogger<Program> logger, CancellationToken ct) =>
@@ -98,7 +118,7 @@ app.MapPost("/" + ApiRoutes.Calculator,async (CalcRequest? request, CalculatorSe
         var response = await calculator.CalculateAsync(rules, request, ct);
         return Results.Ok(response with { Sources = AbsoluteSources(http, response.Sources) });
     });
-});
+}).RequireRateLimiting(UsageLimitOptions.PolicyName);
 
 // Numbers only, for every supported year; TaxYear in the body is ignored.
 app.MapPost("/" + ApiRoutes.CompareYears, (CalcRequest? request) =>
@@ -127,7 +147,7 @@ app.MapPost("/" + ApiRoutes.Quiz, async (QuizRequest? request, QuizService quiz,
             Items = response.Items.Select(i => i with { Source = AbsoluteSources(http, [i.Source])[0] }).ToList(),
         });
     });
-});
+}).RequireRateLimiting(UsageLimitOptions.PolicyName);
 
 app.MapGet("/api/sources/{docId}/pdf", (string docId, SourceLibrary library) =>
     // Only manifest doc IDs resolve, so the route can't be used to read anything else. The deployed API ships

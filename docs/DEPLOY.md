@@ -69,7 +69,7 @@ curl -s https://$APP.azurewebsites.net/api/ask -H 'content-type: application/jso
 
 Logs: `az webapp log tail -g $RG -n $APP`.
 
-**Cost.** B1 bills against your Azure for Students credit while the plan exists. After the final report, delete everything with `az group delete -n $RG`. The API has no sign-in, so anyone with the URL can spend Anthropic and Voyage credit. Keep the URL out of public places, and set a spend limit in the Anthropic console.
+**Cost.** B1 bills against your Azure for Students credit while the plan exists. After the final report, delete everything with `az group delete -n $RG`. The API has no sign-in, so anyone with the URL can spend Anthropic and Voyage credit, and the URL is readable inside every copy of the App. `appsettings.Production.json` caps each IP address at 60 Claude-backed requests an hour (`UsageLimit`, DECISIONS #20). Change it without redeploying with `az webapp config appsettings set -g $RG -n $APP --settings UsageLimit__PermitLimit=<n>`. Students on the same campus network share one IP, so raise it before a class demo. Also set a monthly spend limit in the Anthropic console.
 
 ## 3. Desktop App (Release)
 
@@ -81,14 +81,15 @@ Point Release builds at Azure by creating `src/TaxWise.App/appsettings.Release.j
 
 Release builds embed it, and its `ApiBaseUrl` overrides the localhost default. Debug builds ignore it.
 
-**macOS (Mac Catalyst):**
+**macOS (Mac Catalyst):** one command builds a universal app (Apple Silicon and Intel) and wraps it in a `.dmg`:
 
 ```bash
-dotnet publish src/TaxWise.App -f net10.0-maccatalyst -c Release -p:ValidateXcodeVersion=false
-open src/TaxWise.App/bin/Release/net10.0-maccatalyst/maccatalyst-arm64/   # TaxWise.app and a .pkg
+scripts/package-mac.sh https://<app-name>.azurewebsites.net
 ```
 
-The build isn't signed for distribution. On another Mac, right-click → **Open** the first time to get past Gatekeeper.
+It writes `appsettings.Release.json`, checks that `/health` answers, and leaves `publish/mac/TaxWise.dmg`. Share the `.dmg`. The user opens it and drags TaxWise into Applications.
+
+The app isn't signed with an Apple Developer ID, so macOS blocks it the first time. The user opens it once, clicks **Done**, then goes to **System Settings → Privacy & Security** and clicks **Open Anyway** (on macOS 14 and older, right-click → **Open** also works). Removing that step takes an Apple Developer account ($99/year), a `Developer ID Application` certificate and `xcrun notarytool`.
 
 **Windows** (build on a Windows machine with the MAUI workload installed):
 

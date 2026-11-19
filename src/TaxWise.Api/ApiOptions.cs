@@ -22,3 +22,16 @@ public static class CalcLimits
     /// <summary>Upper bound for wages and withholding; well above any student scenario.</summary>
     public const decimal MaxAmount = 10_000_000m;
 }
+
+/// <summary>
+/// "UsageLimit" config section: a per-IP cap on the endpoints that call Claude, so a shared download of the App
+/// can't run up the Anthropic bill. Off when PermitLimit is 0 (the default, so local runs and the eval aren't limited).
+/// </summary>
+public sealed class UsageLimitOptions
+{
+    public const string SectionName = "UsageLimit";
+    public const string PolicyName = "claude";
+
+    public int PermitLimit { get; set; }
+    public int WindowMinutes { get; set; } = 60;
+}
