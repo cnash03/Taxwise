@@ -8,6 +8,7 @@
 @inject ILauncher Launcher
 @inject NavigationManager Nav
 @inject IJSRuntime JS
+@inject IVoiceInput Voice
 
 <div class="ask">
     <section class="chat">
@@ -105,13 +106,34 @@
 
         <form class="composer" @onsubmit="SubmitAsync">
             <input class="composer-input"
-                   @bind="_draft" @bind:event="oninput"
-                   maxlength="1000"
-                   placeholder="Ask a question about your taxes…"
+                   @bind="_draft" @bind:event="oninput" @bind:after="_voice.Dismiss"
+                   maxlength="@QuestionMaxLength"
+                   placeholder="@(_voice.IsActive ? "Listening…" : "Ask a question about your taxes…")"
                    aria-label="Your question"
+                   readonly="@_voice.IsActive"
                    disabled="@Busy" />
+            @if (_voice.Status != VoiceStatus.Unavailable)
+            {
+                <button class="btn mic-btn @(_voice.IsActive ? "listening" : "")" type="button"
+                        aria-label="@_voice.ButtonLabel" title="@_voice.ButtonLabel"
+                        aria-pressed="@(_voice.IsActive ? "true" : "false")"
+                        disabled="@Busy" @onclick="ToggleVoiceAsync">
+                    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+                        <rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor" />
+                        <path d="M6 11a6 6 0 0 0 12 0M12 17v4M9 21h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                    </svg>
+                </button>
+            }
             <button class="btn btn-primary" type="submit" disabled="@(Busy || string.IsNullOrWhiteSpace(_draft))">Ask</button>
         </form>
+        @if (_voice.Status == VoiceStatus.Error)
+        {
+            <div class="inline-error" role="alert">@_voice.StatusText</div>
+        }
+        else if (_voice.Status != VoiceStatus.Unavailable)
+        {
+            <div class="voice-status" role="status">@_voice.StatusText</div>
+        }
         @if (_openError is not null)
         {
             <div class="inline-error" role="alert">@_openError</div>
@@ -129,7 +151,12 @@
         "Is my scholarship taxable?",
     ];
 
+    /// <summary>Same cap as the API's AskLimits.MaxQuestionLength.</summary>
+    private const int QuestionMaxLength = 1000;
+
     private readonly CancellationTokenSource _cts = new();
+    private VoiceDraft _voice = new(supported: false, QuestionMaxLength);
+    private CancellationTokenSource? _voiceCts;
     private ElementReference _messages;
     private string _draft = "";
     private bool _plainLanguage;
@@ -159,6 +186,7 @@
         _plainLanguage = Settings.PlainLanguage;
         _compare = Settings.CompareWithChatbot;
         _taxYear = Settings.GetTaxYear(TaxYearFeature.Chat);
+        _voice = new VoiceDraft(Voice.IsSupported, QuestionMaxLength);
 
         // A request still marked loading was cancelled when we left the page; let the student retry it.
         foreach (var turn in Chat.Turns.Where(t => t.Status == TurnStatus.Loading))
@@ -212,10 +240,70 @@
     {
         question = question.Trim();
         if (question.Length == 0 || Busy) return;
+        StopVoice();
         _draft = "";
         var turn = new ChatTurn(question, _plainLanguage, _taxYear) { Baseline = _compare ? new BaselineTurn() : null };
         Chat.Turns.Add(turn);
         await RunAsync(turn);
+    }
+
+    /// <summary>
+    /// The mic button (voice input, BUILD_PLAN §11): starts listening, or ends it early. The transcript fills the
+    /// question box for the student to check and send; nothing is asked until they press Ask. Never logged.
+    /// </summary>
+    private async Task ToggleVoiceAsync()
+    {
+        if (_voice.Status == VoiceStatus.Listening)
+        {
+            await Voice.StopAsync();
+            return;
+        }
+        if (_voice.Status == VoiceStatus.Starting)
+        {
+            StopVoice();
+            return;
+        }
+
+        _voice.Dismiss();
+        if (!_voice.TryStart(_draft)) return;
+        var cts = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token);
+        _voiceCts = cts;
+        try
+        {
+            var transcript = await Voice.ListenAsync(heard => _ = InvokeAsync(() =>
+            {
+                if (cts.IsCancellationRequested || !_voice.IsActive) return;
+                _draft = _voice.Heard(heard);
+                StateHasChanged();
+            }), cts.Token);
+            _draft = _voice.Completed(transcript);
+        }
+        catch (VoiceInputException e)
+        {
+            DebugLog.Write($"Voice input: {e.Error}", e.InnerException);
+            _voice.Fail(e.Error);
+        }
+        catch (OperationCanceledException)
+        {
+            _voice.Cancel();
+        }
+        catch (Exception e)
+        {
+            DebugLog.Write("Voice input failed", e);
+            _voice.Fail(VoiceError.Failed);
+        }
+        finally
+        {
+            if (_voiceCts == cts) _voiceCts = null;
+            cts.Dispose();
+        }
+    }
+
+    /// <summary>Abandons listening when a question is sent; leaving the page cancels it through <see cref="_cts"/>.</summary>
+    private void StopVoice()
+    {
+        _voice.Cancel();
+        _voiceCts?.Cancel();
     }
 
     private async Task RetryAsync(ChatTurn failed)

@@ -262,3 +262,18 @@ hit@4 went from 87.5% to 95%. `--rejudge` now rescores hit@4 against the current
 **Why:** The comparison should show what the eval measured (8% of out-of-scope questions refused, the TY2027 "not published yet" answers), and sharing one answerer guarantees that. claude.ai has its own system prompt, web search and a different model setup, so it wasn't the same comparison. A plain-language baseline would be a new prompt the eval never scored. Two permits per compared question is the honest cost: each side is one Claude call.
 
 **Caveat:** The plain chatbot's text is free-form and unchecked. The App shows it as plain text (never HTML), under the label and the disclaimer, in a dashed card with no citation chips, so it can't be mistaken for a TaxWise answer. Students who leave the switch on use their hourly limit twice as fast.
+
+## 22. Voice input uses the OS's on-device speech recognizer
+
+**Stretch · 2026-11-18**
+
+**Decision:** The Ask page has a mic button. It uses `OfflineSpeechToText` from `CommunityToolkit.Maui.Core` 16.0.0 (the last release for .NET 10 and MAUI 10; 17.x needs .NET 11) behind a small `IVoiceInput` service in `TaxWise.App/Services`. On the Mac that is Apple's Speech framework with `RequiresOnDeviceRecognition`; on Windows it is System.Speech dictation. The recognizer is English (`en-US`) and stops after a 4-second pause, a press of the mic, 60 seconds, sending a question or leaving the page. The transcript goes into the question box, and nothing is sent until the student presses **Ask**. The button's states (idle, starting, listening, error) live in `VoiceDraft` in `TaxWise.Shared/Display` so they're unit-tested without MAUI. The Mac app gets `NSMicrophoneUsageDescription`, `NSSpeechRecognitionUsageDescription` and the `com.apple.security.device.audio-input` entitlement; the Windows manifest declares the `microphone` capability.
+
+**Alternatives considered:**
+- The toolkit's `SpeechToText`, which on the Mac may send audio to Apple's servers, and on Windows uses online speech recognition.
+- A cloud speech service (Azure Speech, Whisper) through the API, or called from the App.
+- Calling `SFSpeechRecognizer` and `Windows.Media.SpeechRecognition` directly.
+
+**Why:** On-device recognition needs no new keys, costs nothing, and no audio or transcript leaves the computer, which matters for an app that talks about students' money. A cloud service would mean a key in the API, a new endpoint and per-request cost, against BUILD_PLAN §1's rule that the App holds no keys. The toolkit already wraps both platforms' recognizers with permission handling, so writing our own would duplicate it. The transcript is never logged, and the debug log only records the error kind.
+
+**Caveat:** On a Mac the on-device English model must be installed (it comes with Dictation, System Settings → Keyboard); otherwise the button shows "Speech recognition isn't available". On Windows, System.Speech shows each phrase only once it's recognized, not word by word. The toolkit holds event handlers through weak references, so `VoiceInput` is a singleton with instance-method handlers. Neither platform could be tested with a real voice by the agent.
