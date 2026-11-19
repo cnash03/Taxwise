@@ -12,7 +12,7 @@
         <!-- Lets the "Upload mine" file picker open the PDF the student chooses. Without it the open panel can't show and the app hangs. -->
         <key>com.apple.security.files.user-selected.read-only</key>
         <true/>
-        <!-- Voice input on the Ask page (DECISIONS #21). Without it the sandbox gives the app silence, not the microphone. -->
+        <!-- Voice input on the Ask page (DECISIONS #22). Without it the sandbox gives the app silence, not the microphone. -->
         <key>com.apple.security.device.audio-input</key>
         <true/>
     </dict>

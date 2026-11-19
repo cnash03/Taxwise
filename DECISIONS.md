@@ -248,8 +248,22 @@ hit@4 went from 87.5% to 95%. `--rejudge` now rescores hit@4 against the current
 
 **Caveat:** Everyone behind one NAT, such as a campus network, shares one limit. Raise `UsageLimit__PermitLimit` in Azure before a classroom demo.
 
+## 21. The in-app plain-chatbot comparison reuses the eval's baseline, unchanged
 
-## 21. Voice input uses the OS's on-device speech recognizer
+**After Phase 8 · 2026-11-18**
+
+**Decision:** The Ask page has a **Compare with a plain chatbot** switch. With it on, each question goes to `POST /api/ask` and `POST /api/ask/baseline` in parallel, and the answers sit side by side. The baseline is the eval's `--mode baseline` chatbot: same answer model, the one-line `baseline.system.md` prompt, no retrieval, no citation validator, no rerank threshold. Its answerer and prompts moved from `TaxWise.Eval` into `TaxWise.Rag` (`Answering/BaselineAnswerer.cs`, `Prompts/baseline.*`, byte-for-byte), and the eval now uses that copy. The endpoint takes the same `AskRequest`, ignores `plainLanguage`, and returns `{ kind, text, label, disclaimer }` with the label "Plain chatbot — no sources, may be wrong or out of date". It uses the same per-IP limit policy as `/api/ask` (#20), so a compared question uses two permits.
+
+**Alternatives considered:**
+- Keep the demo's separate browser tab with claude.ai, as BUILD_PLAN §8 first planned.
+- A plain-language variant of the baseline prompt.
+- Let the baseline have its own, separate limit.
+
+**Why:** The comparison should show what the eval measured (8% of out-of-scope questions refused, the TY2027 "not published yet" answers), and sharing one answerer guarantees that. claude.ai has its own system prompt, web search and a different model setup, so it wasn't the same comparison. A plain-language baseline would be a new prompt the eval never scored. Two permits per compared question is the honest cost: each side is one Claude call.
+
+**Caveat:** The plain chatbot's text is free-form and unchecked. The App shows it as plain text (never HTML), under the label and the disclaimer, in a dashed card with no citation chips, so it can't be mistaken for a TaxWise answer. Students who leave the switch on use their hourly limit twice as fast.
+
+## 22. Voice input uses the OS's on-device speech recognizer
 
 **Stretch · 2026-11-18**
 

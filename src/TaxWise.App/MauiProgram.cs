@@ -49,7 +49,7 @@ public static class MauiProgram
 		builder.Services.AddSingleton<ChatSession>();
 		builder.Services.AddSingleton(FileSystem.Current);
 		builder.Services.AddSingleton<QuizHistory>();
-		// On-device only (DECISIONS #21): OfflineSpeechToText, not SpeechToText, which may send audio to Apple's servers.
+		// On-device only (DECISIONS #22): OfflineSpeechToText, not SpeechToText, which may send audio to Apple's servers.
 		builder.Services.AddSingleton(OfflineSpeechToText.Default);
 		builder.Services.AddSingleton<IVoiceInput, VoiceInput>();
 

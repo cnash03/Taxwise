@@ -27,3 +27,18 @@ public sealed record SourcePassage(int Number, string ChunkId, string DocId, str
     string? Chapter, string Section, int Page, int TaxYear, string Text, string PdfUrl);
 
 public sealed record HelpLink(string Label, string Url);
+
+/// <summary>
+/// Body of <c>POST /api/ask/baseline</c>: the same model answering with no IRS passages, for the side-by-side
+/// comparison. <see cref="Text"/> is the model's own answer, uncited and unchecked; <see cref="Label"/> says so.
+/// </summary>
+public sealed record BaselineResponse(
+    string Kind,       // "answer" | "refusal" (the model declined)
+    string Text,
+    string Label,
+    string Disclaimer)
+{
+    public const string AnswerKind = "answer";
+    public const string RefusalKind = "refusal";
+    public const string PlainChatbotLabel = "Plain chatbot — no sources, may be wrong or out of date";
+}

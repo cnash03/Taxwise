@@ -57,7 +57,7 @@
         <key>NSAllowsLocalNetworking</key>
         <true/>
     </dict>
-    <!-- Voice input on the Ask page (DECISIONS #21). macOS shows these in its permission prompts. -->
+    <!-- Voice input on the Ask page (DECISIONS #22). macOS shows these in its permission prompts. -->
     <key>NSMicrophoneUsageDescription</key>
     <string>TaxWise listens when you press the microphone button so you can speak your tax question.</string>
     <key>NSSpeechRecognitionUsageDescription</key>

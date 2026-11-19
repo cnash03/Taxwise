@@ -22,6 +22,13 @@ public sealed class TaxWiseApiClient(HttpClient http)
 		return await ReadAsync<AskResponse>(response, cancellationToken);
 	}
 
+	/// <summary>The same question to the same model with no retrieval, for "Compare with a plain chatbot".</summary>
+	public async Task<BaselineResponse> AskBaselineAsync(AskRequest request, CancellationToken cancellationToken)
+	{
+		using var response = await SendAsync(() => http.PostAsJsonAsync(ApiRoutes.AskBaseline, request, cancellationToken), cancellationToken);
+		return await ReadAsync<BaselineResponse>(response, cancellationToken);
+	}
+
 	public async Task<KnowledgeBaseResponse> GetKnowledgeBaseAsync(CancellationToken cancellationToken)
 	{
 		using var response = await SendAsync(() => http.GetAsync(ApiRoutes.KnowledgeBase, cancellationToken), cancellationToken);

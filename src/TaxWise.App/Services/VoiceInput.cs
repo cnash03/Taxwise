@@ -30,7 +30,7 @@ public interface IVoiceInput
 }
 
 /// <summary>
-/// On-device recognition through CommunityToolkit.Maui's <see cref="OfflineSpeechToText"/> (DECISIONS #21): Apple's
+/// On-device recognition through CommunityToolkit.Maui's <see cref="OfflineSpeechToText"/> (DECISIONS #22): Apple's
 /// Speech framework with <c>RequiresOnDeviceRecognition</c> on the Mac, System.Speech dictation on Windows. No audio
 /// or text leaves the computer, and neither is ever logged.
 /// </summary>

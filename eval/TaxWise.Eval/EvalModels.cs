@@ -11,12 +11,6 @@ public interface IJudge
     Task<JudgeVerdict> JudgeAsync(string question, int taxYear, string goldAnswer, string candidate, CancellationToken ct = default);
 }
 
-public interface IBaselineAnswerer
-{
-    /// <summary>Same model, same question, no passages (BUILD_PLAN §8 "Baseline").</summary>
-    Task<(string? Answer, bool Refused, ModelCallInfo Call)> AnswerAsync(string question, int taxYear, CancellationToken ct = default);
-}
-
 /// <summary>LLM judge with structured output <c>{verdict, reason}</c>. Its <see cref="ClaudeJsonClient"/> runs the judge model.</summary>
 public sealed class ClaudeJudge(ClaudeJsonClient claude) : IJudge
 {
@@ -37,30 +31,14 @@ public sealed class ClaudeJudge(ClaudeJsonClient claude) : IJudge
     }
 }
 
-/// <summary>A plain chatbot: the answer model with a one-line system prompt and no retrieval.</summary>
-public sealed class ClaudeBaselineAnswerer(ClaudeJsonClient claude) : IBaselineAnswerer
-{
-    private sealed record Reply([property: JsonPropertyName("answer")] string Answer);
-
-    public async Task<(string? Answer, bool Refused, ModelCallInfo Call)> AnswerAsync(string question, int taxYear,
-        CancellationToken ct = default)
-    {
-        var result = await claude.CallAsync(EvalPrompts.BaselineSystem(taxYear), question.Trim(), EvalPrompts.BaselineSchema, ct);
-        if (result.Refused) return (null, true, result.Call);
-        return (claude.Parse<Reply>(result).Answer, false, result.Call);
-    }
-}
-
-/// <summary>The eval's own prompts, embedded from Prompts/ like the app's.</summary>
+/// <summary>
+/// The eval's own prompts (the judge), embedded from Prompts/ like the app's. The baseline prompt lives in
+/// TaxWise.Rag (<see cref="BaselinePrompt"/>), shared with <c>POST /api/ask/baseline</c>.
+/// </summary>
 public static class EvalPrompts
 {
     public static string JudgeSystem { get; } = Resource("judge.system.md").TrimEnd();
     public static IReadOnlyDictionary<string, JsonElement> JudgeSchema { get; } = Schema("judge.schema.json");
-    public static IReadOnlyDictionary<string, JsonElement> BaselineSchema { get; } = Schema("baseline.schema.json");
-    private static readonly string BaselineTemplate = Resource("baseline.system.md").TrimEnd();
-
-    public static string BaselineSystem(int taxYear) =>
-        BaselineTemplate.Replace("{TaxYear}", taxYear.ToString(System.Globalization.CultureInfo.InvariantCulture));
 
     private static IReadOnlyDictionary<string, JsonElement> Schema(string name) =>
         JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(Resource(name))!;
