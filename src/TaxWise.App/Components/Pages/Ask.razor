@@ -15,18 +15,30 @@
         <header class="chat-header">
             <div class="chat-heading">
                 <h1 class="chat-title" title="@Chat.Title">@Chat.Title</h1>
-                <div class="chat-subtitle">Answers come only from official IRS publications, with citations.</div>
+                <div class="chat-subtitle">@(IsColorado
+                    ? "Answers come only from official Colorado Department of Revenue documents, with citations."
+                    : "Answers come only from official IRS publications, with citations.")</div>
             </div>
             <div class="chat-controls">
-                <TaxYearPicker Feature="TaxYearFeature.Chat" @bind-Value="_taxYear" Disabled="Busy" />
+                @* Federal or Colorado (DECISIONS #23). Colorado has one tax year of DOR sources, so the year is fixed there. *@
+                <label class="year-picker" title="Federal questions use IRS publications; Colorado questions use Colorado Department of Revenue documents.">
+                    <span>Taxes</span>
+                    <select value="@_jurisdiction" @onchange="ChangeJurisdiction" disabled="@Busy" aria-label="Which taxes: federal or Colorado">
+                        <option value="@Jurisdictions.Federal">Federal</option>
+                        <option value="@Jurisdictions.Colorado">Colorado</option>
+                    </select>
+                </label>
+                <TaxYearPicker Feature="TaxYearFeature.Chat" Value="EffectiveTaxYear" ValueChanged="@((int y) => _taxYear = y)"
+                               Disabled="@(Busy || IsColorado)"
+                               Tooltip="@(IsColorado ? $"Colorado DOR sources are loaded for tax year {ColoradoTaxYear} only." : null)" />
                 <label class="toggle">
                     <input type="checkbox" role="switch" checked="@_plainLanguage" @onchange="TogglePlainLanguage"
-                           aria-label="Plain-language mode: simpler wording from the same IRS passages" />
+                           aria-label="Plain-language mode: simpler wording from the same passages" />
                     <span class="toggle-track" aria-hidden="true"></span>
                     <span>Plain-language mode</span>
                 </label>
-                <label class="toggle">
-                    <input type="checkbox" role="switch" checked="@_compare" @onchange="ToggleCompare"
+                <label class="toggle" title="@(IsColorado ? "The plain-chatbot comparison covers federal questions only." : null)">
+                    <input type="checkbox" role="switch" checked="@(_compare && !IsColorado)" @onchange="ToggleCompare" disabled="@IsColorado"
                            aria-label="Compare with a plain chatbot: also ask the same model with no IRS sources and show both answers side by side" />
                     <span class="toggle-track" aria-hidden="true"></span>
                     <span>Compare with a plain chatbot</span>
@@ -47,14 +59,22 @@
             @if (Chat.Turns.Count == 0)
             {
                 <div class="welcome">
-                    <h2>Ask about your federal taxes</h2>
-                    <p>TaxWise searches IRS publications for tax year @_taxYear and answers with numbered citations you can check.</p>
-                    @if (_compare)
+                    @if (IsColorado)
+                    {
+                        <h2>Ask about your Colorado income taxes</h2>
+                        <p>TaxWise searches Colorado Department of Revenue documents for tax year @EffectiveTaxYear and answers with numbered citations you can check.</p>
+                    }
+                    else
+                    {
+                        <h2>Ask about your federal taxes</h2>
+                        <p>TaxWise searches IRS publications for tax year @_taxYear and answers with numbered citations you can check.</p>
+                    }
+                    @if (_compare && !IsColorado)
                     {
                         <p>Compare is on: each question is also sent to the same model with no IRS sources, and both answers appear side by side.</p>
                     }
                     <div class="follow-ups">
-                        @foreach (var example in Examples)
+                        @foreach (var example in IsColorado ? ColoradoExamples : Examples)
                         {
                             <button class="follow-up" @onclick="() => AskAsync(example)">@example</button>
                         }
@@ -140,7 +160,10 @@
         }
     </section>
 
-    <SourcePanel Source="_selected?.Source" Highlight="@_selected?.Citation.Highlight" OnOpenPdf="OpenPdfAsync" />
+    <SourcePanel Source="_selected?.Source" Highlight="@_selected?.Citation.Highlight" OnOpenPdf="OpenPdfAsync"
+                 EmptyText="@(IsColorado
+                     ? "Click a numbered citation in an answer to see the exact Colorado DOR passage it came from."
+                     : "Click a numbered citation in an answer to see the exact IRS passage it came from.")" />
 </div>
 
 @code {
@@ -150,6 +173,16 @@
         "Do I need to file a tax return if I only worked a summer job?",
         "Is my scholarship taxable?",
     ];
+
+    private static readonly string[] ColoradoExamples =
+    [
+        "Do I have to file a Colorado return if I don't have to file a federal one?",
+        "I moved to Colorado for college in August. Am I a part-year resident?",
+        "Can I subtract my CollegeInvest 529 contributions on my Colorado return?",
+    ];
+
+    /// <summary>Used until the knowledge base loads; the DOR sources in the manifest are TY2025.</summary>
+    private const int DefaultColoradoTaxYear = 2025;
 
     /// <summary>Same cap as the API's AskLimits.MaxQuestionLength.</summary>
     private const int QuestionMaxLength = 1000;
@@ -162,6 +195,7 @@
     private bool _plainLanguage;
     private bool _compare;
     private int _taxYear;
+    private string _jurisdiction = Jurisdictions.Federal;
     private CitationSelection? _selected;
     private KnowledgeBaseResponse? _knowledgeBase;
     private string? _openError;
@@ -169,11 +203,27 @@
 
     private bool Busy => Chat.Turns.Any(t => t.IsLoading);
 
-    /// <summary>BUILD_PLAN §1a: years without their full publications get a banner naming the Rev. Proc. in use.</summary>
+    private bool IsColorado => Jurisdictions.IsColorado(_jurisdiction);
+
+    /// <summary>The newest year the knowledge base has Colorado DOR documents for.</summary>
+    private int ColoradoTaxYear =>
+        _knowledgeBase?.Documents.Where(d => Jurisdictions.IsColorado(d.Jurisdiction)).SelectMany(d => d.TaxYears)
+            .DefaultIfEmpty(DefaultColoradoTaxYear).Max() ?? DefaultColoradoTaxYear;
+
+    /// <summary>The year questions are asked for: the picker's year, or the Colorado year when Colorado is chosen.</summary>
+    private int EffectiveTaxYear => IsColorado ? ColoradoTaxYear : _taxYear;
+
+    /// <summary>
+    /// BUILD_PLAN §1a: years without their full publications get a banner naming the Rev. Proc. in use. Colorado gets a
+    /// banner saying which features stay federal.
+    /// </summary>
     private string? LimitedYearBanner
     {
         get
         {
+            if (IsColorado)
+                return $"Colorado answers use Colorado Department of Revenue documents for tax year {ColoradoTaxYear}. " +
+                       "The calculator, Explain my form, quizzes and the plain-chatbot comparison cover federal taxes only.";
             if (_knowledgeBase is null || _knowledgeBase.FullKnowledgeBaseYears.Contains(_taxYear)) return null;
             var revProc = _knowledgeBase.Documents.FirstOrDefault(d => d.Kind == "rev-proc" && d.TaxYears.Contains(_taxYear));
             var notice = revProc is null ? "" : $" ({SourceLabels.ShortTitle(revProc.Title)})";
@@ -186,7 +236,8 @@
         _plainLanguage = Settings.PlainLanguage;
         _compare = Settings.CompareWithChatbot;
         _taxYear = Settings.GetTaxYear(TaxYearFeature.Chat);
-        _voice = new VoiceDraft(Voice.IsSupported, QuestionMaxLength);
+        _jurisdiction = Settings.ChatJurisdiction;
+        _voice =new VoiceDraft(Voice.IsSupported, QuestionMaxLength);
 
         // A request still marked loading was cancelled when we left the page; let the student retry it.
         foreach (var turn in Chat.Turns.Where(t => t.Status == TurnStatus.Loading))
@@ -228,6 +279,13 @@
         Settings.CompareWithChatbot = _compare;
     }
 
+    /// <summary>Remembered like the other header choices. Earlier turns keep the jurisdiction they were asked in.</summary>
+    private void ChangeJurisdiction(ChangeEventArgs e)
+    {
+        _jurisdiction = Jurisdictions.Normalize(e.Value?.ToString()) ?? Jurisdictions.Federal;
+        Settings.ChatJurisdiction = _jurisdiction;
+    }
+
     private void NewChat()
     {
         Chat.Clear();
@@ -242,7 +300,11 @@
         if (question.Length == 0 || Busy) return;
         StopVoice();
         _draft = "";
-        var turn = new ChatTurn(question, _plainLanguage, _taxYear) { Baseline = _compare ? new BaselineTurn() : null };
+        // The plain-chatbot comparison is federal only (its prompt and the eval it mirrors are about federal taxes).
+        var turn = new ChatTurn(question, _plainLanguage, EffectiveTaxYear, _jurisdiction)
+        {
+            Baseline = _compare && !IsColorado ? new BaselineTurn() : null,
+        };
         Chat.Turns.Add(turn);
         await RunAsync(turn);
     }
@@ -310,7 +372,7 @@
     {
         if (Busy) return;
         // Only the failed side is asked again; a plain-chatbot answer already on screen is kept.
-        var turn = new ChatTurn(failed.Question, failed.PlainLanguage, failed.TaxYear)
+        var turn = new ChatTurn(failed.Question, failed.PlainLanguage, failed.TaxYear, failed.Jurisdiction)
         {
             Baseline = failed.Baseline is { Status: TurnStatus.Done } done ? done : failed.Baseline is null ? null : new BaselineTurn(),
         };
@@ -341,7 +403,7 @@
     {
         try
         {
-            turn.Response = await Api.AskAsync(new AskRequest(turn.Question, turn.PlainLanguage, turn.TaxYear), _cts.Token);
+            turn.Response = await Api.AskAsync(new AskRequest(turn.Question, turn.PlainLanguage, turn.TaxYear, turn.Jurisdiction), _cts.Token);
             turn.Status = TurnStatus.Done;
             if (turn.QuizTopic is { } topic) QuizHistory.Record(topic, turn.TaxYear, turn.CitedChunkIds);
             SelectFirstCitation(turn);

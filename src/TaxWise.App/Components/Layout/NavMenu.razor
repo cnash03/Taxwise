@@ -24,6 +24,10 @@
         {
             <div class="kb-detail kb-muted">@limited</div>
         }
+        @if (ColoradoSummary(kb) is { } colorado)
+        {
+            <div class="kb-detail kb-muted">@colorado</div>
+        }
     }
     else
     {
@@ -62,8 +66,17 @@
     /// <summary>"6 IRS documents · full for TY 2025"</summary>
     private static string FullSummary(KnowledgeBaseResponse kb)
     {
-        var full = kb.Documents.Count(d => d.TaxYears.Any(kb.FullKnowledgeBaseYears.Contains));
+        var full = kb.Documents.Count(d => !Jurisdictions.IsColorado(d.Jurisdiction) && d.TaxYears.Any(kb.FullKnowledgeBaseYears.Contains));
         return $"{full} IRS documents · full for TY {string.Join(", ", kb.FullKnowledgeBaseYears)}";
+    }
+
+    /// <summary>"Colorado: 2 DOR documents · TY 2025", or null when none are listed.</summary>
+    private static string? ColoradoSummary(KnowledgeBaseResponse kb)
+    {
+        var docs = kb.Documents.Where(d => Jurisdictions.IsColorado(d.Jurisdiction)).ToList();
+        if (docs.Count == 0) return null;
+        var years = docs.SelectMany(d => d.TaxYears).Distinct().Order();
+        return $"Colorado: {docs.Count} DOR documents · TY {string.Join(", ", years)}";
     }
 
     /// <summary>"TY 2026, 2027: Rev. Proc. only", or null when every year has its full publications.</summary>

@@ -17,6 +17,10 @@
         </div>
 
         <div class="tags">
+            @if (SourceLabels.Publisher(Source) is { } publisher)
+            {
+                <span class="tag">@publisher</span>
+            }
             <span class="tag">Tax year @Source.TaxYear</span>
             @if (SourceLabels.ShortChapter(Source.Chapter) is { } chapter)
             {

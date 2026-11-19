@@ -38,11 +38,13 @@ internal sealed class FakeVoyage(params double[] rerankScores) : IVoyageClient
 internal sealed class FakeStore(IReadOnlyList<Chunk> hits) : IChunkStore
 {
     public List<(int TaxYear, int Limit, IReadOnlyCollection<string>? DocIds)> Searches { get; } = [];
+    public List<string> SearchedJurisdictions { get; } = [];
 
     public Task<IReadOnlyList<ScoredChunk>> SearchAsync(float[] vector, int taxYear, int limit,
         IReadOnlyCollection<string>? docIds = null, string jurisdiction = TaxWise.Shared.Jurisdictions.Federal, CancellationToken ct = default)
     {
         Searches.Add((taxYear, limit, docIds));
+        SearchedJurisdictions.Add(jurisdiction);
         return Task.FromResult<IReadOnlyList<ScoredChunk>>(hits.Take(limit).Select(c => new ScoredChunk(c, 0.5)).ToList());
     }
 
@@ -60,11 +62,13 @@ internal sealed class FakeAnswerer(DraftAnswer? draft, bool refuse = false) : IA
 {
     public int Calls { get; private set; }
     public IReadOnlyList<Chunk>? LastPassages { get; private set; }
+    public string? LastJurisdiction { get; private set; }
 
     public Task<AnswererResult> AnswerAsync(string question, IReadOnlyList<Chunk> passages, int taxYear, bool plainLanguage, string jurisdiction = TaxWise.Shared.Jurisdictions.Federal, CancellationToken ct = default)
     {
         Calls++;
         LastPassages = passages;
+        LastJurisdiction = jurisdiction;
         var call = new ModelCallInfo("fake", 1, 10, 10, 0, refuse ? "refusal" : "end_turn");
         return Task.FromResult(new AnswererResult(refuse ? null : draft, refuse, call));
     }
@@ -72,6 +76,12 @@ internal sealed class FakeAnswerer(DraftAnswer? draft, bool refuse = false) : IA
 
 internal sealed class FakeRetriever(RetrievalResult result) : IRetriever
 {
+    public string? LastJurisdiction { get; private set; }
+
     public Task<RetrievalResult> RetrieveAsync(string question, int taxYear, IReadOnlyCollection<string>? docIds = null,
-        string jurisdiction = TaxWise.Shared.Jurisdictions.Federal, CancellationToken ct = default) => Task.FromResult(result);
+        string jurisdiction = TaxWise.Shared.Jurisdictions.Federal, CancellationToken ct = default)
+    {
+        LastJurisdiction = jurisdiction;
+        return Task.FromResult(result);
+    }
 }
