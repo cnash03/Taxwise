@@ -27,8 +27,8 @@ builder.Configuration.AddEnvironmentVariables();
 builder.Logging.AddFilter("System.Net.Http.HttpClient", LogLevel.Warning).AddFilter("Polly", LogLevel.Warning)
     .AddFilter("Microsoft", LogLevel.Warning).AddFilter("TaxWise.Rag", LogLevel.Warning);
 
+// AddTaxWiseAnswering also registers the baseline answerer that the API's /api/ask/baseline uses.
 builder.Services.AddTaxWiseRag(builder.Configuration).AddTaxWiseAnswering(builder.Configuration);
-builder.Services.AddSingleton<IBaselineAnswerer, ClaudeBaselineAnswerer>();
 builder.Services.AddSingleton<IJudge>(sp =>
 {
     // The judge is a separate, cheaper model with its own client settings; the answer model is untouched.

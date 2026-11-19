@@ -1,4 +1,6 @@
 using System.Reflection;
+using CommunityToolkit.Maui.Core;
+using CommunityToolkit.Maui.Media;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using TaxWise.App.Services;
@@ -12,6 +14,7 @@ public static class MauiProgram
 		var builder = MauiApp.CreateBuilder();
 		builder
 			.UseMauiApp<App>()
+			.UseMauiCommunityToolkitCore()
 			.ConfigureFonts(fonts =>
 			{
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -46,6 +49,9 @@ public static class MauiProgram
 		builder.Services.AddSingleton<ChatSession>();
 		builder.Services.AddSingleton(FileSystem.Current);
 		builder.Services.AddSingleton<QuizHistory>();
+		// On-device only (DECISIONS #22): OfflineSpeechToText, not SpeechToText, which may send audio to Apple's servers.
+		builder.Services.AddSingleton(OfflineSpeechToText.Default);
+		builder.Services.AddSingleton<IVoiceInput, VoiceInput>();
 
 		builder.Services.AddMauiBlazorWebView();
 

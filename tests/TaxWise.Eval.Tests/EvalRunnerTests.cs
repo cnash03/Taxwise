@@ -32,8 +32,8 @@ public class EvalRunnerTests
 
     private sealed class FakeBaseline(string answer) : IBaselineAnswerer
     {
-        public Task<(string? Answer, bool Refused, ModelCallInfo Call)> AnswerAsync(string question, int taxYear, CancellationToken ct = default) =>
-            Task.FromResult<(string?, bool, ModelCallInfo)>((answer, false, Call));
+        public Task<BaselineResult> AnswerAsync(string question, int taxYear, CancellationToken ct = default) =>
+            Task.FromResult(new BaselineResult(answer, false, Call));
     }
 
     private sealed class FakeJudge(string verdict) : IJudge

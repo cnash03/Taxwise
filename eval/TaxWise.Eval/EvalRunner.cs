@@ -97,8 +97,8 @@ public sealed class EvalRunner(
         var sw = Stopwatch.StartNew();
         try
         {
-            var (text, refused, _) = await baseline.AnswerAsync(g.Question, g.TaxYear, ct);
-            return Result(g, 0, [], null, refused ? Outcomes.ModelRefusal : Outcomes.Answered, 0, 0, text, sw);
+            var answer = await baseline.AnswerAsync(g.Question, g.TaxYear, ct);
+            return Result(g, 0, [], null, answer.Refused ? Outcomes.ModelRefusal : Outcomes.Answered, 0, 0, answer.Answer, sw);
         }
         catch (AnswererException e)
         {

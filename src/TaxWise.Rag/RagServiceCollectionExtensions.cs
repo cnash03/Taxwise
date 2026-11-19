@@ -35,7 +35,7 @@ public static class RagServiceCollectionExtensions
 
     /// <summary>
     /// Adds the cited Q&amp;A pipeline on top of <see cref="AddTaxWiseRag"/>: retriever, Claude answerer,
-    /// <see cref="AskService"/>, the "Explain my form" explainer and <see cref="FormExplainService"/>, the upload extractor and <see cref="FormUploadService"/>, the calculator explainer and <see cref="CalculatorService"/>, and the quiz writer and <see cref="QuizService"/>. The Anthropic key is read from <c>ANTHROPIC_API_KEY</c> (env, user-secrets or
+    /// <see cref="AskService"/>, the no-retrieval baseline and <see cref="BaselineService"/>, the "Explain my form" explainer and <see cref="FormExplainService"/>, the upload extractor and <see cref="FormUploadService"/>, the calculator explainer and <see cref="CalculatorService"/>, and the quiz writer and <see cref="QuizService"/>. The Anthropic key is read from <c>ANTHROPIC_API_KEY</c> (env, user-secrets or
     /// App Service settings) when the client is first needed, so hosts without a key still start. Without a key the
     /// SDK falls back to the <c>ant auth login</c> profile in <c>~/.config/anthropic</c>, which is how local dev runs.
     /// </summary>
@@ -55,6 +55,8 @@ public static class RagServiceCollectionExtensions
         services.AddSingleton<ClaudeJsonClient>();
         services.AddSingleton<IAnswerer, ClaudeAnswerer>();
         services.AddSingleton<AskService>();
+        services.AddSingleton<IBaselineAnswerer, ClaudeBaselineAnswerer>();
+        services.AddSingleton<BaselineService>();
         services.AddSingleton<FormLibrary>();
         services.AddSingleton<IFormExplainer, ClaudeFormExplainer>();
         services.AddSingleton<FormExplainService>();
