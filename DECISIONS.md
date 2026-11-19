@@ -248,3 +248,18 @@ hit@4 went from 87.5% to 95%. `--rejudge` now rescores hit@4 against the current
 
 **Caveat:** Everyone behind one NAT, such as a campus network, shares one limit. Raise `UsageLimit__PermitLimit` in Azure before a classroom demo.
 
+
+## 21. Voice input uses the OS's on-device speech recognizer
+
+**Stretch · 2026-11-18**
+
+**Decision:** The Ask page has a mic button. It uses `OfflineSpeechToText` from `CommunityToolkit.Maui.Core` 16.0.0 (the last release for .NET 10 and MAUI 10; 17.x needs .NET 11) behind a small `IVoiceInput` service in `TaxWise.App/Services`. On the Mac that is Apple's Speech framework with `RequiresOnDeviceRecognition`; on Windows it is System.Speech dictation. The recognizer is English (`en-US`) and stops after a 4-second pause, a press of the mic, 60 seconds, sending a question or leaving the page. The transcript goes into the question box, and nothing is sent until the student presses **Ask**. The button's states (idle, starting, listening, error) live in `VoiceDraft` in `TaxWise.Shared/Display` so they're unit-tested without MAUI. The Mac app gets `NSMicrophoneUsageDescription`, `NSSpeechRecognitionUsageDescription` and the `com.apple.security.device.audio-input` entitlement; the Windows manifest declares the `microphone` capability.
+
+**Alternatives considered:**
+- The toolkit's `SpeechToText`, which on the Mac may send audio to Apple's servers, and on Windows uses online speech recognition.
+- A cloud speech service (Azure Speech, Whisper) through the API, or called from the App.
+- Calling `SFSpeechRecognizer` and `Windows.Media.SpeechRecognition` directly.
+
+**Why:** On-device recognition needs no new keys, costs nothing, and no audio or transcript leaves the computer, which matters for an app that talks about students' money. A cloud service would mean a key in the API, a new endpoint and per-request cost, against BUILD_PLAN §1's rule that the App holds no keys. The toolkit already wraps both platforms' recognizers with permission handling, so writing our own would duplicate it. The transcript is never logged, and the debug log only records the error kind.
+
+**Caveat:** On a Mac the on-device English model must be installed (it comes with Dictation, System Settings → Keyboard); otherwise the button shows "Speech recognition isn't available". On Windows, System.Speech shows each phrase only once it's recognized, not word by word. The toolkit holds event handlers through weak references, so `VoiceInput` is a singleton with instance-method handlers. Neither platform could be tested with a real voice by the agent.

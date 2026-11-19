@@ -103,6 +103,8 @@ It writes `appsettings.Release.json`, checks that `/health` answers, and leaves 
 
 The app isn't signed with an Apple Developer ID, so macOS blocks it the first time. The user opens it once, clicks **Done**, then goes to **System Settings → Privacy & Security** and clicks **Open Anyway** (on macOS 14 and older, right-click → **Open** also works). Removing that step takes an Apple Developer account ($99/year), a `Developer ID Application` certificate and `xcrun notarytool`.
 
+The first press of the mic button on the Ask page asks for **Microphone** and **Speech Recognition** access. The bundle must carry the `com.apple.security.device.audio-input` entitlement for that to work (DECISIONS #21); check with `codesign -d --entitlements - src/TaxWise.App/bin/Release/net10.0-maccatalyst/TaxWise.app`.
+
 **Windows** (build on a Windows machine with the MAUI workload installed):
 
 ```powershell

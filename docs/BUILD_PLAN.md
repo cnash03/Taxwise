@@ -549,7 +549,7 @@ Run **head-to-head comparisons** (the same prompt given to Claude Code and to Co
 - OCR for scanned or photographed W-2 and 1098-T uploads. (Parsing PDFs with a text layer was built after Phase 8; see §6.)
 - Colorado state tax coverage (a second collection, or `jurisdiction` payload filtering).
 - A side-by-side view comparing TaxWise with a plain chatbot (Phase 7's baseline mode already gives the data).
-- Voice input.
+- Voice input. (Built after Phase 8 on request: a mic button on the Ask page fills the question box using the OS's on-device speech recognizer. See DECISIONS #21 and the README.)
 
 ---
 
