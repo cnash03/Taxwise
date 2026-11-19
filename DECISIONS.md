@@ -233,3 +233,18 @@ hit@4 went from 87.5% to 95%. `--rejudge` now rescores hit@4 against the current
 **Why:** "Upload mine" (#17) uses Blazor's `InputFile`, which opens the system file picker. In the sandboxed app without this entitlement the picker never appeared and the app hung on the first click. Read-only access to files the student chooses is the narrowest permission that works. The sandbox stays on because the Mac App Store needs it, and the app never writes the PDF anywhere.
 
 **Caveat:** The build doesn't always re-sign the app when only the entitlements change. After editing them, delete the `.app` bundle and rebuild, then check with `codesign -d --entitlements - <app>`.
+
+## 20. The API keys stay on the server, and Claude-backed endpoints are limited per IP
+
+**After Phase 8 · 2026-11-18 · session `24bebf56`**
+
+**Decision:** The packaged App ships with only the deployed API's URL. Students use the team's Anthropic and Voyage keys through `TaxWise.Api`, where the keys are App Service settings. `/api/ask`, `/api/forms/explain`, `/api/forms/upload`, `/api/calculator` and `/api/quiz` use ASP.NET Core's built-in rate limiter: a fixed window per client IP, set by `UsageLimit:PermitLimit` and `UsageLimit:WindowMinutes`. It is off by default and set to 60 an hour in `appsettings.Production.json`. A blocked request gets a 429 ProblemDetails, and the App shows its `detail`. `scripts/package-mac.sh` builds the universal Mac app and `.dmg`.
+
+**Alternatives considered:**
+- Embed the Anthropic and Voyage keys in the App and call the APIs from it.
+- Sign-in for the API.
+
+**Why:** A .NET app can be decompiled in minutes, so an embedded key is a published key, and it would also have meant moving retrieval and Qdrant access into the App. With the keys on the server, the only thing a copied App exposes is the URL, and the per-IP cap bounds what that URL can cost. Sign-in would be a bigger change than the demo needs. The limit is read per request, so the tests can change it and Azure can change it without a redeploy.
+
+**Caveat:** Everyone behind one NAT, such as a campus network, shares one limit. Raise `UsageLimit__PermitLimit` in Azure before a classroom demo.
+

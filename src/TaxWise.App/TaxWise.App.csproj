@@ -78,6 +78,9 @@
         <!-- Release builds for the demo point at the deployed API (docs/DEPLOY.md). -->
         <Content Remove="appsettings.Release.json" />
         <EmbeddedResource Include="appsettings.Release.json" Condition="'$(Configuration)' == 'Release' And Exists('appsettings.Release.json')" />
+        <!-- Optional, gitignored, any configuration: points your own build at another API, e.g. the deployed one (docs/DEPLOY.md §4). -->
+        <Content Remove="appsettings.local.json" />
+        <EmbeddedResource Include="appsettings.local.json" Condition="Exists('appsettings.local.json')" />
         <!-- Human-reviewed term definitions for plain-language mode (BUILD_PLAN §5.2). -->
         <EmbeddedResource Include="..\..\data\glossary.json" LogicalName="TaxWise.App.glossary.json" Link="glossary.json" />
     </ItemGroup>

@@ -496,3 +496,36 @@ Entries are append-only. The overall summary is in [AI_USAGE.md](AI_USAGE.md).
   - **A full-screen screenshot captured another app** (our browser) because TaxWise had opened behind it. The agent deleted it without using it. This happened before in `ce6c7853`.
   - **It can't drive the App:** macOS hadn't given the terminal accessibility permission, so it couldn't click through pages itself.
 - **Tag:** partial
+
+### 2026-11-18 · Deploy · Claude Code (claude-opus-5-5) · @cnash03 · session `24bebf56`
+- **Role:** ad hoc after the plan: the Azure deploy, Mac packaging, and docs for the teammate. It finishes Phase 8's open acceptance check.
+- **Prompt:** "I actually want the api keys in the app so users can use my claude and voyage - please set that up - i would also like to package this so a user can open this on their computer mac or windows how would that work?". Follow-ups were pasted Azure CLI errors, then "everything is up in azure now what", "can you note this now in the repo for my teammate and future use - how to update the api and how to connect thier local ui to it" and "push it and open a PR".
+- **Generated:**
+  - **Per-IP usage limit** on the five endpoints that call Claude (`UsageLimitOptions` in `ApiOptions.cs`, ASP.NET Core's rate limiter in `Program.cs`). It's off by default and 60 an hour in `appsettings.Production.json`. Over the limit, the API returns a 429 ProblemDetails, which the App already shows. Tests: `UsageLimitTests.cs` (3).
+  - **`scripts/package-mac.sh`:** a universal (arm64 + x64) `TaxWise.app` in a `.dmg`, after a `/health` check.
+  - **`appsettings.Release.json`** pointing at `https://taxwise-api-cnash.azurewebsites.net`, and an optional gitignored `appsettings.local.json` that overrides `ApiBaseUrl` in any build (`.csproj`, `MauiProgram.cs`).
+  - **Docs:** DEPLOY.md lists the deployed resources and adds §4 (run your local App against Azure), §5 (ship API changes) and §6 (give a teammate access). There are also SETUP.md and README updates and DECISIONS #20.
+  - Commits `5c9bbff` and `3d8847e`, on a new branch `azure-deploy`, in PR #13.
+  - Shell commands for us to run: the Azure plan and web app, app settings read straight from user-secrets, publish and checks.
+- **Human decisions:**
+  - **Keys in the App:** we asked for it. The AI explained that a .NET app can be decompiled, so an embedded key is effectively public, and that the hosted API already let users run on our keys. **We chose the server option (Recommended).**
+  - **Windows build:** AI recommended a GitHub Actions workflow → **we chose Mac only for now.**
+  - The API wasn't deployed yet, so we ran the Azure and Qdrant steps ourselves, with the agent reading our pasted errors.
+  - The skill skips the running session; we chose to log this one now because the work was finished.
+- **Verified by:**
+  - `dotnet test tests/TaxWise.Api.Tests`: 43 passed, including the 3 new limit tests.
+  - Mounted the `.dmg` and ran `lipo` and `codesign`: universal binary with the `files.user-selected.read-only` entitlement.
+  - `curl` against the deployed API: `/health` ok, and `/api/ask` returned a Pub 970-cited answer.
+  - Launched the packaged Release app and took a screenshot: green dot, knowledge base loaded from Azure.
+  - Built Debug with and without `appsettings.local.json` and searched the DLL for the Azure URL: present with the file, absent without it.
+- **Worked?** Yes. The API is live on Azure, the packaged app connects to it, and PR #13 is open.
+- **Human change:** none by hand. We ran every cloud command ourselves.
+- **AI limits seen:**
+  - **The first packaging script picked the wrong app bundle.** `find | head -1` grabbed the Intel-only bundle, which has no entitlements. The agent caught it by inspecting its own `.dmg` and switched to the exact path of the universal bundle.
+  - **It didn't know our subscription's Azure quota.** It suggested F1 and then B1 in Central US, and both failed with a quota of 0. A loop over regions found West US 3.
+  - **We pasted a command with its `<anthropic-key>` placeholders still in it,** and zsh read them as file redirects. The agent replaced the placeholders with a script that reads the keys from user-secrets and prompts for the Qdrant key without echoing it.
+  - **That script's empty-value check only warned,** so a blank value was saved to Azure. The agent admitted the gap and gave a way to check each setting's length without showing it. The cause was likely a blank pasted line being read as the Qdrant key.
+  - **Debug Mac builds still need `-p:ValidateXcodeVersion=false`** (as in `a69ad57c`). The agent's first verification build failed without it.
+  - **A screenshot of the launched app also captured our Notes window,** which showed what looks like a login token. The agent deleted the image and told us to change the token.
+  - **The log holds our Azure subscription ID** from a pasted CLI error. It isn't a secret, but the redaction doesn't mask it.
+- **Tag:** success

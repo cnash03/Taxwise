@@ -18,7 +18,8 @@ public static class MauiProgram
 			});
 
 		// appsettings.Release.json is only embedded in Release builds and overrides ApiBaseUrl with the deployed API.
-		foreach (var name in new[] { "TaxWise.App.appsettings.json", "TaxWise.App.appsettings.Release.json" })
+		// appsettings.local.json (gitignored, any build) overrides both, e.g. to run a Debug build against Azure.
+		foreach (var name in new[] { "TaxWise.App.appsettings.json", "TaxWise.App.appsettings.Release.json", "TaxWise.App.appsettings.local.json" })
 		{
 			using var settings = Assembly.GetExecutingAssembly().GetManifestResourceStream(name);
 			if (settings is not null)

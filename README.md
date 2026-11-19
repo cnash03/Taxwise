@@ -164,7 +164,7 @@ Options: `--only <docId>`, `--year <2025|2026|2027>`, `--recreate` (drop the col
 
 ## Deploy and demo
 
-- [docs/DEPLOY.md](docs/DEPLOY.md): Qdrant Cloud ingestion, Azure App Service publish and settings, and the Release App builds for macOS and Windows (`appsettings.Release.json` points them at Azure).
+- [docs/DEPLOY.md](docs/DEPLOY.md): Qdrant Cloud ingestion, Azure App Service publish and settings, and the Release App builds for macOS and Windows (`appsettings.Release.json` points them at Azure). It also covers running your local App against the deployed API (§4), shipping API changes (§5) and getting Azure access (§6).
 - [docs/demo-script.md](docs/demo-script.md): the 4-minute demo rehearsal checklist.
 - The deployed API ships the manifest and sample forms but not the PDFs. `GET /api/sources/{docId}/pdf` redirects to irs.gov when the file isn't on the server.
 - The sidebar footer lists the knowledge base from `GET /api/knowledge-base`. **About & disclaimer** links IRS Free File and VITA.
@@ -176,7 +176,7 @@ Options: `--only <docId>`, `--year <2025|2026|2027>`, `--recreate` (drop the col
 - **Calculator scope.** One W-2, standard deduction only, no credits, no other income, no 2025–2028 tip and overtime deductions. TY2026 and TY2027 results are estimates because those Tax Tables aren't published.
 - **Explain my form** covers TY2025 only, and only the boxes on the sample forms (W-2 box 12 with code DD only). Uploads need a PDF with a text layer: scans and photos aren't read (no OCR), and fillable PDFs whose values live only in form fields may come back empty until they're printed to a new PDF.
 - **Answer correctness** was 80% (judge-scored, one run of 52 questions). That's below the plain chatbot's 90% on in-scope questions, because TaxWise only says what its passages support. 6 of its 8 misses were partial answers. The trade-off is 100% valid citations and 100% out-of-scope refusals, against 8% for the chatbot.
-- **No sign-in or rate limiting** on the API. Anyone with the deployed URL can spend the project's Anthropic and Voyage credit, so the URL isn't published and the Azure resources are deleted after the course.
+- **No sign-in** on the API. Anyone with the deployed URL can spend the project's Anthropic and Voyage credit. A per-IP limit (60 Claude-backed requests an hour, DECISIONS #20) and an Anthropic spend limit cap the damage, and the Azure resources are deleted after the course.
 - **The App isn't signed** for distribution, and its builds aren't part of CI.
 - **Educational tool, not tax advice.** Every answer, explanation and calculator result says so.
 
