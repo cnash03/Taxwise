@@ -529,3 +529,59 @@ Entries are append-only. The overall summary is in [AI_USAGE.md](AI_USAGE.md).
   - **A screenshot of the launched app also captured our Notes window,** which showed what looks like a login token. The agent deleted the image and told us to change the token.
   - **The log holds our Azure subscription ID** from a pasted CLI error. It isn't a secret, but the redaction doesn't mask it.
 - **Tag:** success
+
+### 2026-11-18 · Stretch · Claude Code (claude-opus-5-5) · @cnash03 · session `2245e2dc`
+- **Role:** ad hoc. A gap review against the two design PDFs, then the main agent coordinated three background subagents (one per BUILD_PLAN §11 stretch goal) and merged and shipped their work. It integrated each branch, redeployed Azure and loaded Qdrant Cloud.
+- **Prompt:** "is ther anything left in this app to do per the pdfs", then "lets work on the stretch goals - make each of them their own branches and put different agents on each to work on". Follow-ups that changed direction:
+  - "they can spend credit i have room"
+  - "yes load colorado into qdrant cloud too"
+  - "redeploy the api to azure when colorado is done"
+  - "merge the other two branches too when they're done"
+  - "launch the app so i can test the mic", "rebuild the dmg", "relaunch the app so i can test colorado"
+- **Generated:**
+  - **Gap review.** The agent read both PDFs directly with the Read tool; in `a69ad57c` it couldn't. All core features are built. Still open: the Copilot head-to-heads (BUILD_PLAN §9), the human judge spot-check (10 ☐ in each eval report), demo rehearsal, the report and the presentation.
+  - **Plain-chatbot comparison (subagent),** PR [#14](https://github.com/cnash03/Taxwise/pull/14) (`04fe310`, `2fb4748`, `5d50bef`). It adds `POST /api/ask/baseline`, using the eval's baseline answerer and prompts moved byte for byte into `TaxWise.Rag`. The Ask page gets a side-by-side compare switch, and the demo script now uses it. DECISIONS #21.
+  - **Voice input (subagent),** PR [#15](https://github.com/cnash03/Taxwise/pull/15) (`c3c2dd1`, `f3a31db`; merge `f0ea43b` by the main agent). A mic button uses CommunityToolkit.Maui's `OfflineSpeechToText`, which recognizes speech on the device, so no audio leaves the machine. Mic and speech permissions are added for Mac and Windows. `VoiceDraft` state model plus 11 tests. DECISIONS #22.
+  - **Colorado chat (subagent),** PR [#16](https://github.com/cnash03/Taxwise/pull/16) (`89d9bff`, `93140b8`, `8b74a86`, `ff8626f`):
+    - a `jurisdiction` payload with its own index; old federal chunks without the field still count as federal;
+    - `AskRequest.Jurisdiction` and a Federal / Colorado picker;
+    - two Colorado Department of Revenue (DOR) documents in the manifest, with new `edition` and page-range fields;
+    - DECISIONS #23.
+  - **Integration by the main agent:**
+    - merged `main` into the voice branch and renumbered its clashing DECISIONS #21 to #22 in the docs and code comments;
+    - redeployed `main` (`d6cc3e9`) to Azure;
+    - created the `jurisdiction` index on Qdrant Cloud and loaded 90 Colorado chunks there and locally;
+    - rebuilt the Mac `.dmg` twice, once before and once after the Colorado merge.
+- **Human decisions:**
+  - **Stretch goals:** we asked for all three, on separate branches and separate agents. The main agent set the rules: commit only to its own branch, no pushes or PRs, keep tests green, no ports that collide with the others.
+  - **Spending:** we lifted the agent's "no paid calls" rule. The AI kept Qdrant Cloud, Azure and pushes off limits because our approval covered only credit, and we then approved Qdrant Cloud separately.
+  - **Colorado upload order:** the agent made the cloud upload conditional. Wait for the redeploy if Colorado chunks (tagged TY2025) could show up in federal answers on the live API, which only filtered by year. The subagent waited.
+  - **How to ship:** AI recommended "Merge, then deploy", following DEPLOY.md §5 (Azure matches `main`) → we chose that. We also told it to merge the other two branches when done, so the agent merged its own PRs after its tests passed, without a human PR review.
+  - **The blocked Colorado ingestion:** the subagent's ingestion of the second Colorado document was blocked by a permission prompt. The main agent asked us rather than running it on the subagent's behalf. AI recommended "Local and cloud" → we chose that.
+- **Verified by:**
+  - `dotnet test TaxWise.CI.slnf` on every branch before merging: 390 (compare), 401 (voice after merging `main`) and 443 (Colorado) passed, plus Mac App builds with 0 warnings.
+  - Real local calls. The comparison showed:
+    - TaxWise refusing crypto staking while the plain chatbot gave a how-to;
+    - the plain chatbot giving a $15,000 2025 standard deduction (it's $15,750);
+    - the plain chatbot saying the 2027 amounts weren't published.
+  - Colorado local checks:
+    - a Colorado rate question cites DR 0104 p. 10, TY2025;
+    - the federal scholarship question cites only IRS documents;
+    - the same Colorado question in federal mode is refused.
+  - Spot checks: 8/8 on Qdrant Cloud. The collection went from 1,377 to 1,467 points, with the 1,377 federal points unchanged.
+  - Live Azure checks after the deploy: federal answer, crypto refusal, plain-chatbot label, and Colorado 4.4% and part-year answers with DOR citations.
+  - `codesign`/`lipo` on the `.dmg`.
+  - Our tests in the App: the mic works, and Colorado works.
+- **Worked?** Mostly. All three stretch goals are merged, live on Azure and tested by us on the Mac. Live chat broke for about 2 minutes after the deploy.
+- **Human change:** none by hand.
+- **AI limits seen:**
+  - **The deploy took live chat down.** Qdrant Cloud rejects a filter on a field with no index ("Index required but not found for "jurisdiction""), so every `/api/ask` returned 502 for about 2 minutes. The Colorado agent had flagged a data leak, not this. The main agent had deployed before the index existed, which ingestion would have created. Found by its post-deploy check and the Azure log. Fixed by creating the index; no stored data changed. DEPLOY.md doesn't mention this ordering yet.
+  - **It launched a stale app and said it had Colorado.** `dotnet build -t:Run` reopened a 19:21 bundle built before the Colorado merge. This is the third time (`ce6c7853`, `3b05f178`). We tested it and got "I don't know"; the agent then found `jurisdiction=US` in the API log and the old DLL timestamp, rebuilt, and checked the new DLL for the picker before reopening.
+  - **Our retest still got "I don't know".** The API log showed the question went in as federal with compare on. The agent asked what the picker showed; we interrupted, and it worked on the next try. The cause wasn't confirmed.
+  - **The Colorado subagent's paid checks only partly ran.** The second document's ingestion was blocked, so its spot check and live `/api/ask` calls never ran. The main agent ran them itself after asking us.
+  - **A cloud upload stopped on a missing file.** The first `co-dr0104` upload stopped because the PDF had only been downloaded inside the subagent's worktree. It was re-run with `--download`.
+  - **The parallel branches collided.** The comparison and voice agents both wrote a DECISIONS #21 and edited the same README and BUILD_PLAN lines. The main agent resolved the conflicts and renumbered.
+  - **The subagent's local load affected our running API.** It loaded Colorado chunks into the shared local Qdrant while our API on port 5080 still ran pre-Colorado code, which could cite Colorado in federal answers. The subagent flagged it, and the main agent restarted 5080 on `main`.
+  - **`--only` runs overwrote the committed `ingest-report.json`.** Reverted.
+  - **The voice agent couldn't test the mic or see the App.** A full-screen screenshot showed our IDE instead, so it stopped trying; we tested the mic.
+- **Tag:** partial
